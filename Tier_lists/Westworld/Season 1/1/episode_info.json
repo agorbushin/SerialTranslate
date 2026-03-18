@@ -1,0 +1,21 @@
+{
+  "series": "Westworld",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "westworld_s1_e1.srt",
+  "analysis_date": "2026-03-18T17:59:01.967515",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 98714623,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 42,
+    "tier_2_random": 125,
+    "tier_3_common": 15,
+    "tier_4_rare_in_series": 11,
+    "tier_5_filtered": 436
+  },
+  "excluded_names_fantasy_count": 32
+}

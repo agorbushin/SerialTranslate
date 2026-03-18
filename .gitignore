@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+venv/
+.venv/
+env/
+
+# Logs and temp
+*.log
+*.tmp
+test_results/
+
+# Large binaries / assets (keep repo small)
+*.zip
+*.pdf
+*.xlsx
+*.png
+
+# Data folders — see docs/DATA_AND_GIT.md for options
+# Uncomment the lines below if you want to exclude these from Git:
+Subtitle/
+translations/
+Archieve/
+
+# Keep: filters/, Tier_lists/, docs/, tests/, *.py, etc. are tracked

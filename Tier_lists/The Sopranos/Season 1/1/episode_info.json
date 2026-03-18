@@ -1,0 +1,21 @@
+{
+  "series": "The Sopranos",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "the_sopranos_s1_e1.srt",
+  "analysis_date": "2026-03-18T17:53:42.021092",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 83635409,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 48,
+    "tier_2_random": 202,
+    "tier_3_common": 23,
+    "tier_4_rare_in_series": 7,
+    "tier_5_filtered": 457
+  },
+  "excluded_names_fantasy_count": 94
+}

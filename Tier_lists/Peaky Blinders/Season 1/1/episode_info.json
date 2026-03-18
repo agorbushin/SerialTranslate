@@ -1,0 +1,21 @@
+{
+  "series": "Peaky Blinders",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "peaky_blinders_s1_e1.srt",
+  "analysis_date": "2026-03-18T18:01:54.254727",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 93253122,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 26,
+    "tier_2_random": 148,
+    "tier_3_common": 17,
+    "tier_4_rare_in_series": 8,
+    "tier_5_filtered": 384
+  },
+  "excluded_names_fantasy_count": 47
+}

@@ -1,0 +1,21 @@
+{
+  "series": "Narcos",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "narcos_s1_e1.srt",
+  "analysis_date": "2026-03-18T17:50:38.077678",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 96020036,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 43,
+    "tier_2_random": 150,
+    "tier_3_common": 22,
+    "tier_4_rare_in_series": 3,
+    "tier_5_filtered": 472
+  },
+  "excluded_names_fantasy_count": 99
+}

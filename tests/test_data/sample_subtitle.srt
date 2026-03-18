@@ -1,0 +1,19 @@
+1
+00:00:01,000 --> 00:00:03,000
+This is a test subtitle with example words.
+
+2
+00:00:04,000 --> 00:00:06,000
+Another line of dialogue for testing purposes.
+
+3
+00:00:07,000 --> 00:00:09,000
+Here is a sample phrase with more words to analyze.
+
+4
+00:00:10,000 --> 00:00:12,000
+The quick brown fox jumps over the lazy dog.
+
+5
+00:00:13,000 --> 00:00:15,000
+Testing translation functionality with various words.

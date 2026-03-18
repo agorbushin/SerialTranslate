@@ -1,0 +1,21 @@
+{
+  "series": "Game Of Thrones S2 E1",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "game_of_thrones_s2_e1.srt",
+  "analysis_date": "2026-03-18T17:12:04.391476",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 76553113,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 50,
+    "tier_2_random": 161,
+    "tier_3_common": 24,
+    "tier_4_rare_in_series": 5,
+    "tier_5_filtered": 440
+  },
+  "excluded_names_fantasy_count": 96
+}

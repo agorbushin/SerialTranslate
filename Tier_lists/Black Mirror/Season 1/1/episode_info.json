@@ -1,0 +1,21 @@
+{
+  "series": "Black Mirror",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "black_mirror_s1_e1.srt",
+  "analysis_date": "2026-03-18T18:08:40.332669",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 91495139,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 22,
+    "tier_2_random": 187,
+    "tier_3_common": 17,
+    "tier_4_rare_in_series": 4,
+    "tier_5_filtered": 361
+  },
+  "excluded_names_fantasy_count": 56
+}
