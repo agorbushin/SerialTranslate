@@ -4,12 +4,12 @@
 
 **Subtitle**: `breaking_bad_s1_e1.srt`
 
-**Analysis**: 2026-03-18 17:48
+**Analysis**: 2026-03-19 19:11
 
 ## Word counts
 
-- Tier 1 (Hard Usable): 22
-- Tier 2 (Random): 101
-- Tier 3 (Common): 11
-- Tier 4 (Rare in Series): 8
-- Tier 5 (Filtered): 368
+- Tier 1 (Hard Usable): 15
+- Tier 2 (Random): 96
+- Tier 3 (Common): 10
+- Tier 4 (Rare in Series): 10
+- Tier 5 (Filtered): 366

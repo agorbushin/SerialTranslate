@@ -83,6 +83,42 @@ def get_translations_episode_dir(
     return base_dir / series_name / season_name / str(episode_number)
 
 
+def _normalize_movie_for_filename(movie_name: str) -> str:
+    """Normalize movie name for filename: same as series."""
+    return _normalize_series_for_filename(movie_name)
+
+
+def get_movie_subtitle_path(base_dir: Path, movie_name: str, year: int) -> Path:
+    """
+    Return the path where a movie subtitle file should be stored (does not download).
+    Path: base_dir / Movies / movie_name / {movie_name}_{year}.srt
+    """
+    base = _normalize_movie_for_filename(movie_name)
+    filename = f"{base}_{year}.srt" if year else f"{base}.srt"
+    return base_dir / "Movies" / movie_name / filename
+
+
+def get_tierlist_movie_dir(base_dir: Path, movie_name: str, year: int) -> Path:
+    """
+    Return the directory where tier list files for a movie should be stored.
+    Path: base_dir / Movies / movie_name / {movie_name}_{year}/
+    """
+    base = _normalize_movie_for_filename(movie_name)
+    folder = f"{base}_{year}" if year else base
+    return base_dir / "Movies" / movie_name / folder
+
+
+def get_translations_movie_dir(base_dir: Path, movie_name: str, year: int) -> Path:
+    """
+    Return the directory where translation files for a movie should be stored.
+    Path: base_dir / Movies / movie_name / {movie_name}_{year}/
+    Same layout as get_tierlist_movie_dir; typically base_dir is "translations".
+    """
+    base = _normalize_movie_for_filename(movie_name)
+    folder = f"{base}_{year}" if year else base
+    return base_dir / "Movies" / movie_name / folder
+
+
 class OpenSubtitlesDownloader:
     """Download subtitles from OpenSubtitles API and save under Subtitle/{series}/{season}/."""
 

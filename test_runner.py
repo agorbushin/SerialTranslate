@@ -23,6 +23,7 @@ import json
 import shutil
 import sys
 import traceback
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -483,6 +484,13 @@ def main() -> None:
         action="store_true",
         help="Print the test plan without executing anything",
     )
+    parser.add_argument(
+        "--parallel",
+        type=int,
+        default=1,
+        metavar="N",
+        help="Run up to N series in parallel (default: 1). Use 2-3 to speed up multi-series runs.",
+    )
     args = parser.parse_args()
 
     # Build series list to test
@@ -498,6 +506,7 @@ def main() -> None:
     if args.dry_run:
         print("DRY RUN — test plan (no changes will be made):")
         print(f"  Judge model: {args.model}")
+        print(f"  Parallel: {args.parallel}")
         print(f"  Series to test ({len(series_to_test)}):")
         for s in series_to_test:
             print(f"    - {s['series']} S{s['season']}E{s['episode']}")
@@ -517,23 +526,77 @@ def main() -> None:
     print(f"Test run started: {timestamp}")
     print(f"Series to test: {len(series_to_test)}")
     print(f"Judge model: {args.model}")
+    print(f"Parallel: {args.parallel}")
     print(f"Results dir: {run_dir.relative_to(BASE_DIR)}")
 
-    all_results: List[Dict[str, Any]] = []
-    for spec in series_to_test:
-        result = run_single(
+    def run_one(spec: Dict[str, Any]) -> Dict[str, Any]:
+        return run_single(
             series=spec["series"],
             season=spec["season"],
             episode=spec["episode"],
             model=args.model,
             skip_download=args.skip_download,
         )
-        all_results.append(result)
 
-        # Save incremental JSON after each series so partial results are preserved
-        (run_dir / "full_report.json").write_text(
-            json.dumps(all_results, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
+    all_results: List[Dict[str, Any]] = []
+    max_workers = min(args.parallel, len(series_to_test)) if args.parallel > 1 else 1
+
+    if max_workers > 1 and len(series_to_test) > 1:
+        all_results = [None] * len(series_to_test)
+
+        def _to_saveable(results: List[Any]) -> List[Dict[str, Any]]:
+            return [
+                r
+                if r is not None
+                else {
+                    "status": "PENDING",
+                    "label": f"{s['series']} S{s['season']}E{s['episode']}",
+                    "series": s["series"],
+                    "season": s["season"],
+                    "episode": s["episode"],
+                }
+                for r, s in zip(results, series_to_test)
+            ]
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_idx = {
+                executor.submit(run_one, spec): i
+                for i, spec in enumerate(series_to_test)
+            }
+            for future in as_completed(future_to_idx):
+                idx = future_to_idx[future]
+                try:
+                    result = future.result()
+                    all_results[idx] = result
+                except Exception as e:
+                    spec = series_to_test[idx]
+                    all_results[idx] = {
+                        "series": spec["series"],
+                        "season": spec["season"],
+                        "episode": spec["episode"],
+                        "label": f"{spec['series']} S{spec['season']}E{spec['episode']}",
+                        "status": "FAILED",
+                        "steps": {},
+                        "completed_at": datetime.now().isoformat(),
+                        "error": str(e),
+                    }
+                    traceback.print_exc()
+                (run_dir / "full_report.json").write_text(
+                    json.dumps(
+                        _to_saveable(all_results),
+                        ensure_ascii=False,
+                        indent=2,
+                    ),
+                    encoding="utf-8",
+                )
+        all_results = _to_saveable(all_results)
+    else:
+        for spec in series_to_test:
+            result = run_one(spec)
+            all_results.append(result)
+            (run_dir / "full_report.json").write_text(
+                json.dumps(all_results, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
 
     save_report(all_results, run_dir)
 

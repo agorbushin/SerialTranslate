@@ -9,6 +9,7 @@ saw,9,50570151,"High English frequency (50,570,151 > 20,000,000)",N/A
 wall,7,74268226,Oxford 3000,A1
 dead,7,48412882,Oxford 3000,A2
 coming,7,70099649,"High English frequency (70,099,649 > 20,000,000)",N/A
+throne,6,4208809,Easy word (easy_words.csv),C2
 lady,6,58395651,Oxford 3000,B1
 told,6,57248600,"High English frequency (57,248,600 > 20,000,000)",N/A
 horse,5,58453720,Oxford 3000,A1
@@ -256,7 +257,6 @@ host,1,62147306,Oxford 3000,B2
 asked,1,75532722,"High English frequency (75,532,722 > 20,000,000)",N/A
 perfect,1,60242920,Oxford 3000,A2
 wake,1,14996908,Oxford 3000,B1
-dragon,1,22370272,"High English frequency (22,370,272 > 20,000,000)",N/A
 began,1,38269468,"High English frequency (38,269,468 > 20,000,000)",N/A
 known,1,86436041,"High English frequency (86,436,041 > 20,000,000)",B2
 cut,1,74169573,Oxford 3000,A2

@@ -31,6 +31,7 @@ dark,5,50740032,Oxford 3000,A1
 depressed,5,3358586,Oxford 3000,B1
 attack,4,55851080,Oxford 3000,B1
 maybe,4,51946944,Oxford 3000,A2
+build,4,83635409,Oxford 3000,A2
 trying,4,57462639,"High English frequency (57,462,639 > 20,000,000)",N/A
 fly,4,33412987,Oxford 3000,A1
 tower,4,28125182,Oxford 3000,B1
@@ -48,6 +49,7 @@ lately,3,5574422,Vocabulary level below C (B1),B1
 couple,3,58208821,Oxford 3000,B1
 pool,3,60024599,Oxford 3000,A2
 happy,3,63486618,Oxford 3000,A1
+mind,3,84923564,Oxford 3000,B1
 bought,3,31501377,"High English frequency (31,501,377 > 20,000,000)",N/A
 hear,3,49163786,"High English frequency (49,163,786 > 20,000,000)",A1
 saying,3,38415068,Easy word (easy_words.csv),C2
@@ -74,6 +76,7 @@ sad,3,13029702,Oxford 3000,A1
 everybody,3,14705200,Oxford 3000,A2
 drop,3,45620690,Oxford 3000,B1
 hate,3,23308836,Oxford 3000,A2
+jesus,3,34929061,"High English frequency (34,929,061 > 20,000,000)",N/A
 seat,2,46137154,Oxford 3000,A2
 physician,2,33643902,"High English frequency (33,643,902 > 20,000,000)",N/A
 blood,2,61544877,Oxford 3000,A2
@@ -97,6 +100,7 @@ changing,2,32076618,"High English frequency (32,076,618 > 20,000,000)",N/A
 situation,2,59151157,Oxford 3000,B1
 wet,2,24090751,Oxford 3000,A2
 ruin,2,6039110,Easy word (easy_words.csv),B1
+remember,2,84324100,Oxford 3000,A1
 stuff,2,82013389,Oxford 3000,B1
 died,2,35803272,"High English frequency (35,803,272 > 20,000,000)",N/A
 worry,2,16187062,Oxford 3000,A2
@@ -226,6 +230,7 @@ occupy,1,3609337,Vocabulary level below C (B2),B2
 gone,1,34511028,"High English frequency (34,511,028 > 20,000,000)",N/A
 volunteer,1,39176660,Oxford 3000,B2
 retirement,1,23373598,"High English frequency (23,373,598 > 20,000,000)",B2
+active,1,84084764,Oxford 3000,B1
 senior,1,67527137,Oxford 3000,B2
 seen,1,78381896,"High English frequency (78,381,896 > 20,000,000)",N/A
 idiot,1,6496256,Vocabulary level below C (B2),B2
@@ -423,6 +428,7 @@ creature,1,11281733,Oxford 3000,B1
 cry,1,13637934,Oxford 3000,A2
 birth,1,40153101,Oxford 3000,B1
 became,1,37332761,"High English frequency (37,332,761 > 20,000,000)",N/A
+connection,1,83878153,Oxford 3000,B1
 afraid,1,10858793,Oxford 3000,A2
 lost,1,74772026,Oxford 3000,A2
 burn,1,23062858,Oxford 3000,B1

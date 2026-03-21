@@ -37,7 +37,6 @@ leave,4,70957750,Oxford 3000,A1
 brain,4,37025785,Oxford 3000,A2
 pretty,4,51699969,Oxford 3000,A2
 worried,4,6610456,Oxford 3000,A2
-mom,4,39068727,"High English frequency (39,068,727 > 20,000,000)",N/A
 accept,4,49819069,Oxford 3000,B1
 shot,4,61225531,Oxford 3000,B2
 coffee,4,42858323,Oxford 3000,A1
@@ -308,7 +307,6 @@ bought,1,31501377,"High English frequency (31,501,377 > 20,000,000)",N/A
 neighborhood,1,28783336,"High English frequency (28,783,336 > 20,000,000)",N/A
 opened,1,23076347,"High English frequency (23,076,347 > 20,000,000)",N/A
 smell,1,8940822,Oxford 3000,B1
-french,1,81440411,"High English frequency (81,440,411 > 20,000,000)",N/A
 cheese,1,16704436,Oxford 3000,A1
 pop,1,57137816,Oxford 3000,A2
 mistake,1,18974243,Oxford 3000,A2
@@ -326,7 +324,6 @@ nicely,1,4366949,Vocabulary level below C (B2),B2
 adjust,1,10384172,Vocabulary level below C (B2),B2
 nut,1,15509690,Oxford 3000,B2
 named,1,34099544,"High English frequency (34,099,544 > 20,000,000)",N/A
-german,1,56375982,"High English frequency (56,375,982 > 20,000,000)",N/A
 fan,1,76335616,Oxford 3000,A2
 remember,1,84324100,Oxford 3000,A1
 saw,1,50570151,"High English frequency (50,570,151 > 20,000,000)",N/A
@@ -465,6 +462,7 @@ army,1,46902606,Oxford 3000,C2
 boot,1,39793652,Oxford 3000,A2
 idea,1,65459222,Oxford 3000,A2
 excellent,1,60316327,Oxford 3000,A2
+else,1,96020036,Oxford 3000,A2
 learned,1,23121323,"High English frequency (23,121,323 > 20,000,000)",N/A
 complicated,1,8423441,Oxford 3000,B1
 relative,1,26646324,Oxford 3000,B1

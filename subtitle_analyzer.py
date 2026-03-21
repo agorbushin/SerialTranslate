@@ -280,6 +280,29 @@ def extract_series_info(subtitle_path: Path) -> Dict[str, Optional[str]]:
     return {"series": series_name or "Unknown", "season": season, "episode": episode}
 
 
+def extract_movie_info(subtitle_path: Path) -> Dict[str, Optional[str]]:
+    """Extract movie name and year from path like .../Movies/Inception/Inception_2010.srt."""
+    parts = subtitle_path.parts
+    movie_name = None
+    year = None
+    if "Movies" in parts:
+        idx = parts.index("Movies")
+        if idx + 1 < len(parts):
+            movie_name = parts[idx + 1]
+        m = re.search(r"_?(19|20)\d{2}$", subtitle_path.stem)
+        if m:
+            year = m.group(0).lstrip("_")  # e.g. "2010"
+    if not movie_name:
+        stem = subtitle_path.stem
+        m = re.search(r"^(.+?)_((?:19|20)\d{2})$", stem)
+        if m:
+            movie_name = m.group(1).replace("_", " ").replace(".", " ").strip().title()
+            year = m.group(2)  # full 4-digit year
+        else:
+            movie_name = stem.replace("_", " ").replace(".", " ").strip().title() or "Unknown"
+    return {"series": movie_name or "Unknown", "year": year}
+
+
 def save_tierlist_results_to_dir(
     tiers: Dict[str, List],
     output_episode_dir: Path,
@@ -292,18 +315,33 @@ def save_tierlist_results_to_dir(
     episode_number: int,
     excluded_words: Optional[Set[str]] = None,
     c1_assessment: Optional[Dict[str, str]] = None,
+    is_movie: bool = False,
+    movie_year: Optional[int] = None,
 ) -> None:
     """Write tier CSVs, episode_info.json, and README to output_episode_dir (Tier_lists layout).
     If excluded_words is set, rows whose word (lowercase) is in it are omitted (name/fantasy filter).
     Words with vocabulary level below C (A1, A2, B1, B2) are omitted when level is determined.
+    For tier-1 specifically, words rated "low" by c1_assessment (C1 speakers likely know them)
+    are also excluded so the list contains only genuinely advanced vocabulary.
     """
     excluded_lower = {w.lower() for w in (excluded_words or set())}
     LEVELS_BELOW_C = ("A1", "A2", "B1", "B2")
 
-    def keep(item: tuple, *, apply_level_filter: bool = True) -> bool:
+    # Build lowercase c1_assessment lookup for fast filtering
+    c1_lower: Dict[str, str] = {}
+    if c1_assessment:
+        for w, v in c1_assessment.items():
+            c1_lower[w.lower()] = str(v).lower()
+
+    def keep(item: tuple, *, apply_level_filter: bool = True, apply_c1_filter: bool = False) -> bool:
         word = (item[0] or "").strip().lower()
         if word in excluded_lower:
             return False
+        # Drop words the GPT c1_assessment rated "low" (C1 speakers very likely know them)
+        if apply_c1_filter and c1_lower:
+            rating = c1_lower.get(word, "")
+            if rating == "low":
+                return False
         if apply_level_filter:
             vocab = (item[-1] if item else None) or ""
             level = str(vocab).strip().upper()
@@ -312,7 +350,11 @@ def save_tierlist_results_to_dir(
         return True
 
     output_episode_dir.mkdir(parents=True, exist_ok=True)
-    season_label = f"Season {season_number}"
+    season_label = (
+        f"Movie ({movie_year})" if is_movie and movie_year
+        else "Movie" if is_movie
+        else f"Season {season_number}"
+    )
     tier_files_map = {
         "tier_1_hard_usable": "tier_1_hard_usable_words.csv",
         "tier_2_random": "tier_2_random_words.csv",
@@ -322,9 +364,11 @@ def save_tierlist_results_to_dir(
     }
     word_counts = {}
     for tier_key, filename in tier_files_map.items():
-        # Tier 5 holds filtered-out words (including below-C); do not drop them by level when writing
+        # Tier 5 holds filtered-out words; do not re-filter by level or c1 when writing
         apply_level = tier_key != "tier_5_filtered"
-        items = [it for it in tiers.get(tier_key, []) if keep(it, apply_level_filter=apply_level)]
+        # Only apply the c1_assessment "low" filter to tier-1 (the "hard words to learn" list)
+        apply_c1 = tier_key == "tier_1_hard_usable"
+        items = [it for it in tiers.get(tier_key, []) if keep(it, apply_level_filter=apply_level, apply_c1_filter=apply_c1)]
         word_counts[tier_key] = len(items)
         filepath = output_episode_dir / filename
         with open(filepath, "w", newline="", encoding="utf-8") as f:
@@ -359,6 +403,9 @@ def save_tierlist_results_to_dir(
         },
         "word_counts": word_counts,
     }
+    if is_movie and movie_year is not None:
+        metadata["is_movie"] = True
+        metadata["year"] = movie_year
     if excluded_words:
         metadata["excluded_names_fantasy_count"] = len(excluded_words)
     if excluded_words is not None or c1_assessment:
@@ -372,9 +419,10 @@ def save_tierlist_results_to_dir(
     (output_episode_dir / "episode_info.json").write_text(
         json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8"
     )
+    ep_label = "" if is_movie else f", Episode {episode_number}"
     readme = (
         f"# {series_name} - Word Tier List\n\n"
-        f"**{season_label}, Episode {episode_number}**\n\n"
+        f"**{season_label}{ep_label}**\n\n"
         f"**Subtitle**: `{subtitle_path.name}`\n\n"
         f"**Analysis**: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
         "## Word counts\n\n"
@@ -446,6 +494,8 @@ def run_pipeline(
     series_name: Optional[str] = None,
     season_number: Optional[int] = None,
     episode_number: Optional[int] = None,
+    is_movie: bool = False,
+    year: Optional[int] = None,
     freq_path: Optional[Path] = None,
     filters_dir: Optional[Path] = None,
     max_english_freq: int = 20_000_000,
@@ -512,7 +562,15 @@ def run_pipeline(
     if not tierlist_base_dir:
         return None
     tierlist_base_dir = tierlist_base_dir.resolve()
-    if series_name is None or season_number is None or episode_number is None:
+    if is_movie:
+        if series_name is None or year is None:
+            info = extract_movie_info(subtitle_path)
+            series_name = info["series"]
+            if year is None and info.get("year"):
+                year = int(info["year"])
+        season_number = 0
+        episode_number = 0
+    elif series_name is None or season_number is None or episode_number is None:
         info = extract_series_info(subtitle_path)
         series_name = info["series"]
         if info["season"] and info["episode"]:
@@ -556,10 +614,15 @@ def run_pipeline(
         except Exception as e:
             print(f"Warning: Name/fantasy filter failed ({e}), saving tier lists without filtering")
 
-    from download_subtitles import get_tierlist_episode_dir
-    output_episode_dir = get_tierlist_episode_dir(
-        tierlist_base_dir, series_name, season_number, episode_number
-    )
+    from download_subtitles import get_tierlist_episode_dir, get_tierlist_movie_dir
+    if is_movie:
+        output_episode_dir = get_tierlist_movie_dir(
+            tierlist_base_dir, series_name, year or 0
+        )
+    else:
+        output_episode_dir = get_tierlist_episode_dir(
+            tierlist_base_dir, series_name, season_number, episode_number
+        )
     save_tierlist_results_to_dir(
         tiers,
         output_episode_dir,
@@ -572,6 +635,8 @@ def run_pipeline(
         episode_number,
         excluded_words=excluded_words,
         c1_assessment=c1_assessment,
+        is_movie=is_movie,
+        movie_year=year if is_movie else None,
     )
     if debug_output_dir and HAS_MATPLOTLIB:
         create_frequency_plot(tiers, series_threshold, english_threshold, debug_output_dir)
@@ -585,6 +650,8 @@ def main() -> None:
     parser.add_argument("--series", type=str, help="Series name (default: from filename)")
     parser.add_argument("--season", type=int, help="Season number (default: from filename)")
     parser.add_argument("--episode", type=int, help="Episode number (default: from filename)")
+    parser.add_argument("--movie", action="store_true", help="Treat as movie (use Tier_lists/Movies/... path)")
+    parser.add_argument("--year", type=int, default=None, help="Movie release year (for movies)")
     parser.add_argument("--freq-list", type=Path, help="English frequency CSV")
     parser.add_argument("--max-english-freq", type=int, default=20_000_000, help="Max English freq for Tier 1")
     parser.add_argument("--min-length", type=int, default=3, help="Min word length")
@@ -614,6 +681,8 @@ def main() -> None:
         series_name=args.series,
         season_number=args.season,
         episode_number=args.episode,
+        is_movie=args.movie,
+        year=args.year,
         freq_path=args.freq_list or base_dir / "Frequency list" / "English" / "unigram_freq.csv",
         max_english_freq=args.max_english_freq,
         min_length=args.min_length,

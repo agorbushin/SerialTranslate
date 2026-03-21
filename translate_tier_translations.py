@@ -2,18 +2,21 @@
 """
 Translate tier-1 (hard usable) words to Russian using ChatGPT.
 Reads words from tier_1_hard_usable_words.csv and subtitle context from an SRT file.
-Sends up to 10 words per API request and saves results under translations/{series}/Season {N}/{episode}/.
+Sends 1 word per API request (gpt-4o-mini) for maximum per-word context focus.
 """
 
 import csv
 import json
 import re
 import os
+import asyncio
+import time
 from pathlib import Path
 from typing import List, Dict, Optional, Any
 import argparse
 
-BATCH_SIZE = 10
+BATCH_SIZE = 1
+MAX_CONCURRENT_BATCHES = 5
 SUBTITLE_CONTEXT_CHARS = 6000
 TRANSLATIONS_BASE_DIR = Path("translations")
 SUBTITLE_BASE_DIR = Path("Subtitle")
@@ -131,16 +134,21 @@ def resolve_subtitle_path(
     if explicit_subtitle is not None:
         return explicit_subtitle if explicit_subtitle.exists() else None
     series = episode_info.get("series") or ""
-    season_number = episode_info.get("season_number")
     subtitle_file = episode_info.get("subtitle_file") or ""
-    if not series or season_number is None or not subtitle_file:
+    if not series or not subtitle_file:
         return None
-    season_name = f"Season {season_number}"
-    path = subtitle_base_dir / series / season_name / subtitle_file
+    if episode_info.get("is_movie"):
+        path = subtitle_base_dir / "Movies" / series / subtitle_file
+    else:
+        season_number = episode_info.get("season_number")
+        if season_number is None:
+            return None
+        season_name = f"Season {season_number}"
+        path = subtitle_base_dir / series / season_name / subtitle_file
     return path if path.exists() else None
 
 
-def translate_batch(
+async def translate_batch(
     client: Any,
     words: List[str],
     subtitle_context: str,
@@ -180,25 +188,46 @@ RULES:
 - Translation must be short and dictionary-like: maximum 4-5 words.
 - Prefer the meaning that appears in the EXAMPLE LINES above; if there are no examples for a word, use the subtitle context and the series setting.
 - For period/fantasy series, prefer setting-appropriate terms (e.g. maid as servant = служанка; appropriate register for nobility/war).
-- If a word is a character name, fantasy entity, or a geographical/place name (city, region, kingdom, river, etc.), do NOT translate it: output an empty string for that key.
 - Avoid generic or default dictionary sense when the context clearly suggests a more specific sense (e.g. beating in a fight context; raped as in the dialogue).
+- NEVER phonetically transcribe English sounds into Russian. Always use a real Russian dictionary word.
+  Wrong: "cockroach" → "Кокроча"   Right: "cockroach" → "таракан"
+  Wrong: "erm" → "эм"              Right: "erm" → "э-э (звук колебания)"
+  If a word has no clean Russian equivalent, use the closest semantic meaning — never a phonetic copy.
+- If you are genuinely unsure of a word's meaning in context, leave its value as an empty string "".
 - Output ONLY a JSON object with the exact English word as key and the {target_language} translation as value. No explanation.
 - Example format: {{"word1": "translation1", "word2": "translation2"}}
 
 Respond with a single JSON object only."""
 
+    response = None
+    for attempt in range(4):
+        if attempt > 0:
+            wait = 15 * (2 ** (attempt - 1))  # 15s, 30s, 60s
+            print(f"    translate retry {attempt}/3 after {wait}s...")
+            await asyncio.sleep(wait)
+        try:
+            response = await client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are a precise Russian dictionary translator. You respond only with valid JSON. No markdown, no extra text. Never phonetically transcribe — always use real Russian words."},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.1,
+                timeout=90.0,
+            )
+            break
+        except Exception as e:
+            err = str(e)
+            if "429" not in err and "rate" not in err.lower():
+                print(f"  API error: {e}")
+                return {}
+            if attempt == 3:
+                print(f"  API error after retries: {e}")
+                return {}
+
+    if not response or not response.choices or not response.choices[0].message:
+        return {}
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You respond only with valid JSON. No markdown, no extra text."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.2,
-            timeout=60.0,
-        )
-        if not response or not response.choices or not response.choices[0].message:
-            return {}
         content = (response.choices[0].message.content or "").strip()
         # Strip markdown code block if present
         if content.startswith("```"):
@@ -210,9 +239,6 @@ Respond with a single JSON object only."""
         return {k: (v if isinstance(v, str) else str(v)).strip() for k, v in result.items()}
     except json.JSONDecodeError as e:
         print(f"  JSON error for batch: {e}")
-        return {}
-    except Exception as e:
-        print(f"  API error: {e}")
         return {}
 
 
@@ -255,7 +281,7 @@ def run(
         return False, msg
 
     subtitle_text = get_subtitle_text(srt_path)
-    examples = extract_examples_from_subtitle(srt_path, words, max_per_word=2)
+    examples = extract_examples_from_subtitle(srt_path, words, max_per_word=3)
     print(f"Loaded {len(words)} words, subtitle context {len(subtitle_text)} chars.")
 
     api_key = api_key or os.environ.get("OPENAI_API_KEY")
@@ -286,23 +312,91 @@ def run(
     client = OpenAI(api_key=api_key)
     all_translations: Dict[str, str] = {}
 
+    async def translate_all_parallel() -> None:
+        nonlocal all_translations
+        from openai import AsyncOpenAI
+
+        async_client = AsyncOpenAI(api_key=api_key)
+        semaphore = asyncio.Semaphore(MAX_CONCURRENT_BATCHES)
+
+        async def translate_one(batch_words: List[str], batch_index: int) -> Dict[str, str]:
+            async with semaphore:
+                # One request per batch (BATCH_SIZE currently 1)
+                print(
+                    f"  Translating batch {batch_index}/{(len(words) + BATCH_SIZE - 1) // BATCH_SIZE}: {batch_words[0]!r}..."
+                )
+                return await translate_batch(
+                    async_client, batch_words, subtitle_text, series_name, examples
+                )
+
+        batches: List[List[str]] = [
+            words[i : i + BATCH_SIZE] for i in range(0, len(words), BATCH_SIZE)
+        ]
+        tasks = [
+            translate_one(batch_words, idx + 1) for idx, batch_words in enumerate(batches)
+        ]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        for batch_words, result in zip(batches, results):
+            if isinstance(result, Exception):
+                continue
+            for w in batch_words:
+                all_translations[w] = result.get(w) or ""
+
+        await async_client.close()
+
     try:
-        for i in range(0, len(words), BATCH_SIZE):
-            batch = words[i : i + BATCH_SIZE]
-            print(f"  Translating batch {i // BATCH_SIZE + 1}/{(len(words) + BATCH_SIZE - 1) // BATCH_SIZE} ({len(batch)} words)...")
-            batch_result = translate_batch(
-                client, batch, subtitle_text, series_name, examples
-            )
-            for w in batch:
-                all_translations[w] = batch_result.get(w) or ""
+        asyncio.run(translate_all_parallel())
     except Exception as e:
         msg = f"Translation API error: {str(e)[:80]}"
         print(msg)
         return False, msg
 
+    # Retry pass: re-translate any words that came back empty
+    empty_words = [w for w in words if not all_translations.get(w, "").strip()]
+    if empty_words:
+        print(f"  Retry pass: {len(empty_words)} empty translations...")
+        try:
+            async def retry_parallel() -> None:
+                nonlocal all_translations
+                from openai import AsyncOpenAI
+
+                retry_client = AsyncOpenAI(api_key=api_key)
+                semaphore = asyncio.Semaphore(MAX_CONCURRENT_BATCHES)
+
+                async def retry_one(batch_words: List[str]) -> Dict[str, str]:
+                    async with semaphore:
+                        return await translate_batch(
+                            retry_client, batch_words, subtitle_text, series_name, examples
+                        )
+
+                retry_batches: List[List[str]] = [
+                    empty_words[i : i + BATCH_SIZE]
+                    for i in range(0, len(empty_words), BATCH_SIZE)
+                ]
+                tasks = [retry_one(b) for b in retry_batches]
+                results = await asyncio.gather(*tasks, return_exceptions=True)
+                for batch_words, result in zip(retry_batches, results):
+                    if isinstance(result, Exception):
+                        continue
+                    for w in batch_words:
+                        filled = (result.get(w) or "").strip()
+                        if filled:
+                            all_translations[w] = filled
+
+                await retry_client.close()
+
+            asyncio.run(retry_parallel())
+        except Exception as e:
+            print(f"  Retry pass error (non-fatal): {e}")
+
     base = (translations_base or TRANSLATIONS_BASE_DIR).resolve()
-    from download_subtitles import get_translations_episode_dir
-    out_dir = get_translations_episode_dir(base, series_name, season_number, episode_number)
+    from download_subtitles import get_translations_episode_dir, get_translations_movie_dir
+    if episode_info.get("is_movie"):
+        year = int(episode_info.get("year", 0))
+        out_dir = get_translations_movie_dir(base, series_name, year)
+    else:
+        out_dir = get_translations_episode_dir(base, series_name, season_number, episode_number)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     csv_path = out_dir / "tier_1_translations.csv"
@@ -319,6 +413,9 @@ def run(
         "source_subtitle": srt_path.name,
         "translated_at": __import__("datetime").datetime.now().isoformat(),
     }
+    if episode_info.get("is_movie"):
+        info["is_movie"] = True
+        info["year"] = int(episode_info.get("year", 0))
     (out_dir / "translation_info.json").write_text(
         json.dumps(info, indent=2, ensure_ascii=False), encoding="utf-8"
     )

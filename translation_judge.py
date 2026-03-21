@@ -23,6 +23,7 @@ import json
 import os
 import re
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -378,26 +379,40 @@ def judge_translations(
     client = OpenAI(api_key=resolved_key)
     print(f"  Calling {model} judge for {series_name} S{season}E{episode} ({len(pairs)} words)...")
 
-    try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a rigorous translation quality evaluator. "
-                        "You reason carefully through each criterion before scoring. "
-                        "You respond only with valid JSON — no markdown fences, no extra text."
-                    ),
-                },
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.1,
-            response_format={"type": "json_object"},
-            timeout=120.0,
-        )
-    except Exception as e:
-        result["error"] = f"OpenAI API call failed: {str(e)[:120]}"
+    response = None
+    last_error: Optional[str] = None
+    for attempt in range(4):
+        if attempt > 0:
+            wait = 30 * (2 ** (attempt - 1))  # 30s, 60s, 120s
+            print(f"  Judge retry {attempt}/3 after {wait}s (rate limit)...")
+            time.sleep(wait)
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a rigorous translation quality evaluator. "
+                            "You reason carefully through each criterion before scoring. "
+                            "You respond only with valid JSON — no markdown fences, no extra text."
+                        ),
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.1,
+                response_format={"type": "json_object"},
+                timeout=120.0,
+            )
+            last_error = None
+            break
+        except Exception as e:
+            last_error = str(e)
+            if "429" not in last_error and "rate" not in last_error.lower():
+                break  # non-rate-limit error — no point retrying
+
+    if response is None:
+        result["error"] = f"OpenAI API call failed: {(last_error or 'unknown')[:120]}"
         return result
 
     # --- Parse response ---

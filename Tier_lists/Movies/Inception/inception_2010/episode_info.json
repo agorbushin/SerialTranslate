@@ -1,0 +1,22 @@
+{
+  "series": "Inception",
+  "season": "Movie (2010)",
+  "season_number": 0,
+  "episode_number": 0,
+  "subtitle_file": "inception_2010.srt",
+  "analysis_date": "2026-03-19T14:33:39.752290",
+  "thresholds": {
+    "series_threshold": 3,
+    "english_threshold": 74326492,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 42,
+    "tier_2_random": 305,
+    "tier_3_common": 24,
+    "tier_4_rare_in_series": 23,
+    "tier_5_filtered": 595
+  },
+  "is_movie": true,
+  "year": 2010
+}

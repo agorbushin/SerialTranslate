@@ -4,17 +4,19 @@ Filter tier lists: remove words that are character names or fantasy entities
 using ChatGPT (OpenAI API). Based on archive telegram_bot.filter_names_and_fantasy_entities.
 """
 
+import asyncio
 import csv
 import json
 import os
 import re
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple, Union
 
-from openai import OpenAI
+from openai import AsyncOpenAI, OpenAI
 
 # Model for name/fantasy filtering (same as archive)
 NAME_FILTER_MODEL = "gpt-4o"
+MAX_CONCURRENT_BATCHES = 3
 
 # Default API key: env, then fallback from project telegram_bot (which may load from archive)
 def _default_api_key() -> str:
@@ -54,28 +56,11 @@ def get_subtitle_text(subtitle_path: Path) -> str:
         return ""
 
 
-def filter_names_and_fantasy_entities(
-    words: List[str],
-    subtitle_text: str,
-    series_name: str,
-    openai_client: OpenAI,
-    batch_size: int = 50,
-) -> Tuple[Set[str], Dict[str, str]]:
-    """
-    Use ChatGPT to identify character names and fantasy entities to exclude, and for
-    non-excluded words assess how likely a C1-level English speaker would NOT know the word.
-    Returns (excluded_set, c1_assessment) where c1_assessment[word] is "high"|"medium"|"low"
-    (likelihood unknown to C1) or "name/fantasy" for excluded words.
-    """
-    if not words:
-        return set(), {}
-    all_excluded: Set[str] = set()
-    c1_assessment: Dict[str, str] = {}
-    for batch_start in range(0, len(words), batch_size):
-        words_batch = words[batch_start : batch_start + batch_size]
-        context = subtitle_text[:4000] if len(subtitle_text) > 4000 else subtitle_text
-        words_text = ", ".join(f'"{w}"' for w in words_batch)
-        prompt = f"""You are analyzing words from the TV series "{series_name}".
+def _build_filter_prompt(words_batch: List[str], subtitle_text: str, series_name: str) -> str:
+    """Build the prompt for a single batch of words."""
+    context = subtitle_text[:4000] if len(subtitle_text) > 4000 else subtitle_text
+    words_text = ", ".join(f'"{w}"' for w in words_batch)
+    return f"""You are analyzing words from the TV series "{series_name}".
 
 WORDS TO CHECK:
 {words_text}
@@ -94,51 +79,149 @@ Return ONLY a JSON object with this structure (you MUST include every word from 
 }}
 
 Rules:
-1. **exclude**: List only words that are fantasy/character names, geographical names (places, countries, cities, regions), or made-up (not real English). Do NOT exclude real English vocabulary (e.g. armor, commander, seagull, knight, heir, crying).
 
-2. **c1_assessment**: For EVERY word in the list, set exactly one value:
-   - **"name/fantasy"** — if the word is in "exclude" (character name, geographical name, or made-up word).
-   - **"high"** — if it is real English and a C1-level speaker is LIKELY NOT to know it (specialized, rare, or advanced vocabulary).
-   - **"medium"** — if it is real English and a C1 speaker MIGHT not know it (uncommon but not rare).
-   - **"low"** — if it is real English and a C1 speaker is LIKELY to know it (common vocabulary).
+1. **exclude**: List words that must be removed from a vocabulary learning list:
+   - Character names (e.g. "walter", "tyrion", "escobar")
+   - Real people's names (e.g. "nixon", "pinochet")
+   - Geographical names: countries, cities, regions (e.g. "colombia", "peru", "aspen", "brooklyn")
+   - Brand names (e.g. "twitter", "prozac")
+   - Made-up/non-English words not in a standard English dictionary
+   Do NOT exclude real English vocabulary even if it sounds foreign (e.g. "armor", "smuggling", "seagull").
 
-Use C1 (Common European Framework) as reference: C1 speakers have a large vocabulary but may not know specialized, literary, or very rare words.
+2. **c1_assessment**: For EVERY word, assign exactly one value.
+   C1 (CEFR) speakers are advanced — they have a large active vocabulary but may not know rare,
+   specialized, or literary words. Use these benchmarks:
+
+   - **"high"** — genuinely advanced; a C1 speaker would LIKELY NOT know it.
+     Examples: "laconic", "usurp", "nefarious", "skulk", "obsequious", "phosphine",
+               "aberrant", "decommission", "trafficker", "contraband", "volumetric"
+
+   - **"medium"** — uncommon but not rare; a C1 speaker MIGHT not know it.
+     Examples: "smuggling", "bookmaker", "blinder", "diagnostic", "eggplant", "emerald"
+
+   - **"low"** — common; a C1 speaker almost certainly knows it. DO NOT use "low" sparingly —
+     be strict. If in doubt between "low" and "medium", choose "low".
+     Examples: "loved", "stopped", "sitting", "dude", "garbage", "elevator", "mommy",
+               "fake", "lying", "drunk", "cop", "punch", "drove", "tired", "smiled",
+               "eating", "running", "shooting", "talking", "crying", "listening"
+
+   - **"name/fantasy"** — if the word is in "exclude".
 
 Return the JSON:"""
 
-        try:
-            response = openai_client.chat.completions.create(
-                model=NAME_FILTER_MODEL,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You identify fantasy names, geographical names (places, countries, cities, regions), and made-up words vs real English. Rate how likely a C1 speaker would NOT know each real English word. Respond with valid JSON only. Include every word in c1_assessment.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.2,
-                response_format={"type": "json_object"},
-            )
-            result = json.loads(response.choices[0].message.content)
-            batch_excluded = set(result.get("exclude", []))
-            batch_c1 = result.get("c1_assessment") or {}
-            for w in batch_excluded:
-                all_excluded.add(w.lower() if isinstance(w, str) else str(w).lower())
-            for w, val in batch_c1.items():
-                if isinstance(w, str) and isinstance(val, str):
-                    c1_assessment[w.strip()] = val.strip().lower()
-            # Normalize keys to match original casing from words_batch where possible
-            for w in words_batch:
-                w_lower = w.lower()
-                if w_lower not in c1_assessment and w not in c1_assessment:
-                    for k, v in list(batch_c1.items()):
-                        if k.lower() == w_lower:
-                            c1_assessment[w] = v.strip().lower()
-                            break
-            print(f"  Batch {batch_start // batch_size + 1}: flagged {len(batch_excluded)} words, C1 assessment for {len(batch_c1)} words")
-        except Exception as e:
-            print(f"  Error filtering batch: {e}")
+
+async def filter_names_and_fantasy_entities_async(
+    words: List[str],
+    subtitle_text: str,
+    series_name: str,
+    async_client: AsyncOpenAI,
+    batch_size: int = 20,
+    max_concurrent: int = MAX_CONCURRENT_BATCHES,
+) -> Tuple[Set[str], Dict[str, str]]:
+    """
+    Async version: Use ChatGPT to identify character names and fantasy entities.
+    Processes batches in parallel with a semaphore for rate limiting.
+    Returns (excluded_set, c1_assessment).
+    """
+    if not words:
+        return set(), {}
+    all_excluded: Set[str] = set()
+    c1_assessment: Dict[str, str] = {}
+    semaphore = asyncio.Semaphore(max_concurrent)
+
+    async def process_batch(words_batch: List[str], batch_num: int) -> Tuple[Set[str], Dict[str, str]]:
+        async with semaphore:
+            prompt = _build_filter_prompt(words_batch, subtitle_text, series_name)
+            try:
+                response = await async_client.chat.completions.create(
+                    model=NAME_FILTER_MODEL,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": (
+                                "You identify names, geographical names, brand names, and made-up words "
+                                "that should be excluded from English vocabulary learning lists. "
+                                "For real English words, you rate whether a C1 (CEFR advanced) speaker "
+                                "would likely know them: 'high' = probably unknown, 'medium' = possibly unknown, "
+                                "'low' = almost certainly known. Be strict: everyday verbs, common nouns, and "
+                                "basic adjectives are always 'low'. Respond with valid JSON only."
+                            ),
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=0.1,
+                    response_format={"type": "json_object"},
+                )
+                result = json.loads(response.choices[0].message.content)
+                batch_excluded = set(result.get("exclude", []))
+                batch_c1 = result.get("c1_assessment") or {}
+                print(f"  Batch {batch_num}: flagged {len(batch_excluded)} words, C1 assessment for {len(batch_c1)} words")
+                return batch_excluded, batch_c1
+            except Exception as e:
+                print(f"  Error filtering batch {batch_num}: {e}")
+                return set(), {}
+
+    batches = [
+        (words[i : i + batch_size], i // batch_size + 1)
+        for i in range(0, len(words), batch_size)
+    ]
+    results = await asyncio.gather(*[
+        process_batch(words_batch, batch_num)
+        for words_batch, batch_num in batches
+    ])
+
+    for (words_batch, _), (batch_excluded, batch_c1) in zip(batches, results):
+        for w in batch_excluded:
+            all_excluded.add(w.lower() if isinstance(w, str) else str(w).lower())
+        for w, val in batch_c1.items():
+            if isinstance(w, str) and isinstance(val, str):
+                c1_assessment[w.strip()] = val.strip().lower()
+        for w in words_batch:
+            w_lower = w.lower()
+            if w_lower not in c1_assessment and w not in c1_assessment:
+                for k, v in list(batch_c1.items()):
+                    if k.lower() == w_lower:
+                        c1_assessment[w] = v.strip().lower()
+                        break
     return all_excluded, c1_assessment
+
+
+def filter_names_and_fantasy_entities(
+    words: List[str],
+    subtitle_text: str,
+    series_name: str,
+    openai_client: Union[OpenAI, AsyncOpenAI],
+    batch_size: int = 20,
+) -> Tuple[Set[str], Dict[str, str]]:
+    """
+    Use ChatGPT to identify character names and fantasy entities to exclude, and for
+    non-excluded words assess how likely a C1-level English speaker would NOT know the word.
+    Returns (excluded_set, c1_assessment) where c1_assessment[word] is "high"|"medium"|"low"
+    (likelihood unknown to C1) or "name/fantasy" for excluded words.
+
+    Processes batches in parallel when given an AsyncOpenAI client; otherwise uses
+    asyncio.run() with AsyncOpenAI created from the sync client's api_key.
+    """
+    if not words:
+        return set(), {}
+    if isinstance(openai_client, AsyncOpenAI):
+        return asyncio.run(filter_names_and_fantasy_entities_async(
+            words, subtitle_text, series_name, openai_client, batch_size
+        ))
+    api_key = getattr(openai_client, "api_key", None)
+    if not api_key:
+        raise ValueError("OpenAI client must have api_key for parallel filtering")
+    async_client = AsyncOpenAI(api_key=api_key)
+
+    async def _run() -> Tuple[Set[str], Dict[str, str]]:
+        try:
+            return await filter_names_and_fantasy_entities_async(
+                words, subtitle_text, series_name, async_client, batch_size
+            )
+        finally:
+            await async_client.close()
+
+    return asyncio.run(_run())
 
 
 def get_all_words_from_episode_tiers(

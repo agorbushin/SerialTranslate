@@ -11,7 +11,6 @@ happy,6,63486618,Oxford 3000,A1
 nothing,5,73363579,Oxford 3000,A2
 jesus,5,34929061,"High English frequency (34,929,061 > 20,000,000)",N/A
 cow,5,12084295,Oxford 3000,A1
-bacon,4,5385205,Vocabulary level below C (B1),B1
 till,4,16477131,Oxford 3000,A2
 eat,4,32034082,Oxford 3000,A1
 wrong,4,49934294,Oxford 3000,A1
@@ -42,7 +41,6 @@ guy,3,82889911,Oxford 3000,A2
 gone,3,34511028,"High English frequency (34,511,028 > 20,000,000)",N/A
 pant,3,19912941,Oxford 3000,N/A
 shut,3,12663576,Oxford 3000,A2
-christ,2,28486624,"High English frequency (28,486,624 > 20,000,000)",N/A
 matter,2,96529766,Easy word (easy_words.csv),A2
 believe,2,75918053,Oxford 3000,A2
 taste,2,20925313,Oxford 3000,B1
@@ -100,7 +98,6 @@ straight,2,32760917,Oxford 3000,A2
 crazy,2,23174564,Oxford 3000,A2
 tomorrow,2,21262762,Oxford 3000,A1
 tight,2,20005001,Oxford 3000,B1
-jean,2,34822067,Oxford 3000,N/A
 whatever,2,31901912,Oxford 3000,B1
 inch,2,63696489,Oxford 3000,B1
 acceptable,2,14590887,Oxford 3000,B1
@@ -344,6 +341,7 @@ basic,1,97156959,Oxford 3000,B1
 glad,1,14607042,Oxford 3000,A2
 iron,1,35668530,Oxford 3000,B1
 chef,1,11974633,Oxford 3000,A2
+vice,1,33215970,Easy word (easy_words.csv),C2
 personally,1,14373028,Oxford 3000,B1
 train,1,40164074,Oxford 3000,A1
 mouth,1,24325805,Oxford 3000,A1

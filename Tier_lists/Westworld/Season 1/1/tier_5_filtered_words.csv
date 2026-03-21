@@ -51,6 +51,7 @@ narrative,3,6865202,Oxford 3000,C2
 roll,3,39810763,Oxford 3000,B1
 stop,3,86868060,Oxford 3000,A1
 hang,3,13364783,Oxford 3000,B1
+perhap,3,42450144,Oxford 3000,N/A
 deep,3,53536903,Oxford 3000,A2
 happened,3,24951096,"High English frequency (24,951,096 > 20,000,000)",N/A
 behavior,3,37145825,"High English frequency (37,145,825 > 20,000,000)",N/A
@@ -366,7 +367,6 @@ blood,1,61544877,Oxford 3000,A2
 complicated,1,8423441,Oxford 3000,B1
 scenery,1,3907615,Vocabulary level below C (B1),B1
 couple,1,58208821,Oxford 3000,B1
-indian,1,64021150,"High English frequency (64,021,150 > 20,000,000)",N/A
 wisdom,1,12780590,Vocabulary level below C (B2),B2
 ancient,1,23888596,Oxford 3000,B1
 culture,1,79296976,Oxford 3000,B1
@@ -380,7 +380,6 @@ considerable,1,10518680,Vocabulary level below C (B2),B2
 effort,1,78950684,Oxford 3000,B1
 lack,1,35178494,Oxford 3000,B2
 inspire,1,4614369,Oxford 3000,B2
-gif,1,55673869,"High English frequency (55,673,869 > 20,000,000)",N/A
 barely,1,6764292,Easy word (easy_words.csv),B2
 contain,1,84698441,Oxford 3000,B1
 train,1,40164074,Oxford 3000,A1

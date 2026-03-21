@@ -1,7 +1,6 @@
 word,series_frequency,english_frequency,vocabulary_level
 mama,1,5042818,N/A
 christening,1,1332232,N/A
-kleenex,1,256244,N/A
 whipped,1,1869632,N/A
 whip,1,4308941,N/A
 rolling,1,15125241,N/A
@@ -18,7 +17,6 @@ paying,1,19621495,N/A
 chauffeur,1,991122,N/A
 heated,1,5694239,N/A
 tiff,1,3123894,N/A
-whatcha,1,222878,N/A
 madame,1,2406665,N/A
 forelady,1,0,N/A
 unanimous,1,2520971,C2
@@ -64,7 +62,6 @@ undivided,1,466636,N/A
 typing,1,6581237,N/A
 typos,1,1067335,N/A
 barn,1,7175453,C2
-eastside,1,889783,N/A
 beefing,1,95737,N/A
 wondering,1,9239585,N/A
 slick,1,2528572,N/A
@@ -72,7 +69,6 @@ inviting,1,2822014,N/A
 bum,1,2005525,N/A
 cop,1,9737327,N/A
 knocking,1,1630521,N/A
-pooh,1,3606264,N/A
 dumb,1,5409969,C1
 def,1,16254361,N/A
 quieter,1,719364,N/A
@@ -112,7 +108,10 @@ mouthed,1,401042,N/A
 talked,1,9582713,N/A
 briefed,1,811483,N/A
 escort,1,16975528,N/A
+nowaday,1,2547379,N/A
 informant,1,1320543,N/A
+walkup,1,126857,N/A
+homer,1,4734759,N/A
 fiber,1,18943552,N/A
 optic,1,12175755,N/A
 lensing,1,191183,N/A
@@ -120,7 +119,6 @@ drywall,1,1099391,N/A
 baseboard,1,333449,N/A
 duct,1,3839890,N/A
 backing,1,5447072,C2
-dominican,1,9311432,N/A
 transferred,1,11023998,N/A
 counterterrorism,1,564895,N/A
 pending,1,12509596,N/A
@@ -131,7 +129,6 @@ expressway,1,1227670,N/A
 manufactured,1,9345751,N/A
 gathering,1,12907959,C1
 wired,1,8371548,N/A
-gimme,1,1551167,N/A
 mastermind,1,864671,N/A
 prosecutor,1,5493078,C2
 prosecution,1,5656733,C2

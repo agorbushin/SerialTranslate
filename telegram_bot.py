@@ -57,6 +57,20 @@ TIERLIST_BASE = BASE_DIR / "Tier_lists"
 TRANSLATIONS_BASE = BASE_DIR / "translations"
 
 
+def _cmd_keyboard() -> "InlineKeyboardMarkup":
+    """Return inline keyboard with command buttons (New Series, Movies, Full List, Phrasal Verbs)."""
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("🔍 New Series", callback_data="next_series"),
+            InlineKeyboardButton("🎬 Movies", callback_data="next_movie"),
+        ],
+        [
+            InlineKeyboardButton("📋 Full List", callback_data="full_list"),
+            InlineKeyboardButton("🔤 Phrasal Verbs", callback_data="phrasal_verbs"),
+        ],
+    ])
+
+
 def _parse_series_input(text: str) -> Tuple[str, int, int]:
     """
     Parse user message into series name and optional season/episode (simple regex only).
@@ -98,6 +112,27 @@ def _parse_series_input(text: str) -> Tuple[str, int, int]:
     elif len(series_name) > 1 and not any(c.isupper() for c in series_name[1:]):
         series_name = series_name.title()
     return series_name, season, episode
+
+
+def _parse_movie_input(text: str) -> Tuple[str, int]:
+    """
+    Parse user message into movie name and optional year.
+    Examples: "Inception", "The Matrix 1999", "Dune (2021)"
+    Returns (movie_name, year); year defaults to 0 if not found.
+    """
+    text = (text or "").strip()
+    year = 0
+    # Match year at end: 1999, (1999), (2021)
+    m = re.search(r"\(?(19\d{2}|20\d{2})\)?\s*$", text)
+    if m:
+        year = int(m.group(1))
+        text = text[: m.start()].strip(" .,;()")
+    movie_name = re.sub(r"\s+", " ", text).strip()
+    if not movie_name:
+        movie_name = "Unknown"
+    elif len(movie_name) > 1 and not any(c.isupper() for c in movie_name[1:]):
+        movie_name = movie_name.title()
+    return movie_name, year
 
 
 def _simple_parse_likely_failed(raw: str, series_name: str, season: int, episode: int) -> bool:
@@ -171,8 +206,8 @@ If the input is too vague or not a series name, set series_name to "UNKNOWN". Re
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "👋 Welcome to the Subtitle Translation Bot!\n\n"
-        "📺 **What series do you want to translate?**\n\n"
-        "Type the series name (e.g. _Fallout_, _Game of Thrones_, _Breaking Bad s2 e3_).\n\n"
+        "📺 **Series** or 🎬 **Movies** — use the buttons below, then type the name.\n\n"
+        "Examples: _Fallout s2 e3_, _Inception_, _The Matrix 1999_.\n\n"
         f"🤖 Build: {BOT_BUILD_DATETIME or 'unknown'}",
         parse_mode="Markdown",
         reply_markup=_cmd_keyboard(),
@@ -180,9 +215,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def next_series(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data["mode"] = "series"
     await update.message.reply_text(
         "📺 **What series do you want to translate?**\n\n"
         "Type the series name (e.g. _Fallout_, _Game of Thrones s2 e3_).",
+        parse_mode="Markdown",
+        reply_markup=_cmd_keyboard(),
+    )
+
+
+async def next_movie(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data["mode"] = "movie"
+    await update.message.reply_text(
+        "🎬 **What movie do you want to translate?**\n\n"
+        "Type the movie name (e.g. _Inception_, _The Matrix 1999_, _Dune (2021)_).",
         parse_mode="Markdown",
         reply_markup=_cmd_keyboard(),
     )
@@ -236,6 +282,46 @@ def _find_existing(
     )
 
 
+def _find_existing_movie(
+    movie_name: str, year: int
+) -> Tuple[Optional[Path], Optional[Path], Optional[Path]]:
+    """
+    Look for existing tier list and/or translations for this movie.
+    Returns (episode_dir, translations_dir, subtitle_path).
+    """
+    from download_subtitles import (
+        get_tierlist_movie_dir,
+        get_translations_movie_dir,
+        get_movie_subtitle_path,
+    )
+
+    episode_dir = get_tierlist_movie_dir(TIERLIST_BASE, movie_name, year)
+    has_tier = episode_dir.exists() and (episode_dir / "tier_1_hard_usable_words.csv").exists()
+
+    translations_dir = get_translations_movie_dir(TRANSLATIONS_BASE, movie_name, year)
+    has_translations = (translations_dir / "tier_1_translations.csv").exists()
+
+    subtitle_path = get_movie_subtitle_path(SUBTITLE_BASE, movie_name, year)
+    if not subtitle_path.exists() and episode_dir.exists():
+        info_file = episode_dir / "episode_info.json"
+        if info_file.exists():
+            try:
+                info = json.loads(info_file.read_text(encoding="utf-8"))
+                mn = info.get("series") or movie_name
+                yr = int(info.get("year", year))
+                sub_name = info.get("subtitle_file")
+                if sub_name:
+                    subtitle_path = SUBTITLE_BASE / "Movies" / mn / sub_name
+            except Exception:
+                pass
+
+    return (
+        episode_dir if has_tier else None,
+        translations_dir if has_translations else None,
+        subtitle_path if subtitle_path.exists() else None,
+    )
+
+
 def _do_download(series_name: str, season: int, episode: int) -> Optional[Path]:
     """Download subtitle. Returns subtitle path or None."""
     from download_subtitles import get_subtitle_path, download_subtitle
@@ -251,7 +337,7 @@ def _do_download(series_name: str, season: int, episode: int) -> Optional[Path]:
 
 
 def _do_analyze(subtitle_path: Path) -> Optional[Path]:
-    """Run tier pipeline. Returns episode_dir or None."""
+    """Run tier pipeline for series. Returns episode_dir or None."""
     from subtitle_analyzer import run_pipeline
 
     episode_dir = run_pipeline(
@@ -266,11 +352,43 @@ def _do_analyze(subtitle_path: Path) -> Optional[Path]:
     return episode_dir
 
 
+def _do_download_movie(movie_name: str, year: int) -> Optional[Path]:
+    """Download movie subtitle. Returns subtitle path or None."""
+    from download_movie_subtitles import download_movie_subtitle
+
+    path = download_movie_subtitle(
+        movie_title=movie_name,
+        year=year,
+        base_dir=SUBTITLE_BASE,
+        api_key=OPENSUBTITLES_API_KEY,
+    )
+    return path
+
+
+def _do_analyze_movie(subtitle_path: Path, movie_name: str, year: int) -> Optional[Path]:
+    """Run tier pipeline for movie. Returns episode_dir or None."""
+    from subtitle_analyzer import run_pipeline
+
+    episode_dir = run_pipeline(
+        subtitle_path=subtitle_path,
+        base_dir=BASE_DIR,
+        tierlist_base_dir=TIERLIST_BASE,
+        max_english_freq=20_000_000,
+        openai_api_key=OPENAI_API_KEY or None,
+        is_movie=True,
+        series_name=movie_name,
+        year=year if year > 0 else None,
+    )
+    if not episode_dir or not (episode_dir / "tier_1_hard_usable_words.csv").exists():
+        return None
+    return episode_dir
+
+
 def _do_translate(
     episode_dir: Path, subtitle_path: Optional[Path]
 ) -> Tuple[bool, Optional[Path], Optional[str]]:
     """Translate tier 1 and save to translations/. Returns (success, translations_dir, error_reason)."""
-    from download_subtitles import get_translations_episode_dir
+    from download_subtitles import get_translations_episode_dir, get_translations_movie_dir
     from translate_tier_translations import run as run_translate
 
     ok, err = run_translate(
@@ -285,24 +403,226 @@ def _do_translate(
     info = episode_dir / "episode_info.json"
     series_name = "Unknown"
     season_num = episode_num = 1
+    is_movie = False
+    year = 0
     if info.exists():
         try:
             data = json.loads(info.read_text(encoding="utf-8"))
             series_name = data.get("series") or series_name
             season_num = int(data.get("season_number", 1))
             episode_num = int(data.get("episode_number", 1))
+            is_movie = bool(data.get("is_movie", False))
+            year = int(data.get("year", 0))
         except Exception:
             pass
-    out_dir = get_translations_episode_dir(
-        TRANSLATIONS_BASE, series_name, season_num, episode_num
-    )
+    if is_movie:
+        out_dir = get_translations_movie_dir(TRANSLATIONS_BASE, series_name, year)
+    else:
+        out_dir = get_translations_episode_dir(
+            TRANSLATIONS_BASE, series_name, season_num, episode_num
+        )
     return True, out_dir, None
+
+
+async def _handle_message_movie(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, raw: str
+) -> None:
+    """Handle movie search flow: parse, find existing, download, analyze, translate."""
+    movie_name, year = _parse_movie_input(raw)
+    label = f"*{movie_name}*" + (f" ({year})" if year else "")
+    status_msg = await update.message.reply_text(
+        f"🎬 Processing request for: {label}\n\n"
+        "⏳ Searching for existing tier lists and translations…",
+        parse_mode="Markdown",
+    )
+
+    loop = asyncio.get_event_loop()
+    timeout = 600.0
+
+    try:
+        episode_dir, translations_dir, subtitle_path = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: _find_existing_movie(movie_name, year),
+            ),
+            timeout=timeout,
+        )
+
+        # Case A: translations already exist
+        if translations_dir is not None:
+            await status_msg.edit_text(
+                f"🎬 Processing: {label}\n"
+                f"✅ Found existing translations.\n\n"
+                f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
+                parse_mode="Markdown",
+            )
+            await _send_translations_list(
+                update, translations_dir, movie_name, 0, 0,
+                is_movie=True, year=year,
+            )
+            context.user_data["last_episode_dir"] = str(episode_dir) if episode_dir else ""
+            context.user_data["last_series_name"] = movie_name
+            context.user_data["last_translations_dir"] = str(translations_dir)
+            return
+
+        # Case B: tier list exists but no translations
+        if episode_dir is not None:
+            await status_msg.edit_text(
+                f"🎬 Processing: {label}\n"
+                f"✅ Found existing hard words list.\n\n"
+                "⏳ Translating words…",
+                parse_mode="Markdown",
+            )
+            if subtitle_path is None:
+                await status_msg.edit_text(
+                    f"🎬 Processing: {label}\n"
+                    "⏳ Subtitle file missing, downloading…",
+                    parse_mode="Markdown",
+                )
+                subtitle_path = await asyncio.wait_for(
+                    loop.run_in_executor(
+                        None,
+                        lambda: _do_download_movie(movie_name, year),
+                    ),
+                    timeout=timeout,
+                )
+                if not subtitle_path:
+                    await status_msg.edit_text(
+                        f"❌ **Subtitle download failed** for {label}.\n\n"
+                        "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
+                        parse_mode="Markdown",
+                        reply_markup=_cmd_keyboard(),
+                    )
+                    return
+            ok, out_dir, trans_err = await asyncio.wait_for(
+                loop.run_in_executor(
+                    None,
+                    lambda: _do_translate(episode_dir, subtitle_path),
+                ),
+                timeout=timeout,
+            )
+            if not ok or not out_dir:
+                reason = (trans_err or "Translation failed.").strip()
+                await status_msg.edit_text(
+                    f"❌ **Translation failed.**\n\n{reason}",
+                    parse_mode="Markdown",
+                    reply_markup=_cmd_keyboard(),
+                )
+                return
+            rel = out_dir.relative_to(BASE_DIR)
+            await status_msg.edit_text(
+                f"✅ {label}\n\n"
+                f"📁 Hard words translated and saved to: `{rel}/`",
+                parse_mode="Markdown",
+            )
+            await _send_translations_list(
+                update, out_dir, movie_name, 0, 0,
+                is_movie=True, year=year,
+            )
+            context.user_data["last_episode_dir"] = str(episode_dir)
+            context.user_data["last_series_name"] = movie_name
+            context.user_data["last_translations_dir"] = str(out_dir)
+            return
+
+        # Case C: nothing exists — download, analyze, translate
+        await status_msg.edit_text(
+            f"🎬 Processing: {label}\n\n"
+            "⏳ Downloading subtitle…",
+            parse_mode="Markdown",
+        )
+        subtitle_path = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: _do_download_movie(movie_name, year),
+            ),
+            timeout=timeout,
+        )
+        if not subtitle_path:
+            await status_msg.edit_text(
+                f"❌ **Subtitle download failed** for {label}.\n\n"
+                "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
+                parse_mode="Markdown",
+                reply_markup=_cmd_keyboard(),
+            )
+            return
+
+        await status_msg.edit_text(
+            f"🎬 Processing: {label}\n"
+            f"✅ Subtitle downloaded.\n\n"
+            "⏳ Analyzing subtitle and building tier list…",
+            parse_mode="Markdown",
+        )
+        episode_dir = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: _do_analyze_movie(subtitle_path, movie_name, year),
+            ),
+            timeout=timeout,
+        )
+        if not episode_dir:
+            await status_msg.edit_text(
+                "❌ **Tier list build failed** (could not analyze subtitle).\n\n"
+                "Subtitle file may be invalid or empty.",
+                parse_mode="Markdown",
+                reply_markup=_cmd_keyboard(),
+            )
+            return
+
+        await status_msg.edit_text(
+            f"🎬 Processing: {label}\n"
+            f"✅ Hard words list ready.\n\n"
+            "⏳ Translating words…",
+            parse_mode="Markdown",
+        )
+        ok, out_dir, trans_err = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: _do_translate(episode_dir, subtitle_path),
+            ),
+            timeout=timeout,
+        )
+        if not ok or not out_dir:
+            reason = (trans_err or "Translation failed.").strip()
+            await status_msg.edit_text(
+                f"❌ **Translation failed.**\n\n{reason}",
+                parse_mode="Markdown",
+                reply_markup=_cmd_keyboard(),
+            )
+            return
+
+        rel = out_dir.relative_to(BASE_DIR)
+        await status_msg.edit_text(
+            f"✅ {label}\n\n"
+            f"📁 Hard words translated and saved to: `{rel}/`",
+            parse_mode="Markdown",
+            reply_markup=_cmd_keyboard(),
+        )
+        await _send_translations_list(
+            update, out_dir, movie_name, 0, 0,
+            is_movie=True, year=year,
+        )
+        context.user_data["last_episode_dir"] = str(episode_dir)
+        context.user_data["last_series_name"] = movie_name
+        context.user_data["last_translations_dir"] = str(out_dir)
+
+    except asyncio.TimeoutError:
+        await status_msg.edit_text(
+            "❌ **Request timed out** (download/analysis/translation took too long).",
+            parse_mode="Markdown",
+            reply_markup=_cmd_keyboard(),
+        )
+    except Exception as e:
+        await status_msg.edit_text(
+            f"❌ **Error:** {str(e)[:150]}",
+            parse_mode="Markdown",
+            reply_markup=_cmd_keyboard(),
+        )
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not update.message or not update.message.text:
         await update.message.reply_text(
-            "❌ Please send a series name.",
+            "❌ Please send a series or movie name.",
             reply_markup=_cmd_keyboard(),
         )
         return
@@ -310,10 +630,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     raw = update.message.text.strip()
     if len(raw) < 2:
         await update.message.reply_text(
-            "❌ Series name too short. Try e.g. _Fallout_, _Game of Thrones_.",
+            "❌ Name too short. Try e.g. _Fallout_, _Inception_, _Game of Thrones_.",
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
+        return
+
+    mode = context.user_data.get("mode", "series")
+    if mode == "movie":
+        await _handle_message_movie(update, context, raw)
         return
 
     series_name, season, episode = _parse_series_input(raw)
@@ -512,30 +837,46 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 def _load_translations_list(translations_dir: Path) -> List[Tuple[str, str]]:
-    """Load word → translation from tier_1_translations.csv. Returns [(word, translation_ru), ...]."""
+    """Load word → translation from tier_1_translations.csv. Returns [(word, translation_ru), ...].
+    Excludes words with empty or placeholder translations (—, N/A, [Translation failed])."""
     path = translations_dir / "tier_1_translations.csv"
     if not path.exists():
         return []
     out = []
+    empty_values = {"", "—", "n/a", "na", "[translation failed]"}
     try:
         with open(path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 w = (row.get("word") or "").strip()
-                t = (row.get("translation_ru") or "").strip() or "—"
-                if w:
-                    out.append((w, t))
+                t = (row.get("translation_ru") or "").strip()
+                if not w:
+                    continue
+                t_lower = t.lower()
+                if t_lower in empty_values or not t:
+                    continue  # Skip words with empty translation
+                out.append((w, t))
     except Exception:
         pass
     return out
 
 
 def _format_word_list(
-    series_name: str, season: int, episode: int, pairs: List[Tuple[str, str]], max_lines: int = 25
+    series_name: str,
+    season: int,
+    episode: int,
+    pairs: List[Tuple[str, str]],
+    max_lines: int = 25,
+    *,
+    is_movie: bool = False,
+    year: int = 0,
 ) -> str:
     """Format header + numbered word list. If pairs > max_lines, show first max_lines and '... and N more'."""
     n = len(pairs)
-    header = f"📺 *{series_name}* S{season}E{episode}\n\n📊 *Hard words: {n}*\n\n"
+    if is_movie:
+        header = f"🎬 *{series_name}*" + (f" ({year})" if year else "") + f"\n\n📊 *Hard words: {n}*\n\n"
+    else:
+        header = f"📺 *{series_name}* S{season}E{episode}\n\n📊 *Hard words: {n}*\n\n"
     if not pairs:
         return header + "_No words._"
     show = pairs[:max_lines]
@@ -547,11 +888,20 @@ def _format_word_list(
 
 
 def _format_full_list(
-    series_name: str, season: int, episode: int, pairs: List[Tuple[str, str]]
+    series_name: str,
+    season: int,
+    episode: int,
+    pairs: List[Tuple[str, str]],
+    *,
+    is_movie: bool = False,
+    year: int = 0,
 ) -> str:
     """Format header + full numbered word list (all pairs)."""
     n = len(pairs)
-    header = f"📋 *Full list* — *{series_name}* S{season}E{episode}\n\n📊 *{n} words*\n\n"
+    if is_movie:
+        header = f"📋 *Full list* — *{series_name}*" + (f" ({year})" if year else "") + f"\n\n📊 *{n} words*\n\n"
+    else:
+        header = f"📋 *Full list* — *{series_name}* S{season}E{episode}\n\n📊 *{n} words*\n\n"
     if not pairs:
         return header + "_No words._"
     lines = [f"{i}. *{w}* → {t}" for i, (w, t) in enumerate(pairs, 1)]
@@ -579,8 +929,10 @@ def _split_message_chunks(text: str, max_len: int = 4096) -> List[str]:
     return chunks
 
 
-def _get_translations_header(translations_dir: Path, context: ContextTypes.DEFAULT_TYPE) -> Tuple[str, int, int]:
-    """Get (series_name, season, episode) from translation_info.json or context. Fallback: last_series_name, 0, 0."""
+def _get_translations_header(
+    translations_dir: Path, context: ContextTypes.DEFAULT_TYPE
+) -> Tuple[str, int, int, bool, int]:
+    """Get (series_name, season, episode, is_movie, year) from translation_info.json or context."""
     info_path = translations_dir / "translation_info.json"
     if info_path.exists():
         try:
@@ -589,12 +941,16 @@ def _get_translations_header(translations_dir: Path, context: ContextTypes.DEFAU
                 data.get("series") or context.user_data.get("last_series_name") or "Unknown",
                 int(data.get("season_number", 0)),
                 int(data.get("episode_number", 0)),
+                bool(data.get("is_movie", False)),
+                int(data.get("year", 0)),
             )
         except Exception:
             pass
     return (
         context.user_data.get("last_series_name") or "Unknown",
         0,
+        0,
+        False,
         0,
     )
 
@@ -605,17 +961,21 @@ async def _send_translations_list(
     series_name: str,
     season: int,
     episode: int,
+    *,
+    is_movie: bool = False,
+    year: int = 0,
 ) -> None:
     """Load translations from CSV and send word list in chat (chunked if >4096 chars)."""
     pairs = _load_translations_list(translations_dir)
     if not pairs:
+        header = f"🎬 *{series_name}*" + (f" ({year})" if year else "") if is_movie else f"📺 *{series_name}* S{season}E{episode}"
         await update.message.reply_text(
-            f"📺 *{series_name}* S{season}E{episode}\n\n📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`\n\n_No words in CSV._",
+            f"{header}\n\n📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`\n\n_No words in CSV._",
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
         return
-    text = _format_word_list(series_name, season, episode, pairs)
+    text = _format_word_list(series_name, season, episode, pairs, is_movie=is_movie, year=year)
     max_len = 4096
     kb = _cmd_keyboard()
     if len(text) <= max_len:
@@ -646,8 +1006,8 @@ async def send_full_list(
     last_dir = context.user_data.get("last_translations_dir")
     if not last_dir:
         msg = (
-            "❌ No series requested yet.\n\n"
-            "Send a series name first (e.g. _Game of Thrones s2 e3_), then use /full or the Full List button."
+            "❌ No series or movie requested yet.\n\n"
+            "Send a name first (e.g. _Game of Thrones s2 e3_, _Inception_), then use /full or the Full List button."
         )
         kb = _cmd_keyboard()
         if query:
@@ -667,12 +1027,10 @@ async def send_full_list(
         return
 
     pairs = _load_translations_list(translations_dir)
+    series_name, season, episode, is_movie, year = _get_translations_header(translations_dir, context)
     if not pairs:
-        series_name, season, episode = _get_translations_header(translations_dir, context)
-        msg = (
-            f"📺 *{series_name}* S{season}E{episode}\n\n"
-            f"📁 `{_rel_path(last_dir)}/`\n\n_No words in CSV._"
-        )
+        header = f"🎬 *{series_name}*" + (f" ({year})" if year else "") if is_movie else f"📺 *{series_name}* S{season}E{episode}"
+        msg = f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n_No words in CSV._"
         kb = _cmd_keyboard()
         if query:
             await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb)
@@ -680,8 +1038,7 @@ async def send_full_list(
             await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb)
         return
 
-    series_name, season, episode = _get_translations_header(translations_dir, context)
-    full_text = _format_full_list(series_name, season, episode, pairs)
+    full_text = _format_full_list(series_name, season, episode, pairs, is_movie=is_movie, year=year)
     chunks = _split_message_chunks(full_text)
     kb = _cmd_keyboard()
 
@@ -749,6 +1106,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         )
     elif data == "next_series":
         await next_series(wrapped, context)
+    elif data == "next_movie":
+        await next_movie(wrapped, context)
     else:
         await query.edit_message_text(
             "Unknown action.",
@@ -776,6 +1135,7 @@ def main() -> None:
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("next", next_series))
+    app.add_handler(CommandHandler("movie", next_movie))
     app.add_handler(CommandHandler("full", send_full_list))
     app.add_handler(CommandHandler("phrasal", send_phrasal_placeholder))
     app.add_handler(CallbackQueryHandler(button_callback))
