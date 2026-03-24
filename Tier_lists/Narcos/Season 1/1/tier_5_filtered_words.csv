@@ -1,5 +1,7 @@
 word,series_frequency,english_frequency,filter_reason,vocabulary_level
 guy,24,82889911,Oxford 3000,A2
+miami,18,29904805,"High English frequency (29,904,805 > 20,000,000)",N/A
+poison,10,5780004,Oxford 3000,B2
 lion,10,18511993,Oxford 3000,A2
 brother,9,56375413,Oxford 3000,A1
 lab,9,49108169,Oxford 3000,B1
@@ -37,6 +39,7 @@ leave,4,70957750,Oxford 3000,A1
 brain,4,37025785,Oxford 3000,A2
 pretty,4,51699969,Oxford 3000,A2
 worried,4,6610456,Oxford 3000,A2
+mom,4,39068727,"High English frequency (39,068,727 > 20,000,000)",N/A
 accept,4,49819069,Oxford 3000,B1
 shot,4,61225531,Oxford 3000,B2
 coffee,4,42858323,Oxford 3000,A1
@@ -88,6 +91,7 @@ myself,2,37983649,Oxford 3000,A2
 stick,2,28793076,Oxford 3000,B1
 helped,2,21000656,"High English frequency (21,000,656 > 20,000,000)",N/A
 everybody,2,14705200,Oxford 3000,A2
+goe,2,47478275,"High English frequency (47,478,275 > 20,000,000)",N/A
 wrong,2,49934294,Oxford 3000,A1
 rear,2,22583111,"High English frequency (22,583,111 > 20,000,000)",B2
 kill,2,31335290,Oxford 3000,A2
@@ -156,6 +160,7 @@ packet,2,23795620,"High English frequency (23,795,620 > 20,000,000)",B1
 cousin,2,6460959,Oxford 3000,A2
 jungle,2,7505928,Vocabulary level below C (B1),B1
 anybody,2,10367449,Oxford 3000,A2
+brazil,2,29414612,"High English frequency (29,414,612 > 20,000,000)",N/A
 involved,2,59408103,Oxford 3000,N/A
 potato,2,6397517,Oxford 3000,A1
 buying,2,53534781,"High English frequency (53,534,781 > 20,000,000)",N/A
@@ -188,6 +193,7 @@ standing,1,34637239,"High English frequency (34,637,239 > 20,000,000)",N/A
 himself,1,39757666,Oxford 3000,A2
 negative,1,30504487,Oxford 3000,A2
 told,1,57248600,"High English frequency (57,248,600 > 20,000,000)",N/A
+steve,1,41997245,"High English frequency (41,997,245 > 20,000,000)",N/A
 deeply,1,7641115,Oxford 3000,B2
 rest,1,55957144,Oxford 3000,A2
 foreign,1,67443436,Oxford 3000,A2
@@ -245,6 +251,7 @@ cool,1,57131174,Oxford 3000,A2
 beautiful,1,58503804,Oxford 3000,A1
 fox,1,24616090,"High English frequency (24,616,090 > 20,000,000)",B2
 gorgeous,1,7921525,Vocabulary level below C (B1),B1
+deserf,1,4081562,Easy word (easy_words.csv),N/A
 jewelry,1,72648785,"High English frequency (72,648,785 > 20,000,000)",N/A
 drop,1,45620690,Oxford 3000,B1
 hospital,1,78835222,Oxford 3000,A1
@@ -307,6 +314,7 @@ bought,1,31501377,"High English frequency (31,501,377 > 20,000,000)",N/A
 neighborhood,1,28783336,"High English frequency (28,783,336 > 20,000,000)",N/A
 opened,1,23076347,"High English frequency (23,076,347 > 20,000,000)",N/A
 smell,1,8940822,Oxford 3000,B1
+french,1,81440411,"High English frequency (81,440,411 > 20,000,000)",N/A
 cheese,1,16704436,Oxford 3000,A1
 pop,1,57137816,Oxford 3000,A2
 mistake,1,18974243,Oxford 3000,A2
@@ -324,6 +332,7 @@ nicely,1,4366949,Vocabulary level below C (B2),B2
 adjust,1,10384172,Vocabulary level below C (B2),B2
 nut,1,15509690,Oxford 3000,B2
 named,1,34099544,"High English frequency (34,099,544 > 20,000,000)",N/A
+german,1,56375982,"High English frequency (56,375,982 > 20,000,000)",N/A
 fan,1,76335616,Oxford 3000,A2
 remember,1,84324100,Oxford 3000,A1
 saw,1,50570151,"High English frequency (50,570,151 > 20,000,000)",N/A
@@ -433,6 +442,8 @@ vehicle,1,91333573,Oxford 3000,B1
 fine,1,75242969,Oxford 3000,A1
 except,1,52230850,Oxford 3000,A2
 onto,1,26411439,Oxford 3000,B1
+florida,1,85775901,"High English frequency (85,775,901 > 20,000,000)",N/A
+diego,1,32238555,"High English frequency (32,238,555 > 20,000,000)",N/A
 consideration,1,31057328,Oxford 3000,B2
 bond,1,38879421,Oxford 3000,B2
 trial,1,72001855,"High English frequency (72,001,855 > 20,000,000)",B2
@@ -456,6 +467,7 @@ vivid,1,4479514,Vocabulary level below C (B2),B2
 precious,1,9529904,Vocabulary level below C (B2),B2
 dad,1,16837773,Easy word (easy_words.csv),A1
 pearl,1,22735227,"High English frequency (22,735,227 > 20,000,000)",N/A
+hawaii,1,33075697,"High English frequency (33,075,697 > 20,000,000)",N/A
 farm,1,57843397,Oxford 3000,A1
 soil,1,28738911,Oxford 3000,B2
 army,1,46902606,Oxford 3000,C2

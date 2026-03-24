@@ -14,9 +14,9 @@ from typing import Dict, List, Set, Tuple, Union
 
 from openai import AsyncOpenAI, OpenAI
 
-# Model for name/fantasy filtering (same as archive)
-NAME_FILTER_MODEL = "gpt-4o"
-MAX_CONCURRENT_BATCHES = 3
+# Model for name/fantasy filtering
+NAME_FILTER_MODEL = "gpt-4o-mini"
+MAX_CONCURRENT_BATCHES = 5
 
 # Default API key: env, then fallback from project telegram_bot (which may load from archive)
 def _default_api_key() -> str:

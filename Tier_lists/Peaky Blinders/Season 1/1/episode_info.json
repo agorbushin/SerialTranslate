@@ -4,18 +4,17 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "peaky_blinders_s1_e1.srt",
-  "analysis_date": "2026-03-19T19:18:57.419786",
+  "analysis_date": "2026-03-21T17:17:58.259514",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 93253122,
     "max_english_freq": 20000000
   },
   "word_counts": {
-    "tier_1_hard_usable": 14,
-    "tier_2_random": 147,
-    "tier_3_common": 15,
+    "tier_1_hard_usable": 47,
+    "tier_2_random": 165,
+    "tier_3_common": 19,
     "tier_4_rare_in_series": 8,
-    "tier_5_filtered": 379
-  },
-  "excluded_names_fantasy_count": 55
+    "tier_5_filtered": 387
+  }
 }

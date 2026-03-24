@@ -11,6 +11,7 @@ happy,6,63486618,Oxford 3000,A1
 nothing,5,73363579,Oxford 3000,A2
 jesus,5,34929061,"High English frequency (34,929,061 > 20,000,000)",N/A
 cow,5,12084295,Oxford 3000,A1
+bacon,4,5385205,Vocabulary level below C (B1),B1
 till,4,16477131,Oxford 3000,A2
 eat,4,32034082,Oxford 3000,A1
 wrong,4,49934294,Oxford 3000,A1
@@ -36,11 +37,14 @@ ever,3,100646034,Oxford 3000,A2
 actually,3,69444655,Oxford 3000,A2
 honestly,3,4459891,Easy word (easy_words.csv),B1
 wipe,3,4192050,Vocabulary level below C (B2),B2
+goe,3,47478275,"High English frequency (47,478,275 > 20,000,000)",N/A
+chilli,3,991047,Vocabulary level below C (A2),A2
 gas,3,75796707,Oxford 3000,A2
 guy,3,82889911,Oxford 3000,A2
 gone,3,34511028,"High English frequency (34,511,028 > 20,000,000)",N/A
 pant,3,19912941,Oxford 3000,N/A
 shut,3,12663576,Oxford 3000,A2
+christ,2,28486624,"High English frequency (28,486,624 > 20,000,000)",N/A
 matter,2,96529766,Easy word (easy_words.csv),A2
 believe,2,75918053,Oxford 3000,A2
 taste,2,20925313,Oxford 3000,B1
@@ -98,6 +102,7 @@ straight,2,32760917,Oxford 3000,A2
 crazy,2,23174564,Oxford 3000,A2
 tomorrow,2,21262762,Oxford 3000,A1
 tight,2,20005001,Oxford 3000,B1
+jean,2,34822067,Oxford 3000,N/A
 whatever,2,31901912,Oxford 3000,B1
 inch,2,63696489,Oxford 3000,B1
 acceptable,2,14590887,Oxford 3000,B1
@@ -107,6 +112,8 @@ kick,2,16734140,Oxford 3000,A1
 yourself,2,53653034,Oxford 3000,A2
 tick,2,5633979,Vocabulary level below C (B1),B1
 teach,2,24679160,Oxford 3000,A1
+lane,1,30370693,"High English frequency (30,370,693 > 20,000,000)",B2
+mexico,1,62544255,"High English frequency (62,544,255 > 20,000,000)",N/A
 enforcement,1,23670942,"High English frequency (23,670,942 > 20,000,000)",N/A
 entity,1,28891357,"High English frequency (28,891,357 > 20,000,000)",C2
 admission,1,29264413,"High English frequency (29,264,413 > 20,000,000)",B1
@@ -128,6 +135,7 @@ band,1,89411439,Oxford 3000,A1
 aid,1,83178207,Oxford 3000,C1
 smart,1,37455745,Oxford 3000,B1
 anyone,1,74326492,Oxford 3000,A2
+ben,1,25156207,"High English frequency (25,156,207 > 20,000,000)",N/A
 prefer,1,21937284,Oxford 3000,A2
 element,1,80486579,Oxford 3000,B2
 combine,1,19745412,Oxford 3000,B2
@@ -161,6 +169,7 @@ bite,1,9144331,Oxford 3000,B1
 warm,1,23120649,Oxford 3000,A1
 milk,1,21114190,Oxford 3000,A1
 brain,1,37025785,Oxford 3000,A2
+wisconsin,1,33592434,"High English frequency (33,592,434 > 20,000,000)",N/A
 channel,1,90778849,Oxford 3000,A2
 placed,1,35347899,"High English frequency (35,347,899 > 20,000,000)",N/A
 proud,1,17167504,Oxford 3000,B1
@@ -186,6 +195,7 @@ saturday,1,70963024,Oxford 3000,A1
 noon,1,9917780,Vocabulary level below C (A2),A2
 probably,1,61626696,Oxford 3000,A2
 driving,1,40033859,Oxford 3000,N/A
+los,1,69625090,"High English frequency (69,625,090 > 20,000,000)",N/A
 visitor,1,64031818,Oxford 3000,A2
 exhibit,1,23290430,"High English frequency (23,290,430 > 20,000,000)",C1
 exhibition,1,23545552,Oxford 3000,B1
@@ -236,6 +246,7 @@ pottery,1,15519920,Vocabulary level below C (B2),B2
 fault,1,16246310,Oxford 3000,B2
 cheese,1,16704436,Oxford 3000,A1
 anyway,1,26880093,"High English frequency (26,880,093 > 20,000,000)",A2
+lif,1,43191570,"High English frequency (43,191,570 > 20,000,000)",N/A
 dash,1,7007618,Vocabulary level below C (B2),B2
 bus,1,47144892,Oxford 3000,A1
 nasty,1,7565736,Vocabulary level below C (B1),B1
@@ -341,6 +352,7 @@ basic,1,97156959,Oxford 3000,B1
 glad,1,14607042,Oxford 3000,A2
 iron,1,35668530,Oxford 3000,B1
 chef,1,11974633,Oxford 3000,A2
+miami,1,29904805,"High English frequency (29,904,805 > 20,000,000)",N/A
 vice,1,33215970,Easy word (easy_words.csv),C2
 personally,1,14373028,Oxford 3000,B1
 train,1,40164074,Oxford 3000,A1

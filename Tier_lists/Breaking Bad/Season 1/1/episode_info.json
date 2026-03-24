@@ -4,18 +4,17 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "breaking_bad_s1_e1.srt",
-  "analysis_date": "2026-03-19T19:11:56.704793",
+  "analysis_date": "2026-03-21T19:28:16.005686",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 104136684,
     "max_english_freq": 20000000
   },
   "word_counts": {
-    "tier_1_hard_usable": 15,
-    "tier_2_random": 96,
-    "tier_3_common": 10,
+    "tier_1_hard_usable": 29,
+    "tier_2_random": 127,
+    "tier_3_common": 11,
     "tier_4_rare_in_series": 10,
-    "tier_5_filtered": 366
-  },
-  "excluded_names_fantasy_count": 59
+    "tier_5_filtered": 378
+  }
 }

@@ -1,0 +1,37 @@
+{
+  "request_id": "1f6a5bf53df54bceae55577dc71f4f62",
+  "mode": "series",
+  "raw_input": "fallout s2e6",
+  "started_at": "2026-03-24T00:34:58.181770",
+  "finished_at": "2026-03-24T00:35:52.601195",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Fallout",
+    "season": 2,
+    "episode": 6
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 2,
+    "download_subtitle": 2387,
+    "analyze_subtitle": 47101,
+    "translate": 3562
+  },
+  "timings_ms": {
+    "total_e2e_ms": 54420
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 27,
+    "timings_ms": {
+      "prepare_ms": 20,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 0,
+      "total_ms": 3558
+    }
+  },
+  "error": null
+}

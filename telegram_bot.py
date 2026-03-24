@@ -9,9 +9,11 @@ import csv
 import json
 import os
 import re
+import time
+import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -55,6 +57,43 @@ BASE_DIR = Path(__file__).resolve().parent
 SUBTITLE_BASE = BASE_DIR / "Subtitle"
 TIERLIST_BASE = BASE_DIR / "Tier_lists"
 TRANSLATIONS_BASE = BASE_DIR / "translations"
+LATENCY_METRICS_BASE = BASE_DIR / "latency_metrics"
+
+
+def _ms_since(started: float) -> int:
+    return int((time.perf_counter() - started) * 1000)
+
+
+def _new_latency(raw_input: str, mode: str) -> Dict[str, Any]:
+    return {
+        "request_id": uuid.uuid4().hex,
+        "mode": mode,
+        "raw_input": raw_input,
+        "started_at": datetime.now().isoformat(),
+        "finished_at": None,
+        "status": "in_progress",
+        "branch": "",
+        "identity": {},
+        "phase_timings_ms": {},
+        "timings_ms": {"total_e2e_ms": 0},
+        "translator_metrics": None,
+        "error": None,
+    }
+
+
+def _write_latency(metrics: Dict[str, Any]) -> None:
+    try:
+        LATENCY_METRICS_BASE.mkdir(parents=True, exist_ok=True)
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        req_id = metrics.get("request_id", "unknown")
+        out = LATENCY_METRICS_BASE / f"{ts}_{req_id}.json"
+        out.write_text(json.dumps(metrics, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"Warning: could not write latency metrics: {e}")
+
+
+async def _write_latency_async(metrics: Dict[str, Any]) -> None:
+    await asyncio.to_thread(_write_latency, metrics)
 
 
 def _cmd_keyboard() -> "InlineKeyboardMarkup":
@@ -170,7 +209,7 @@ Examples:
 - "breaking bad" -> {{"series_name": "Breaking Bad", "season": 1, "episode": 1}}
 If the input is too vague or not a series name, set series_name to "UNKNOWN". Return only valid JSON, no markdown."""
 
-    try:
+    def _normalize_sync() -> Optional[Tuple[str, int, int]]:
         from openai import OpenAI
         client = OpenAI(api_key=OPENAI_API_KEY)
         response = client.chat.completions.create(
@@ -198,6 +237,8 @@ If the input is too vague or not a series name, set series_name to "UNKNOWN". Re
         if episode < 1:
             episode = 1
         return (sn, season, episode)
+    try:
+        return await asyncio.to_thread(_normalize_sync)
     except Exception as e:
         print(f"ChatGPT normalization failed: {e}")
         return None
@@ -386,20 +427,22 @@ def _do_analyze_movie(subtitle_path: Path, movie_name: str, year: int) -> Option
 
 def _do_translate(
     episode_dir: Path, subtitle_path: Optional[Path]
-) -> Tuple[bool, Optional[Path], Optional[str]]:
-    """Translate tier 1 and save to translations/. Returns (success, translations_dir, error_reason)."""
+) -> Tuple[bool, Optional[Path], Optional[str], Optional[Dict[str, Any]]]:
+    """Translate tier 1 and save to translations/. Returns (success, out_dir, error_reason, metrics)."""
     from download_subtitles import get_translations_episode_dir, get_translations_movie_dir
     from translate_tier_translations import run as run_translate
 
+    metrics: Dict[str, Any] = {}
     ok, err = run_translate(
         episode_dir=episode_dir,
         subtitle_path=subtitle_path,
         api_key=OPENAI_API_KEY or None,
         translations_base=TRANSLATIONS_BASE,
         subtitle_base=SUBTITLE_BASE,
+        metrics_out=metrics,
     )
     if not ok:
-        return False, None, err or "Translation failed."
+        return False, None, err or "Translation failed.", metrics
     info = episode_dir / "episode_info.json"
     series_name = "Unknown"
     season_num = episode_num = 1
@@ -421,14 +464,19 @@ def _do_translate(
         out_dir = get_translations_episode_dir(
             TRANSLATIONS_BASE, series_name, season_num, episode_num
         )
-    return True, out_dir, None
+    return True, out_dir, None, metrics
 
 
 async def _handle_message_movie(
     update: Update, context: ContextTypes.DEFAULT_TYPE, raw: str
 ) -> None:
     """Handle movie search flow: parse, find existing, download, analyze, translate."""
+    req_started = time.perf_counter()
+    latency = _new_latency(raw, "movie")
+    phase_started = time.perf_counter()
     movie_name, year = _parse_movie_input(raw)
+    latency["phase_timings_ms"]["parse_input"] = _ms_since(phase_started)
+    latency["identity"] = {"movie_name": movie_name, "year": year}
     label = f"*{movie_name}*" + (f" ({year})" if year else "")
     status_msg = await update.message.reply_text(
         f"🎬 Processing request for: {label}\n\n"
@@ -436,10 +484,11 @@ async def _handle_message_movie(
         parse_mode="Markdown",
     )
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     timeout = 600.0
 
     try:
+        phase_started = time.perf_counter()
         episode_dir, translations_dir, subtitle_path = await asyncio.wait_for(
             loop.run_in_executor(
                 None,
@@ -447,9 +496,11 @@ async def _handle_message_movie(
             ),
             timeout=timeout,
         )
+        latency["phase_timings_ms"]["find_existing"] = _ms_since(phase_started)
 
         # Case A: translations already exist
         if translations_dir is not None:
+            latency["branch"] = "cache_hit_translations"
             await status_msg.edit_text(
                 f"🎬 Processing: {label}\n"
                 f"✅ Found existing translations.\n\n"
@@ -459,14 +510,17 @@ async def _handle_message_movie(
             await _send_translations_list(
                 update, translations_dir, movie_name, 0, 0,
                 is_movie=True, year=year,
+                latency_ms=_ms_since(req_started),
             )
             context.user_data["last_episode_dir"] = str(episode_dir) if episode_dir else ""
             context.user_data["last_series_name"] = movie_name
             context.user_data["last_translations_dir"] = str(translations_dir)
+            latency["status"] = "success"
             return
 
         # Case B: tier list exists but no translations
         if episode_dir is not None:
+            latency["branch"] = "tier_exists_translate_only"
             await status_msg.edit_text(
                 f"🎬 Processing: {label}\n"
                 f"✅ Found existing hard words list.\n\n"
@@ -479,6 +533,7 @@ async def _handle_message_movie(
                     "⏳ Subtitle file missing, downloading…",
                     parse_mode="Markdown",
                 )
+                phase_started = time.perf_counter()
                 subtitle_path = await asyncio.wait_for(
                     loop.run_in_executor(
                         None,
@@ -486,6 +541,7 @@ async def _handle_message_movie(
                     ),
                     timeout=timeout,
                 )
+                latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
                 if not subtitle_path:
                     await status_msg.edit_text(
                         f"❌ **Subtitle download failed** for {label}.\n\n"
@@ -493,14 +549,19 @@ async def _handle_message_movie(
                         parse_mode="Markdown",
                         reply_markup=_cmd_keyboard(),
                     )
+                    latency["status"] = "failed"
+                    latency["error"] = "subtitle_download_failed"
                     return
-            ok, out_dir, trans_err = await asyncio.wait_for(
+            phase_started = time.perf_counter()
+            ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
                     lambda: _do_translate(episode_dir, subtitle_path),
                 ),
                 timeout=timeout,
             )
+            latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
+            latency["translator_metrics"] = translator_metrics
             if not ok or not out_dir:
                 reason = (trans_err or "Translation failed.").strip()
                 await status_msg.edit_text(
@@ -508,6 +569,8 @@ async def _handle_message_movie(
                     parse_mode="Markdown",
                     reply_markup=_cmd_keyboard(),
                 )
+                latency["status"] = "failed"
+                latency["error"] = reason
                 return
             rel = out_dir.relative_to(BASE_DIR)
             await status_msg.edit_text(
@@ -518,18 +581,22 @@ async def _handle_message_movie(
             await _send_translations_list(
                 update, out_dir, movie_name, 0, 0,
                 is_movie=True, year=year,
+                latency_ms=_ms_since(req_started),
             )
             context.user_data["last_episode_dir"] = str(episode_dir)
             context.user_data["last_series_name"] = movie_name
             context.user_data["last_translations_dir"] = str(out_dir)
+            latency["status"] = "success"
             return
 
         # Case C: nothing exists — download, analyze, translate
+        latency["branch"] = "full_pipeline"
         await status_msg.edit_text(
             f"🎬 Processing: {label}\n\n"
             "⏳ Downloading subtitle…",
             parse_mode="Markdown",
         )
+        phase_started = time.perf_counter()
         subtitle_path = await asyncio.wait_for(
             loop.run_in_executor(
                 None,
@@ -537,6 +604,7 @@ async def _handle_message_movie(
             ),
             timeout=timeout,
         )
+        latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
         if not subtitle_path:
             await status_msg.edit_text(
                 f"❌ **Subtitle download failed** for {label}.\n\n"
@@ -544,6 +612,8 @@ async def _handle_message_movie(
                 parse_mode="Markdown",
                 reply_markup=_cmd_keyboard(),
             )
+            latency["status"] = "failed"
+            latency["error"] = "subtitle_download_failed"
             return
 
         await status_msg.edit_text(
@@ -552,6 +622,7 @@ async def _handle_message_movie(
             "⏳ Analyzing subtitle and building tier list…",
             parse_mode="Markdown",
         )
+        phase_started = time.perf_counter()
         episode_dir = await asyncio.wait_for(
             loop.run_in_executor(
                 None,
@@ -559,6 +630,7 @@ async def _handle_message_movie(
             ),
             timeout=timeout,
         )
+        latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
         if not episode_dir:
             await status_msg.edit_text(
                 "❌ **Tier list build failed** (could not analyze subtitle).\n\n"
@@ -566,6 +638,8 @@ async def _handle_message_movie(
                 parse_mode="Markdown",
                 reply_markup=_cmd_keyboard(),
             )
+            latency["status"] = "failed"
+            latency["error"] = "tier_list_build_failed"
             return
 
         await status_msg.edit_text(
@@ -574,13 +648,16 @@ async def _handle_message_movie(
             "⏳ Translating words…",
             parse_mode="Markdown",
         )
-        ok, out_dir, trans_err = await asyncio.wait_for(
+        phase_started = time.perf_counter()
+        ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
             loop.run_in_executor(
                 None,
                 lambda: _do_translate(episode_dir, subtitle_path),
             ),
             timeout=timeout,
         )
+        latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
+        latency["translator_metrics"] = translator_metrics
         if not ok or not out_dir:
             reason = (trans_err or "Translation failed.").strip()
             await status_msg.edit_text(
@@ -588,6 +665,8 @@ async def _handle_message_movie(
                 parse_mode="Markdown",
                 reply_markup=_cmd_keyboard(),
             )
+            latency["status"] = "failed"
+            latency["error"] = reason
             return
 
         rel = out_dir.relative_to(BASE_DIR)
@@ -600,10 +679,12 @@ async def _handle_message_movie(
         await _send_translations_list(
             update, out_dir, movie_name, 0, 0,
             is_movie=True, year=year,
+            latency_ms=_ms_since(req_started),
         )
         context.user_data["last_episode_dir"] = str(episode_dir)
         context.user_data["last_series_name"] = movie_name
         context.user_data["last_translations_dir"] = str(out_dir)
+        latency["status"] = "success"
 
     except asyncio.TimeoutError:
         await status_msg.edit_text(
@@ -611,12 +692,20 @@ async def _handle_message_movie(
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
+        latency["status"] = "timeout"
+        latency["error"] = "request_timeout"
     except Exception as e:
         await status_msg.edit_text(
             f"❌ **Error:** {str(e)[:150]}",
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
+        latency["status"] = "failed"
+        latency["error"] = str(e)[:200]
+    finally:
+        latency["finished_at"] = datetime.now().isoformat()
+        latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
+        await _write_latency_async(latency)
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -628,12 +717,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     raw = update.message.text.strip()
+    req_started = time.perf_counter()
+    latency = _new_latency(raw, "series")
     if len(raw) < 2:
         await update.message.reply_text(
             "❌ Name too short. Try e.g. _Fallout_, _Inception_, _Game of Thrones_.",
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
+        latency["status"] = "failed"
+        latency["error"] = "name_too_short"
+        latency["finished_at"] = datetime.now().isoformat()
+        latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
+        _write_latency(latency)
         return
 
     mode = context.user_data.get("mode", "series")
@@ -641,7 +737,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await _handle_message_movie(update, context, raw)
         return
 
+    phase_started = time.perf_counter()
     series_name, season, episode = _parse_series_input(raw)
+    latency["phase_timings_ms"]["parse_input"] = _ms_since(phase_started)
+    latency["identity"] = {
+        "series_name": series_name,
+        "season": season,
+        "episode": episode,
+    }
     status_msg = await update.message.reply_text(
         f"🔍 Processing request for: *{raw}*\n\n"
         "⏳ Searching for existing tier lists and translations…",
@@ -655,20 +758,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             "⏳ Normalizing with ChatGPT…",
             parse_mode="Markdown",
         )
+        phase_started = time.perf_counter()
         chatgpt_result = await _normalize_with_chatgpt(raw)
+        latency["phase_timings_ms"]["normalize_input"] = _ms_since(phase_started)
         if chatgpt_result is not None:
             series_name, season, episode = chatgpt_result
+            latency["identity"] = {
+                "series_name": series_name,
+                "season": season,
+                "episode": episode,
+            }
             await status_msg.edit_text(
                 f"🔍 Processing: *{series_name}* S{season}E{episode}\n\n"
                 "⏳ Searching for existing tier lists and translations…",
                 parse_mode="Markdown",
             )
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     timeout = 600.0
 
     try:
         # Step 1: look for existing tier list and translations
+        phase_started = time.perf_counter()
         episode_dir, translations_dir, subtitle_path = await asyncio.wait_for(
             loop.run_in_executor(
                 None,
@@ -676,23 +787,34 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             ),
             timeout=timeout,
         )
+        latency["phase_timings_ms"]["find_existing"] = _ms_since(phase_started)
 
         # Case A: translations already exist — send word list in chat
         if translations_dir is not None:
+            latency["branch"] = "cache_hit_translations"
             await status_msg.edit_text(
                 f"🔍 Processing: *{series_name}* S{season}E{episode}\n"
                 f"✅ Found existing translations.\n\n"
                 f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
                 parse_mode="Markdown",
             )
-            await _send_translations_list(update, translations_dir, series_name, season, episode)
+            await _send_translations_list(
+                update,
+                translations_dir,
+                series_name,
+                season,
+                episode,
+                latency_ms=_ms_since(req_started),
+            )
             context.user_data["last_episode_dir"] = str(episode_dir) if episode_dir else ""
             context.user_data["last_series_name"] = series_name
             context.user_data["last_translations_dir"] = str(translations_dir)
+            latency["status"] = "success"
             return
 
         # Case B: tier list exists but no translations — translate only
         if episode_dir is not None:
+            latency["branch"] = "tier_exists_translate_only"
             await status_msg.edit_text(
                 f"🔍 Processing: *{series_name}* S{season}E{episode}\n"
                 f"✅ Found existing hard words list.\n\n"
@@ -706,6 +828,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                     "⏳ Subtitle file missing, downloading…",
                     parse_mode="Markdown",
                 )
+                phase_started = time.perf_counter()
                 subtitle_path = await asyncio.wait_for(
                     loop.run_in_executor(
                         None,
@@ -713,6 +836,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                     ),
                     timeout=timeout,
                 )
+                latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
                 if not subtitle_path:
                     await status_msg.edit_text(
                         f"❌ **Subtitle download failed** for *{series_name}* S{season}E{episode}.\n\n"
@@ -720,20 +844,27 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                         parse_mode="Markdown",
                         reply_markup=_cmd_keyboard(),
                     )
+                    latency["status"] = "failed"
+                    latency["error"] = "subtitle_download_failed"
                     return
-            ok, out_dir, trans_err = await asyncio.wait_for(
+            phase_started = time.perf_counter()
+            ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
                     lambda: _do_translate(episode_dir, subtitle_path),
                 ),
                 timeout=timeout,
             )
+            latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
+            latency["translator_metrics"] = translator_metrics
             if not ok or not out_dir:
                 reason = (trans_err or "Translation failed.").strip()
                 await status_msg.edit_text(
                     f"❌ **Translation failed.**\n\n{reason}\n\n💡 Use /next to try again.",
                     parse_mode="Markdown",
                 )
+                latency["status"] = "failed"
+                latency["error"] = reason
                 return
             rel = out_dir.relative_to(BASE_DIR)
             await status_msg.edit_text(
@@ -741,18 +872,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 f"📁 Hard words translated and saved to: `{rel}/`",
                 parse_mode="Markdown",
             )
-            await _send_translations_list(update, out_dir, series_name, season, episode)
+            await _send_translations_list(
+                update,
+                out_dir,
+                series_name,
+                season,
+                episode,
+                latency_ms=_ms_since(req_started),
+            )
             context.user_data["last_episode_dir"] = str(episode_dir)
             context.user_data["last_series_name"] = series_name
             context.user_data["last_translations_dir"] = str(out_dir)
+            latency["status"] = "success"
             return
 
         # Case C: nothing exists — download, analyze, translate
+        latency["branch"] = "full_pipeline"
         await status_msg.edit_text(
             f"🔍 Processing: *{series_name}* S{season}E{episode}\n\n"
             "⏳ Downloading subtitle…",
             parse_mode="Markdown",
         )
+        phase_started = time.perf_counter()
         subtitle_path = await asyncio.wait_for(
             loop.run_in_executor(
                 None,
@@ -760,6 +901,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             ),
             timeout=timeout,
         )
+        latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
         if not subtitle_path:
             await status_msg.edit_text(
                 f"❌ **Subtitle download failed** for *{series_name}* S{season}E{episode}.\n\n"
@@ -767,6 +909,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 parse_mode="Markdown",
                 reply_markup=_cmd_keyboard(),
             )
+            latency["status"] = "failed"
+            latency["error"] = "subtitle_download_failed"
             return
 
         await status_msg.edit_text(
@@ -775,10 +919,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             "⏳ Analyzing subtitle and building tier list…",
             parse_mode="Markdown",
         )
+        phase_started = time.perf_counter()
         episode_dir = await asyncio.wait_for(
             loop.run_in_executor(None, lambda: _do_analyze(subtitle_path)),
             timeout=timeout,
         )
+        latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
         if not episode_dir:
             await status_msg.edit_text(
                 "❌ **Tier list build failed** (could not analyze subtitle).\n\n"
@@ -786,6 +932,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 parse_mode="Markdown",
                 reply_markup=_cmd_keyboard(),
             )
+            latency["status"] = "failed"
+            latency["error"] = "tier_list_build_failed"
             return
 
         await status_msg.edit_text(
@@ -794,13 +942,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             "⏳ Translating words…",
             parse_mode="Markdown",
         )
-        ok, out_dir, trans_err = await asyncio.wait_for(
+        phase_started = time.perf_counter()
+        ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
             loop.run_in_executor(
                 None,
                 lambda: _do_translate(episode_dir, subtitle_path),
             ),
             timeout=timeout,
         )
+        latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
+        latency["translator_metrics"] = translator_metrics
         if not ok or not out_dir:
             reason = (trans_err or "Translation failed.").strip()
             await status_msg.edit_text(
@@ -808,6 +959,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 parse_mode="Markdown",
                 reply_markup=_cmd_keyboard(),
             )
+            latency["status"] = "failed"
+            latency["error"] = reason
             return
 
         rel = out_dir.relative_to(BASE_DIR)
@@ -817,10 +970,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
-        await _send_translations_list(update, out_dir, series_name, season, episode)
+        await _send_translations_list(
+            update,
+            out_dir,
+            series_name,
+            season,
+            episode,
+            latency_ms=_ms_since(req_started),
+        )
         context.user_data["last_episode_dir"] = str(episode_dir)
         context.user_data["last_series_name"] = series_name
         context.user_data["last_translations_dir"] = str(out_dir)
+        latency["status"] = "success"
 
     except asyncio.TimeoutError:
         await status_msg.edit_text(
@@ -828,12 +989,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
+        latency["status"] = "timeout"
+        latency["error"] = "request_timeout"
     except Exception as e:
         await status_msg.edit_text(
             f"❌ **Error:** {str(e)[:150]}",
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
+        latency["status"] = "failed"
+        latency["error"] = str(e)[:200]
+    finally:
+        latency["finished_at"] = datetime.now().isoformat()
+        latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
+        await _write_latency_async(latency)
 
 
 def _load_translations_list(translations_dir: Path) -> List[Tuple[str, str]]:
@@ -964,24 +1133,32 @@ async def _send_translations_list(
     *,
     is_movie: bool = False,
     year: int = 0,
+    latency_ms: Optional[int] = None,
 ) -> None:
     """Load translations from CSV and send word list in chat (chunked if >4096 chars)."""
     pairs = _load_translations_list(translations_dir)
+    latency_suffix = (
+        f"\n⏱ *Latency:* {latency_ms / 1000:.2f}s"
+        if isinstance(latency_ms, int) and latency_ms >= 0
+        else ""
+    )
     if not pairs:
         header = f"🎬 *{series_name}*" + (f" ({year})" if year else "") if is_movie else f"📺 *{series_name}* S{season}E{episode}"
         await update.message.reply_text(
-            f"{header}\n\n📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`\n\n_No words in CSV._",
+            f"{header}\n\n📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`{latency_suffix}\n\n_No words in CSV._",
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
         return
     text = _format_word_list(series_name, season, episode, pairs, is_movie=is_movie, year=year)
+    if latency_suffix:
+        text += f"\n\n{latency_suffix}"
     max_len = 4096
     kb = _cmd_keyboard()
     if len(text) <= max_len:
         await update.message.reply_text(text, parse_mode="Markdown", reply_markup=kb)
     else:
-        parts = [text[i : i + max_len] for i in range(0, len(text), max_len)]
+        parts = _split_message_chunks(text, max_len=max_len)
         for i, part in enumerate(parts):
             await update.message.reply_text(
                 part, parse_mode="Markdown", reply_markup=kb if i == len(parts) - 1 else None
@@ -1141,7 +1318,11 @@ def main() -> None:
     app.add_handler(CallbackQueryHandler(button_callback))
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document_placeholder))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    # Retry bootstrap forever to survive transient Telegram/network hiccups.
+    app.run_polling(
+        allowed_updates=Update.ALL_TYPES,
+        bootstrap_retries=-1,
+    )
 
 
 if __name__ == "__main__":

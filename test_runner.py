@@ -175,13 +175,15 @@ def step_analyze(subtitle_path: Path, series: str, season: int, episode: int) ->
 # ---------------------------------------------------------------------------
 
 def step_translate(
-    episode_dir: Path, subtitle_path: Optional[Path]
+    episode_dir: Path,
+    subtitle_path: Optional[Path],
+    translation_model: str = "gpt-4o-mini",
 ) -> Optional[Path]:
     """Run translate_tier_translations. Returns translations dir or None."""
     from translate_tier_translations import run as run_translate  # type: ignore
     from download_subtitles import get_translations_episode_dir  # type: ignore
 
-    print(f"  [3/4] Translating tier-1 words...")
+    print(f"  [3/4] Translating tier-1 words (model: {translation_model})...")
     try:
         ok, err = run_translate(
             episode_dir=episode_dir,
@@ -189,6 +191,7 @@ def step_translate(
             api_key=_get_openai_key() or None,
             translations_base=TRANSLATIONS_BASE,
             subtitle_base=SUBTITLE_BASE,
+            model=translation_model,
         )
         if not ok:
             print(f"         ✗ Translation failed: {err}")
@@ -263,6 +266,7 @@ def run_single(
     season: int,
     episode: int,
     model: str,
+    translation_model: str = "gpt-4o-mini",
     skip_download: bool = False,
 ) -> Dict[str, Any]:
     """
@@ -279,6 +283,7 @@ def run_single(
         "season": season,
         "episode": episode,
         "label": label,
+        "translation_model": translation_model,
         "started_at": datetime.now().isoformat(),
         "steps": {},
     }
@@ -332,7 +337,7 @@ def run_single(
     record["steps"]["analyze"]["tier1_word_count"] = word_count
 
     # Step 3 — translate
-    translations_dir = step_translate(episode_dir, subtitle_path)
+    translations_dir = step_translate(episode_dir, subtitle_path, translation_model=translation_model)
     record["steps"]["translate"] = {
         "success": translations_dir is not None,
         "translations_dir": str(translations_dir) if translations_dir else None,
@@ -369,10 +374,12 @@ def save_report(results: List[Dict[str, Any]], run_dir: Path) -> None:
     print(f"\nFull JSON report: {json_path.relative_to(BASE_DIR)}")
 
     # Markdown summary
+    trans_models = list({r.get("translation_model", "?") for r in results})
     md_lines = [
         "# Translation Pipeline Test Report",
         f"\nRun: {run_dir.name}",
         f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+        f"Translation model: {', '.join(trans_models)}",
         "\n## Results Summary\n",
         "| Series | S/E | Status | C1 Trans | C2 Entities | C3 C-Level | Overall |",
         "|--------|-----|--------|----------|-------------|------------|---------|",
@@ -454,8 +461,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--model",
-        default="gpt-4o",
-        help="OpenAI model for the LLM judge (default: gpt-4o)",
+        default="gpt-5.4-mini",
+        help="OpenAI model for the LLM judge (default: gpt-5.4-mini)",
+    )
+    parser.add_argument(
+        "--translation-model",
+        default="gpt-4o-mini",
+        help="OpenAI model for translation (default: gpt-4o-mini)",
     )
     parser.add_argument(
         "--series",
@@ -505,6 +517,7 @@ def main() -> None:
 
     if args.dry_run:
         print("DRY RUN — test plan (no changes will be made):")
+        print(f"  Translation model: {args.translation_model}")
         print(f"  Judge model: {args.model}")
         print(f"  Parallel: {args.parallel}")
         print(f"  Series to test ({len(series_to_test)}):")
@@ -514,7 +527,7 @@ def main() -> None:
         print("    0. Clear Tier_lists/{series}/Season N/E and translations/{series}/Season N/E")
         print("    1. Download subtitle from OpenSubtitles")
         print("    2. Run subtitle_analyzer (tier lists + name filter)")
-        print("    3. Run translate_tier_translations (GPT-4o-mini)")
+        print(f"    3. Run translate_tier_translations ({args.translation_model})")
         print(f"    4. Run translation_judge ({args.model})")
         print("\n  Results will be saved to test_results/run_YYYYMMDD_HHMMSS/")
         return
@@ -525,6 +538,7 @@ def main() -> None:
 
     print(f"Test run started: {timestamp}")
     print(f"Series to test: {len(series_to_test)}")
+    print(f"Translation model: {args.translation_model}")
     print(f"Judge model: {args.model}")
     print(f"Parallel: {args.parallel}")
     print(f"Results dir: {run_dir.relative_to(BASE_DIR)}")
@@ -535,6 +549,7 @@ def main() -> None:
             season=spec["season"],
             episode=spec["episode"],
             model=args.model,
+            translation_model=args.translation_model,
             skip_download=args.skip_download,
         )
 

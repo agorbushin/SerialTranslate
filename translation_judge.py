@@ -28,7 +28,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-JUDGE_MODEL = "gpt-4o"
+JUDGE_MODEL = "gpt-5.4-mini"
 SUBTITLE_CONTEXT_CHARS = 4000
 MAX_EXAMPLE_LINE_CHARS = 200
 EXAMPLES_PER_WORD = 2

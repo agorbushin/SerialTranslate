@@ -72,6 +72,7 @@ cash,3,79273690,Oxford 3000,A2
 shot,3,61225531,Oxford 3000,B2
 luck,3,16773261,Easy word (easy_words.csv),A2
 bread,3,15131908,Oxford 3000,A1
+daddy,3,9928046,Easy word (easy_words.csv),N/A
 worry,3,16187062,Oxford 3000,A2
 weekend,3,45215385,Oxford 3000,A1
 someone,3,76553113,Oxford 3000,A2
@@ -379,7 +380,6 @@ willing,1,18418634,Oxford 3000,C2
 rope,1,9332628,Oxford 3000,B2
 considerable,1,10518680,Vocabulary level below C (B2),B2
 angle,1,21639451,Oxford 3000,C1
-perhap,1,42450144,Oxford 3000,N/A
 mutter,1,486946,Easy word (easy_words.csv),B2
 tablet,1,18053971,Oxford 3000,B1
 smart,1,37455745,Oxford 3000,B1

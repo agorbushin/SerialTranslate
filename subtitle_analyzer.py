@@ -9,6 +9,7 @@ import csv
 import json
 import re
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
@@ -40,20 +41,21 @@ def load_filter_from_csv(filter_file: Path, singularize: bool = True) -> Set[str
             reader = csv.DictReader(f)
             if reader.fieldnames:
                 word_column = reader.fieldnames[0]
+                loaded_words: List[str] = []
                 for row in reader:
                     word = row[word_column].strip().lower()
                     if word:
-                        words.add(word)
-                        if singularize:
-                            try:
-                                from lemmatizer import lemmatize_word, is_lemmatization_enabled
-                                if is_lemmatization_enabled():
-                                    lemma = lemmatize_word(word)
-                                else:
-                                    lemma = to_singular(word)
-                            except ImportError:
-                                lemma = to_singular(word)
-                            words.add(lemma)
+                        loaded_words.append(word)
+                words.update(loaded_words)
+                if singularize and loaded_words:
+                    try:
+                        from lemmatizer import lemmatize_words, is_lemmatization_enabled
+                        if is_lemmatization_enabled():
+                            words.update(lemmatize_words(loaded_words))
+                        else:
+                            words.update(to_singular(w) for w in loaded_words)
+                    except ImportError:
+                        words.update(to_singular(w) for w in loaded_words)
     except Exception as e:
         print(f"Warning: Could not load filter from {filter_file}: {e}")
     return words
@@ -99,10 +101,8 @@ def to_singular(word: str) -> str:
     return word_lower
 
 
-def parse_srt_file(srt_path: Path, excluded_words: Set[str]) -> List[str]:
-    """Parse SRT and return list of words (lowercase, filtered)."""
-    with open(srt_path, "r", encoding="utf-8", errors="ignore") as f:
-        content = f.read()
+def parse_srt_content(content: str, excluded_words: Set[str]) -> List[str]:
+    """Parse SRT text and return list of words (lowercase, filtered)."""
     content = re.sub(
         r"\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}", "", content
     )
@@ -124,20 +124,21 @@ def parse_srt_file(srt_path: Path, excluded_words: Set[str]) -> List[str]:
     return words
 
 
+def parse_srt_file(srt_path: Path, excluded_words: Set[str]) -> List[str]:
+    """Parse SRT file and return list of words (lowercase, filtered)."""
+    with open(srt_path, "r", encoding="utf-8", errors="ignore") as f:
+        content = f.read()
+    return parse_srt_content(content, excluded_words)
+
+
 def extract_words_from_zip(zip_path: Path, excluded_words: Set[str]) -> Counter:
     """Extract SRT from ZIP and return word Counter."""
     with zipfile.ZipFile(zip_path, "r") as zf:
         srt_files = [f for f in zf.namelist() if f.endswith(".srt")]
         if not srt_files:
             raise ValueError(f"No SRT in {zip_path}")
-        with zf.open(srt_files[0]) as f:
-            tmp = Path(srt_files[0]).name
-            Path(tmp).write_bytes(f.read())
-            try:
-                words = parse_srt_file(Path(tmp), excluded_words)
-            finally:
-                if Path(tmp).exists():
-                    Path(tmp).unlink()
+        content = zf.read(srt_files[0]).decode("utf-8", errors="ignore")
+        words = parse_srt_content(content, excluded_words)
     return Counter(words)
 
 
@@ -173,13 +174,19 @@ def load_english_frequencies(freq_file: Path) -> Dict[str, int]:
             count = int(row["count"])
             frequencies[word] = count
     try:
-        from lemmatizer import lemmatize_word, is_lemmatization_enabled
+        from lemmatizer import lemmatize_words, is_lemmatization_enabled
         use_lemma = is_lemmatization_enabled()
     except ImportError:
         use_lemma = False
+        lemmatize_words = None  # type: ignore
     singular_freqs = {}
-    for word, count in frequencies.items():
-        lemma = lemmatize_word(word) if use_lemma else to_singular(word)
+    words_in_order = list(frequencies.keys())
+    if use_lemma and lemmatize_words is not None:
+        lemmas = lemmatize_words(words_in_order)
+    else:
+        lemmas = [to_singular(w) for w in words_in_order]
+    for word, lemma in zip(words_in_order, lemmas):
+        count = frequencies[word]
         singular_freqs[lemma] = singular_freqs.get(lemma, 0) + count
     for word, count in frequencies.items():
         if word not in singular_freqs:
@@ -214,9 +221,14 @@ def categorize_words(
     oxford_filter: Optional[Set[str]] = None,
     easy_words_filter: Optional[Set[str]] = None,
     vocabulary_levels: Optional[Dict[str, str]] = None,
+    series_threshold: Optional[int] = None,
+    english_threshold: Optional[int] = None,
 ) -> Dict[str, List[Tuple]]:
     """Categorize words into 5 tiers. Returns dict of tier_key -> list of (word, series_count, english_count, ...)."""
-    series_threshold, english_threshold, _, _ = calculate_thresholds(series_freqs, english_freqs)
+    if series_threshold is None or english_threshold is None:
+        series_threshold, english_threshold, _, _ = calculate_thresholds(
+            series_freqs, english_freqs
+        )
     oxford_filter = oxford_filter or set()
     easy_words_filter = easy_words_filter or set()
     vocabulary_levels = vocabulary_levels or {}
@@ -231,7 +243,7 @@ def categorize_words(
     for word, series_count in series_freqs.items():
         english_count = english_freqs.get(word, 0)
         # Case-insensitive lookup: vocabulary file keys are lowercase
-        vocab_level = vocabulary_levels.get(word.lower(), "N/A")
+        vocab_level = vocabulary_levels.get(word, "N/A")
         level_str = str(vocab_level).strip().upper()
         is_high_series = series_count >= series_threshold
         is_high_english = english_count >= english_threshold
@@ -363,13 +375,13 @@ def save_tierlist_results_to_dir(
         "tier_5_filtered": "tier_5_filtered_words.csv",
     }
     word_counts = {}
-    for tier_key, filename in tier_files_map.items():
+    def _write_tier_csv(tier_key: str, filename: str) -> Tuple[str, int]:
         # Tier 5 holds filtered-out words; do not re-filter by level or c1 when writing
         apply_level = tier_key != "tier_5_filtered"
         # Only apply the c1_assessment "low" filter to tier-1 (the "hard words to learn" list)
         apply_c1 = tier_key == "tier_1_hard_usable"
         items = [it for it in tiers.get(tier_key, []) if keep(it, apply_level_filter=apply_level, apply_c1_filter=apply_c1)]
-        word_counts[tier_key] = len(items)
+        count = len(items)
         filepath = output_episode_dir / filename
         with open(filepath, "w", newline="", encoding="utf-8") as f:
             w = csv.writer(f)
@@ -389,6 +401,16 @@ def save_tierlist_results_to_dir(
                         w.writerow(list(item[:4]))
                     else:
                         w.writerow([*item[:3], "N/A"])
+        return tier_key, count
+
+    with ThreadPoolExecutor(max_workers=len(tier_files_map)) as pool:
+        futures = [
+            pool.submit(_write_tier_csv, tier_key, filename)
+            for tier_key, filename in tier_files_map.items()
+        ]
+        for future in futures:
+            tier_key, count = future.result()
+            word_counts[tier_key] = count
     metadata = {
         "series": series_name,
         "season": season_label,
@@ -520,10 +542,16 @@ def run_pipeline(
     if not freq_path.exists():
         print(f"Frequency list not found: {freq_path}")
         return None
-    excluded_words, oxford_filter, easy_words_filter = load_all_filters(filters_dir, exclude_oxford=True)
-    english_freqs = load_english_frequencies(freq_path)
     vocab_file = base_dir / "Frequency list" / "English" / "complete english vocabulary.xlsx"
-    vocabulary_levels = load_vocabulary_levels(vocab_file)
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        futures = {
+            "filters": pool.submit(load_all_filters, filters_dir, True),
+            "freqs": pool.submit(load_english_frequencies, freq_path),
+            "vocab": pool.submit(load_vocabulary_levels, vocab_file),
+        }
+        excluded_words, oxford_filter, easy_words_filter = futures["filters"].result()
+        english_freqs = futures["freqs"].result()
+        vocabulary_levels = futures["vocab"].result()
     if subtitle_path.suffix.lower() == ".zip":
         series_freqs = extract_words_from_zip(subtitle_path, excluded_words)
     else:
@@ -537,6 +565,8 @@ def run_pipeline(
         oxford_filter=oxford_filter,
         easy_words_filter=easy_words_filter,
         vocabulary_levels=vocabulary_levels,
+        series_threshold=series_threshold,
+        english_threshold=english_threshold,
     )
     if save_debug_csv and debug_output_dir:
         debug_output_dir.mkdir(parents=True, exist_ok=True)

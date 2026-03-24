@@ -1,0 +1,37 @@
+{
+  "request_id": "ab4bd42fdd1b4f04a05ca383e4e6ade0",
+  "mode": "series",
+  "raw_input": "fallout s2e5",
+  "started_at": "2026-03-24T00:07:22.838297",
+  "finished_at": "2026-03-24T00:08:12.478308",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Fallout",
+    "season": 2,
+    "episode": 5
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 1,
+    "download_subtitle": 1253,
+    "analyze_subtitle": 45575,
+    "translate": 1521
+  },
+  "timings_ms": {
+    "total_e2e_ms": 49639
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 8,
+    "timings_ms": {
+      "prepare_ms": 12,
+      "primary_translate_ms": 1492,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 0,
+      "total_ms": 1518
+    }
+  },
+  "error": null
+}

@@ -76,7 +76,6 @@ sad,3,13029702,Oxford 3000,A1
 everybody,3,14705200,Oxford 3000,A2
 drop,3,45620690,Oxford 3000,B1
 hate,3,23308836,Oxford 3000,A2
-jesus,3,34929061,"High English frequency (34,929,061 > 20,000,000)",N/A
 seat,2,46137154,Oxford 3000,A2
 physician,2,33643902,"High English frequency (33,643,902 > 20,000,000)",N/A
 blood,2,61544877,Oxford 3000,A2
@@ -353,6 +352,7 @@ cheat,1,34010404,Oxford 3000,B2
 skiing,1,11337414,Oxford 3000,A2
 stir,1,5260462,Vocabulary level below C (B1),B1
 cruise,1,27827938,"High English frequency (27,827,938 > 20,000,000)",B1
+caribbean,1,21305017,"High English frequency (21,305,017 > 20,000,000)",N/A
 pair,1,35468818,Oxford 3000,A1
 kitchen,1,63873372,Oxford 3000,A1
 union,1,81771545,Oxford 3000,B1
@@ -420,6 +420,7 @@ stupid,1,14144754,Oxford 3000,B1
 capacity,1,51802951,Oxford 3000,B2
 grandfather,1,4178291,Oxford 3000,A2
 stone,1,55106393,Oxford 3000,B1
+italy,1,60280461,"High English frequency (60,280,461 > 20,000,000)",N/A
 knew,1,31636418,"High English frequency (31,636,418 > 20,000,000)",N/A
 decent,1,8075752,Oxford 3000,B2
 effective,1,75960822,Oxford 3000,B2

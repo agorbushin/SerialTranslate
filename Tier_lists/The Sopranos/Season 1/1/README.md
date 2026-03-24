@@ -4,7 +4,7 @@
 
 **Subtitle**: `the_sopranos_s1_e1.srt`
 
-**Analysis**: 2026-03-19 19:14
+**Analysis**: 2026-03-21 15:13
 
 ## Word counts
 
@@ -12,4 +12,4 @@
 - Tier 2 (Random): 189
 - Tier 3 (Common): 24
 - Tier 4 (Rare in Series): 7
-- Tier 5 (Filtered): 463
+- Tier 5 (Filtered): 464

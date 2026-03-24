@@ -25,6 +25,7 @@ path,4,54711903,Oxford 3000,A2
 stay,4,86241601,Oxford 3000,A1
 seem,4,92129504,Oxford 3000,N/A
 guy,4,82889911,Oxford 3000,A2
+ford,4,42309151,"High English frequency (42,309,151 > 20,000,000)",N/A
 mine,4,34337711,Oxford 3000,A2
 drink,4,40392266,Oxford 3000,A1
 fine,4,75242969,Oxford 3000,A1
@@ -169,6 +170,7 @@ darling,1,3925050,Easy word (easy_words.csv),B2
 difference,1,69547459,Oxford 3000,A2
 fixed,1,49215402,Oxford 3000,B2
 door,1,76868330,Oxford 3000,A1
+lif,1,43191570,"High English frequency (43,191,570 > 20,000,000)",N/A
 routine,1,18500074,Oxford 3000,B1
 cease,1,4081957,Vocabulary level below C (B2),B2
 wonder,1,27355961,Oxford 3000,B1
@@ -207,6 +209,7 @@ move,1,70113140,Oxford 3000,A2
 gun,1,35217715,Oxford 3000,B1
 cruel,1,4180956,Oxford 3000,B1
 winning,1,33440237,"High English frequency (33,440,237 > 20,000,000)",N/A
+los,1,69625090,"High English frequency (69,625,090 > 20,000,000)",N/A
 celebrate,1,11805085,Oxford 3000,B1
 remind,1,9348091,Oxford 3000,B1
 lucky,1,14053901,Oxford 3000,A2
@@ -322,6 +325,7 @@ breakdown,1,7802376,Vocabulary level below C (B2),B2
 listen,1,44504101,Oxford 3000,A1
 changing,1,32076618,"High English frequency (32,076,618 > 20,000,000)",N/A
 guard,1,27127471,Oxford 3000,B1
+goe,1,47478275,"High English frequency (47,478,275 > 20,000,000)",N/A
 fantasy,1,43092529,"High English frequency (43,092,529 > 20,000,000)",B2
 completely,1,34385075,Oxford 3000,B1
 beginning,1,51574347,Oxford 3000,A2
@@ -367,6 +371,7 @@ blood,1,61544877,Oxford 3000,A2
 complicated,1,8423441,Oxford 3000,B1
 scenery,1,3907615,Vocabulary level below C (B1),B1
 couple,1,58208821,Oxford 3000,B1
+indian,1,64021150,"High English frequency (64,021,150 > 20,000,000)",N/A
 wisdom,1,12780590,Vocabulary level below C (B2),B2
 ancient,1,23888596,Oxford 3000,B1
 culture,1,79296976,Oxford 3000,B1
@@ -380,6 +385,7 @@ considerable,1,10518680,Vocabulary level below C (B2),B2
 effort,1,78950684,Oxford 3000,B1
 lack,1,35178494,Oxford 3000,B2
 inspire,1,4614369,Oxford 3000,B2
+gif,1,55673869,"High English frequency (55,673,869 > 20,000,000)",N/A
 barely,1,6764292,Easy word (easy_words.csv),B2
 contain,1,84698441,Oxford 3000,B1
 train,1,40164074,Oxford 3000,A1
@@ -412,6 +418,7 @@ born,1,52510893,Oxford 3000,N/A
 cry,1,13637934,Oxford 3000,A2
 stage,1,65151146,Oxford 3000,A2
 configuration,1,42646143,"High English frequency (42,646,143 > 20,000,000)",N/A
+drif,1,27459450,"High English frequency (27,459,450 > 20,000,000)",N/A
 daughter,1,33796898,Oxford 3000,A1
 luck,1,16773261,Easy word (easy_words.csv),A2
 mechanical,1,19315772,Vocabulary level below C (B2),B2

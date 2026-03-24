@@ -1,0 +1,24 @@
+{
+  "request_id": "85918cc4c555492eb093ed1920f50960",
+  "mode": "series",
+  "raw_input": "fallou s2e5",
+  "started_at": "2026-03-24T00:07:13.645821",
+  "finished_at": "2026-03-24T00:07:14.701477",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Fallou",
+    "season": 2,
+    "episode": 5
+  },
+  "phase_timings_ms": {
+    "parse_input": 11,
+    "find_existing": 0,
+    "download_subtitle": 410
+  },
+  "timings_ms": {
+    "total_e2e_ms": 1056
+  },
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

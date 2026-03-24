@@ -4,12 +4,12 @@
 
 **Subtitle**: `the_wire_s1_e1.srt`
 
-**Analysis**: 2026-03-19 19:16
+**Analysis**: 2026-03-21 15:32
 
 ## Word counts
 
-- Tier 1 (Hard Usable): 12
-- Tier 2 (Random): 150
-- Tier 3 (Common): 15
+- Tier 1 (Hard Usable): 72
+- Tier 2 (Random): 196
+- Tier 3 (Common): 18
 - Tier 4 (Rare in Series): 9
-- Tier 5 (Filtered): 418
+- Tier 5 (Filtered): 428

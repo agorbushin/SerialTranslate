@@ -1,0 +1,37 @@
+{
+  "request_id": "f5d8778dbf8143758152f2cfd6b5d06d",
+  "mode": "series",
+  "raw_input": "Fallout s2e7",
+  "started_at": "2026-03-24T02:45:47.463609",
+  "finished_at": "2026-03-24T02:46:14.703300",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Fallout",
+    "season": 2,
+    "episode": 7
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 0,
+    "download_subtitle": 0,
+    "analyze_subtitle": 23660,
+    "translate": 2005
+  },
+  "timings_ms": {
+    "total_e2e_ms": 27239
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 13,
+    "timings_ms": {
+      "prepare_ms": 6,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 0,
+      "total_ms": 2004
+    }
+  },
+  "error": null
+}

@@ -22,6 +22,7 @@ wrong,5,49934294,Oxford 3000,A1
 win,4,79848750,Oxford 3000,A2
 morning,4,55268727,Oxford 3000,A1
 ten,4,50614853,Oxford 3000,A1
+chinese,4,56057597,"High English frequency (56,057,597 > 20,000,000)",N/A
 strike,4,24807822,Oxford 3000,B1
 stand,4,65383320,Oxford 3000,A2
 aunt,4,5203060,Oxford 3000,A2
@@ -60,6 +61,7 @@ myself,3,37983649,Oxford 3000,A2
 understand,3,65846056,Oxford 3000,A1
 anything,3,75999346,Oxford 3000,A1
 told,3,57248600,"High English frequency (57,248,600 > 20,000,000)",N/A
+italian,3,39875209,"High English frequency (39,875,209 > 20,000,000)",N/A
 fortune,2,12387313,Oxford 3000,B2
 magic,2,36764626,Oxford 3000,A2
 lady,2,58395651,Oxford 3000,B1
@@ -84,6 +86,7 @@ hope,2,83608473,Oxford 3000,A2
 sometime,2,52184367,Oxford 3000,N/A
 chance,2,51442371,Oxford 3000,B1
 breathe,2,4368304,Oxford 3000,B1
+england,2,68710198,"High English frequency (68,710,198 > 20,000,000)",N/A
 bring,2,74972410,Oxford 3000,A2
 playing,2,51019438,"High English frequency (51,019,438 > 20,000,000)",N/A
 swear,2,3406203,Oxford 3000,B2
@@ -106,6 +109,7 @@ greet,2,2356647,Oxford 3000,B1
 princess,2,15602441,Oxford 3000,B1
 laugh,2,12662275,Oxford 3000,A2
 favour,2,6132298,Oxford 3000,B1
+ireland,2,56905567,"High English frequency (56,905,567 > 20,000,000)",N/A
 worked,2,38128226,"High English frequency (38,128,226 > 20,000,000)",N/A
 ocean,2,35377889,Oxford 3000,B1
 singing,2,10349448,Oxford 3000,A2
@@ -131,14 +135,17 @@ brain,2,37025785,Oxford 3000,A2
 bury,2,3091991,Oxford 3000,B1
 heaven,2,22161578,Easy word (easy_words.csv),B2
 spell,1,12381087,Oxford 3000,A2
+monday,1,81887183,Oxford 3000,A1
 yourself,1,53653034,Oxford 3000,A2
 cave,1,7668883,Vocabulary level below C (B1),B1
 rich,1,38868722,Oxford 3000,A2
 hurry,1,3620126,Vocabulary level below C (A2),A2
+sunday,1,78182392,Oxford 3000,A1
 push,1,22663953,Oxford 3000,A2
 mate,1,12610566,Vocabulary level below C (B1),B1
 favourite,1,43919600,Oxford 3000,A1
 six,1,71543101,Oxford 3000,A1
+bob,1,43232574,"High English frequency (43,232,574 > 20,000,000)",N/A
 lay,1,17973216,Oxford 3000,N/A
 mess,1,7335889,Oxford 3000,B1
 permission,1,49665270,Oxford 3000,B1
@@ -210,6 +217,7 @@ hang,1,13364783,Oxford 3000,B1
 somewhere,1,14335599,Oxford 3000,A2
 police,1,64560602,Oxford 3000,A2
 showing,1,48048028,"High English frequency (48,048,028 > 20,000,000)",N/A
+tom,1,49170897,"High English frequency (49,170,897 > 20,000,000)",N/A
 mix,1,35980287,Oxford 3000,A2
 mood,1,13305891,Oxford 3000,B1
 covered,1,37662109,Oxford 3000,N/A

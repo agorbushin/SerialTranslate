@@ -1,0 +1,21 @@
+{
+  "series": "Fallout S2 E7",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "fallout_s2_e7.srt",
+  "analysis_date": "2026-03-24T02:46:11.865598",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 133226982,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 13,
+    "tier_2_random": 80,
+    "tier_3_common": 11,
+    "tier_4_rare_in_series": 3,
+    "tier_5_filtered": 277
+  },
+  "excluded_names_fantasy_count": 44
+}
