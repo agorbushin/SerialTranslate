@@ -1,0 +1,38 @@
+{
+  "request_id": "978835dd95e04999b2f974c3747047e3",
+  "mode": "series",
+  "raw_input": "True Detective season 1 episode 1",
+  "started_at": "2026-03-24T13:40:58.180354",
+  "finished_at": "2026-03-24T13:41:48.466118",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "True Detective",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "normalize_input": 1678,
+    "find_existing": 6,
+    "download_subtitle": 1477,
+    "analyze_subtitle": 42773,
+    "translate": 2529
+  },
+  "timings_ms": {
+    "total_e2e_ms": 50287
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 14,
+    "timings_ms": {
+      "prepare_ms": 9,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 658,
+      "write_outputs_ms": 0,
+      "total_ms": 2528
+    }
+  },
+  "error": null
+}

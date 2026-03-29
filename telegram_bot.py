@@ -53,6 +53,8 @@ OPENSUBTITLES_API_KEY = os.environ.get("OPENSUBTITLES_API_KEY", "8FcGUu17mWuXoaq
 
 # Build/start time set when main() runs (see main())
 BOT_BUILD_DATETIME = ""
+# Shown in /start (tests assert this appears in the welcome text)
+BOT_VERSION = "0.1"
 BASE_DIR = Path(__file__).resolve().parent
 SUBTITLE_BASE = BASE_DIR / "Subtitle"
 TIERLIST_BASE = BASE_DIR / "Tier_lists"
@@ -76,6 +78,7 @@ def _new_latency(raw_input: str, mode: str) -> Dict[str, Any]:
         "identity": {},
         "phase_timings_ms": {},
         "timings_ms": {"total_e2e_ms": 0},
+        "analyze_metrics": None,
         "translator_metrics": None,
         "error": None,
     }
@@ -97,15 +100,15 @@ async def _write_latency_async(metrics: Dict[str, Any]) -> None:
 
 
 def _cmd_keyboard() -> "InlineKeyboardMarkup":
-    """Return inline keyboard with command buttons (New Series, Movies, Full List, Phrasal Verbs)."""
+    """Inline actions: pick TV vs movie, then full list or phrasals (when available)."""
     return InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("🔍 New Series", callback_data="next_series"),
-            InlineKeyboardButton("🎬 Movies", callback_data="next_movie"),
+            InlineKeyboardButton("📺 TV series", callback_data="next_series"),
+            InlineKeyboardButton("🎬 Movie", callback_data="next_movie"),
         ],
         [
-            InlineKeyboardButton("📋 Full List", callback_data="full_list"),
-            InlineKeyboardButton("🔤 Phrasal Verbs", callback_data="phrasal_verbs"),
+            InlineKeyboardButton("📋 Full word list", callback_data="full_list"),
+            InlineKeyboardButton("🔤 Phrasal verbs", callback_data="phrasal_verbs"),
         ],
     ])
 
@@ -195,7 +198,7 @@ async def _normalize_with_chatgpt(user_input: str) -> Optional[Tuple[str, int, i
     """
     if not OPENAI_API_KEY or not user_input.strip():
         return None
-    prompt = f"""The user wants to get word translations for a TV series. They entered: "{user_input}"
+    prompt = f"""The user wants frequent hard words from a TV series (with Russian glosses). They entered: "{user_input}"
 
 Extract:
 1. The official TV series name (as used on IMDb / OpenSubtitles), e.g. "Game of Thrones", "Breaking Bad".
@@ -245,11 +248,15 @@ If the input is too vague or not a series name, set series_name to "UNKNOWN". Re
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    build = BOT_BUILD_DATETIME or "unknown"
     await update.message.reply_text(
-        "👋 Welcome to the Subtitle Translation Bot!\n\n"
-        "📺 **Series** or 🎬 **Movies** — use the buttons below, then type the name.\n\n"
+        "👋 Welcome to **SerialTranslate**.\n\n"
+        "**What you get:** harder English words that show up *often* in a specific TV episode or "
+        "movie — with Russian glosses, built from real subtitles.\n\n"
+        "**What to do:** tap **TV series** or **Movie**, then send the title (add season/episode "
+        "for a show).\n\n"
         "Examples: _Fallout s2 e3_, _Inception_, _The Matrix 1999_.\n\n"
-        f"🤖 Build: {BOT_BUILD_DATETIME or 'unknown'}",
+        f"_v{BOT_VERSION} · {build}_",
         parse_mode="Markdown",
         reply_markup=_cmd_keyboard(),
     )
@@ -258,8 +265,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def next_series(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["mode"] = "series"
     await update.message.reply_text(
-        "📺 **What series do you want to translate?**\n\n"
-        "Type the series name (e.g. _Fallout_, _Game of Thrones s2 e3_).",
+        "📺 **Which TV series?**\n\n"
+        "Send the show name and, if you want a specific episode, season/episode "
+        "(e.g. _Fallout_, _Game of Thrones s2 e3_).",
         parse_mode="Markdown",
         reply_markup=_cmd_keyboard(),
     )
@@ -268,8 +276,8 @@ async def next_series(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 async def next_movie(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data["mode"] = "movie"
     await update.message.reply_text(
-        "🎬 **What movie do you want to translate?**\n\n"
-        "Type the movie name (e.g. _Inception_, _The Matrix 1999_, _Dune (2021)_).",
+        "🎬 **Which movie?**\n\n"
+        "Send the title (optional year helps), e.g. _Inception_, _The Matrix 1999_, _Dune (2021)_.",
         parse_mode="Markdown",
         reply_markup=_cmd_keyboard(),
     )
@@ -377,20 +385,22 @@ def _do_download(series_name: str, season: int, episode: int) -> Optional[Path]:
     return path
 
 
-def _do_analyze(subtitle_path: Path) -> Optional[Path]:
-    """Run tier pipeline for series. Returns episode_dir or None."""
+def _do_analyze(subtitle_path: Path) -> Tuple[Optional[Path], Dict[str, int]]:
+    """Run tier pipeline for series. Returns (episode_dir_or_none, analyze_metrics)."""
     from subtitle_analyzer import run_pipeline
 
+    analyze_metrics: Dict[str, int] = {}
     episode_dir = run_pipeline(
         subtitle_path=subtitle_path,
         base_dir=BASE_DIR,
         tierlist_base_dir=TIERLIST_BASE,
         max_english_freq=20_000_000,
         openai_api_key=OPENAI_API_KEY or None,
+        metrics_out=analyze_metrics,
     )
     if not episode_dir or not (episode_dir / "tier_1_hard_usable_words.csv").exists():
-        return None
-    return episode_dir
+        return None, analyze_metrics
+    return episode_dir, analyze_metrics
 
 
 def _do_download_movie(movie_name: str, year: int) -> Optional[Path]:
@@ -406,10 +416,13 @@ def _do_download_movie(movie_name: str, year: int) -> Optional[Path]:
     return path
 
 
-def _do_analyze_movie(subtitle_path: Path, movie_name: str, year: int) -> Optional[Path]:
-    """Run tier pipeline for movie. Returns episode_dir or None."""
+def _do_analyze_movie(
+    subtitle_path: Path, movie_name: str, year: int
+) -> Tuple[Optional[Path], Dict[str, int]]:
+    """Run tier pipeline for movie. Returns (episode_dir_or_none, analyze_metrics)."""
     from subtitle_analyzer import run_pipeline
 
+    analyze_metrics: Dict[str, int] = {}
     episode_dir = run_pipeline(
         subtitle_path=subtitle_path,
         base_dir=BASE_DIR,
@@ -419,10 +432,11 @@ def _do_analyze_movie(subtitle_path: Path, movie_name: str, year: int) -> Option
         is_movie=True,
         series_name=movie_name,
         year=year if year > 0 else None,
+        metrics_out=analyze_metrics,
     )
     if not episode_dir or not (episode_dir / "tier_1_hard_usable_words.csv").exists():
-        return None
-    return episode_dir
+        return None, analyze_metrics
+    return episode_dir, analyze_metrics
 
 
 def _do_translate(
@@ -480,7 +494,7 @@ async def _handle_message_movie(
     label = f"*{movie_name}*" + (f" ({year})" if year else "")
     status_msg = await update.message.reply_text(
         f"🎬 Processing request for: {label}\n\n"
-        "⏳ Searching for existing tier lists and translations…",
+        "⏳ Looking for a saved word list or translations…",
         parse_mode="Markdown",
     )
 
@@ -619,11 +633,11 @@ async def _handle_message_movie(
         await status_msg.edit_text(
             f"🎬 Processing: {label}\n"
             f"✅ Subtitle downloaded.\n\n"
-            "⏳ Analyzing subtitle and building tier list…",
+            "⏳ Building the hard-word list from the subtitle…",
             parse_mode="Markdown",
         )
         phase_started = time.perf_counter()
-        episode_dir = await asyncio.wait_for(
+        episode_dir, analyze_metrics = await asyncio.wait_for(
             loop.run_in_executor(
                 None,
                 lambda: _do_analyze_movie(subtitle_path, movie_name, year),
@@ -631,10 +645,11 @@ async def _handle_message_movie(
             timeout=timeout,
         )
         latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
+        latency["analyze_metrics"] = analyze_metrics
         if not episode_dir:
             await status_msg.edit_text(
-                "❌ **Tier list build failed** (could not analyze subtitle).\n\n"
-                "Subtitle file may be invalid or empty.",
+                "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
+                "The file may be invalid or empty.",
                 parse_mode="Markdown",
                 reply_markup=_cmd_keyboard(),
             )
@@ -711,7 +726,7 @@ async def _handle_message_movie(
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not update.message or not update.message.text:
         await update.message.reply_text(
-            "❌ Please send a series or movie name.",
+            "❌ Please send a TV series or movie title.",
             reply_markup=_cmd_keyboard(),
         )
         return
@@ -747,7 +762,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     }
     status_msg = await update.message.reply_text(
         f"🔍 Processing request for: *{raw}*\n\n"
-        "⏳ Searching for existing tier lists and translations…",
+        "⏳ Looking for a saved word list or translations…",
         parse_mode="Markdown",
     )
 
@@ -770,7 +785,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             }
             await status_msg.edit_text(
                 f"🔍 Processing: *{series_name}* S{season}E{episode}\n\n"
-                "⏳ Searching for existing tier lists and translations…",
+                "⏳ Looking for a saved word list or translations…",
                 parse_mode="Markdown",
             )
 
@@ -860,7 +875,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             if not ok or not out_dir:
                 reason = (trans_err or "Translation failed.").strip()
                 await status_msg.edit_text(
-                    f"❌ **Translation failed.**\n\n{reason}\n\n💡 Use /next to try again.",
+                    f"❌ **Translation failed.**\n\n{reason}\n\n💡 Use /next or **TV series** to try another title.",
                     parse_mode="Markdown",
                 )
                 latency["status"] = "failed"
@@ -916,19 +931,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await status_msg.edit_text(
             f"🔍 Processing: *{series_name}* S{season}E{episode}\n"
             f"✅ Subtitle downloaded.\n\n"
-            "⏳ Analyzing subtitle and building tier list…",
+            "⏳ Building the hard-word list from the subtitle…",
             parse_mode="Markdown",
         )
         phase_started = time.perf_counter()
-        episode_dir = await asyncio.wait_for(
+        episode_dir, analyze_metrics = await asyncio.wait_for(
             loop.run_in_executor(None, lambda: _do_analyze(subtitle_path)),
             timeout=timeout,
         )
         latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
+        latency["analyze_metrics"] = analyze_metrics
         if not episode_dir:
             await status_msg.edit_text(
-                "❌ **Tier list build failed** (could not analyze subtitle).\n\n"
-                "Subtitle file may be invalid or empty.",
+                "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
+                "The file may be invalid or empty.",
                 parse_mode="Markdown",
                 reply_markup=_cmd_keyboard(),
             )
@@ -1183,8 +1199,8 @@ async def send_full_list(
     last_dir = context.user_data.get("last_translations_dir")
     if not last_dir:
         msg = (
-            "❌ No series or movie requested yet.\n\n"
-            "Send a name first (e.g. _Game of Thrones s2 e3_, _Inception_), then use /full or the Full List button."
+            "❌ No episode or movie loaded yet.\n\n"
+            "Send a title first (e.g. _Game of Thrones s2 e3_, _Inception_), then use /full or **Full word list**."
         )
         kb = _cmd_keyboard()
         if query:
@@ -1236,15 +1252,15 @@ async def send_phrasal_placeholder(update: Update, context: ContextTypes.DEFAULT
     kb = _cmd_keyboard()
     if last_dir:
         await update.message.reply_text(
-            "🔤 Phrasal verbs: *Coming soon.*\n\n"
-            f"Last translations: `{_rel_path(last_dir)}/`",
+            "🔤 Phrasal verbs: *coming soon.*\n\n"
+            f"Last word list: `{_rel_path(last_dir)}/`",
             parse_mode="Markdown",
             reply_markup=kb,
         )
     else:
         await update.message.reply_text(
-            "❌ No series requested yet.\n\n"
-            "Send a series name first, then use /phrasal.",
+            "❌ No title loaded yet.\n\n"
+            "Send a TV series or movie first, then tap **Phrasal verbs** or use /phrasal.",
             parse_mode="Markdown",
             reply_markup=kb,
         )
@@ -1271,13 +1287,13 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await send_phrasal_placeholder(wrapped, context)
     elif data == "rare_hard_words":
         await query.edit_message_text(
-            "📊 Rare in Series Hard Words: *Coming soon.*",
+            "📊 Rare hard words in this title: *coming soon.*",
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
     elif data == "hard_words_frequent":
         await query.edit_message_text(
-            "📊 Hard Words Frequent in Series: *Coming soon.*",
+            "📊 Frequent hard words (this title): *coming soon.*",
             parse_mode="Markdown",
             reply_markup=_cmd_keyboard(),
         )
@@ -1294,8 +1310,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 async def handle_document_placeholder(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "📥 File upload: *Coming soon.*\n\n"
-        "For now, type the series name (e.g. _Game of Thrones s2 e3_) to download and translate.",
+        "📥 Subtitle file upload: *coming soon.*\n\n"
+        "For now, send a TV series or movie title (e.g. _Game of Thrones s2 e3_) to build a word list.",
         parse_mode="Markdown",
         reply_markup=_cmd_keyboard(),
     )

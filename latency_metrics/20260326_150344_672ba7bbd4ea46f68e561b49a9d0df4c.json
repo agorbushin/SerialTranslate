@@ -1,0 +1,36 @@
+{
+  "request_id": "672ba7bbd4ea46f68e561b49a9d0df4c",
+  "mode": "movie",
+  "raw_input": "serenity",
+  "started_at": "2026-03-26T15:02:10.826930",
+  "finished_at": "2026-03-26T15:03:44.264764",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "movie_name": "Serenity",
+    "year": 0
+  },
+  "phase_timings_ms": {
+    "parse_input": 2,
+    "find_existing": 14,
+    "download_subtitle": 2870,
+    "analyze_subtitle": 82397,
+    "translate": 6364
+  },
+  "timings_ms": {
+    "total_e2e_ms": 93437
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 31,
+    "timings_ms": {
+      "prepare_ms": 30,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 0,
+      "total_ms": 6363
+    }
+  },
+  "error": null
+}

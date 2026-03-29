@@ -1,0 +1,36 @@
+{
+  "request_id": "470ab2be236a4969ae6b3e10781258a7",
+  "mode": "movie",
+  "raw_input": "Dune (2021)",
+  "started_at": "2026-03-26T14:55:45.121026",
+  "finished_at": "2026-03-26T14:57:06.023929",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "movie_name": "Dune",
+    "year": 2021
+  },
+  "phase_timings_ms": {
+    "parse_input": 7,
+    "find_existing": 4,
+    "download_subtitle": 1853,
+    "analyze_subtitle": 63608,
+    "translate": 13618
+  },
+  "timings_ms": {
+    "total_e2e_ms": 80902
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 41,
+    "timings_ms": {
+      "prepare_ms": 30,
+      "primary_translate_ms": 6,
+      "retry_translate_ms": 940,
+      "write_outputs_ms": 0,
+      "total_ms": 13614
+    }
+  },
+  "error": null
+}

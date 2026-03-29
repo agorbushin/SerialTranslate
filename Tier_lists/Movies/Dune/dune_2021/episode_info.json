@@ -1,0 +1,25 @@
+{
+  "series": "Dune",
+  "season": "Movie (2021)",
+  "season_number": 0,
+  "episode_number": 0,
+  "subtitle_file": "dune_2021.srt",
+  "analysis_date": "2026-03-26T14:56:51.092208",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 74772026,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 41,
+    "tier_2_random": 243,
+    "tier_3_common": 23,
+    "tier_4_rare_in_series": 12,
+    "tier_5_filtered": 476,
+    "tier_b1_words": 12,
+    "tier_b2_words": 28
+  },
+  "is_movie": true,
+  "year": 2021,
+  "excluded_names_fantasy_count": 70
+}

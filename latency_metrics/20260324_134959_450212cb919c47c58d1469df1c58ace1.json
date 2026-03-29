@@ -1,0 +1,24 @@
+{
+  "request_id": "450212cb919c47c58d1469df1c58ace1",
+  "mode": "series",
+  "raw_input": "📺 True Detective S1E1",
+  "started_at": "2026-03-24T13:49:58.537533",
+  "finished_at": "2026-03-24T13:49:59.991622",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "📺 True Detective",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 2,
+    "find_existing": 2,
+    "download_subtitle": 734
+  },
+  "timings_ms": {
+    "total_e2e_ms": 1454
+  },
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

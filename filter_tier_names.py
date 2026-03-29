@@ -284,6 +284,8 @@ DEFAULT_TIER_FILES = [
     "tier_3_common_words.csv",
     "tier_4_rare_in_series.csv",
     "tier_5_filtered_words.csv",
+    "tier_b1_words.csv",
+    "tier_b2_words.csv",
 ]
 
 

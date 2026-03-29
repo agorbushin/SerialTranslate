@@ -1,0 +1,45 @@
+{
+  "request_id": "408e19d053b940e3bc4c1467c5b96672",
+  "mode": "series",
+  "raw_input": "The Studio S1E3",
+  "started_at": "2026-03-29T12:42:32.334774",
+  "finished_at": "2026-03-29T12:43:13.583394",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "The Studio",
+    "season": 1,
+    "episode": 3
+  },
+  "phase_timings_ms": {
+    "parse_input": 1,
+    "find_existing": 7,
+    "download_subtitle": 1603,
+    "analyze_subtitle": 35335,
+    "translate": 2484
+  },
+  "timings_ms": {
+    "total_e2e_ms": 41250
+  },
+  "analyze_metrics": {
+    "preload_ms": 6954,
+    "parse_subtitle_ms": 8,
+    "tier_build_ms": 1,
+    "gpt_filter_ms": 27268,
+    "save_outputs_ms": 6,
+    "total_ms": 34239
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 12,
+    "timings_ms": {
+      "prepare_ms": 8,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 0,
+      "total_ms": 2480
+    }
+  },
+  "error": null
+}

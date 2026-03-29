@@ -101,9 +101,18 @@ class TestCommandHandlers:
         call_args = mock_update.message.reply_text.call_args
         message = call_args[0][0]
         
-        # Check for correct error message content
-        assert "No series" in message or "no series" in message.lower()
-        assert "requested" in message.lower() or "series first" in message.lower()
+        # Check for correct error message content (copy may say episode/movie vs "series")
+        assert (
+            "No series" in message
+            or "no series" in message.lower()
+            or "episode or movie" in message.lower()
+        )
+        assert (
+            "requested" in message.lower()
+            or "series first" in message.lower()
+            or "loaded yet" in message.lower()
+            or "title first" in message.lower()
+        )
         # The message should mention /full or the command itself
         assert "/full" in message or "full" in message.lower() or "complete list" in message.lower()
     

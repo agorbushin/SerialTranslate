@@ -1,0 +1,37 @@
+{
+  "request_id": "213dfc536ccd498eaebdd096d6326f16",
+  "mode": "series",
+  "raw_input": "The Studio S1E2",
+  "started_at": "2026-03-26T14:58:14.083859",
+  "finished_at": "2026-03-26T14:58:48.989492",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "The Studio",
+    "season": 1,
+    "episode": 2
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 10,
+    "download_subtitle": 1422,
+    "analyze_subtitle": 29030,
+    "translate": 3166
+  },
+  "timings_ms": {
+    "total_e2e_ms": 34905
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 12,
+    "timings_ms": {
+      "prepare_ms": 9,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 28,
+      "total_ms": 3153
+    }
+  },
+  "error": null
+}

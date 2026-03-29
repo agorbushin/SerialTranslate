@@ -1,0 +1,37 @@
+{
+  "request_id": "abb65c878cd842699e83f6b02792593f",
+  "mode": "series",
+  "raw_input": "true detective s2e2",
+  "started_at": "2026-03-26T14:39:33.751181",
+  "finished_at": "2026-03-26T14:40:38.493383",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "True Detective",
+    "season": 2,
+    "episode": 2
+  },
+  "phase_timings_ms": {
+    "parse_input": 3,
+    "find_existing": 8,
+    "download_subtitle": 1647,
+    "analyze_subtitle": 55673,
+    "translate": 5538
+  },
+  "timings_ms": {
+    "total_e2e_ms": 64717
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 12,
+    "timings_ms": {
+      "prepare_ms": 8,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 1222,
+      "write_outputs_ms": 0,
+      "total_ms": 5534
+    }
+  },
+  "error": null
+}

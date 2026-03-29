@@ -2,7 +2,7 @@
 """
 Translate tier-1 (hard usable) words to Russian using ChatGPT.
 Reads words from tier_1_hard_usable_words.csv and subtitle context from an SRT file.
-Sends 1 word per API request (gpt-4o-mini) for maximum per-word context focus.
+Sends 1 word per API request (gpt-5.4) for maximum per-word context focus.
 """
 
 import csv
@@ -221,7 +221,7 @@ Respond with a single JSON object only."""
             await asyncio.sleep(wait)
         try:
             response = await client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-5.4",
                 messages=[
                     {"role": "system", "content": "You are a precise Russian dictionary translator. You respond only with valid JSON. No markdown, no extra text. Never phonetically transcribe — always use real Russian words."},
                     {"role": "user", "content": prompt},

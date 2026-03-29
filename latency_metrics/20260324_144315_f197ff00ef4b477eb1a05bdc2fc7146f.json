@@ -1,0 +1,25 @@
+{
+  "request_id": "f197ff00ef4b477eb1a05bdc2fc7146f",
+  "mode": "series",
+  "raw_input": "The studio 1st episode",
+  "started_at": "2026-03-24T14:43:13.252840",
+  "finished_at": "2026-03-24T14:43:15.824910",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "The Studio 1St Episode",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 3,
+    "normalize_input": 1157,
+    "find_existing": 4,
+    "download_subtitle": 546
+  },
+  "timings_ms": {
+    "total_e2e_ms": 2573
+  },
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

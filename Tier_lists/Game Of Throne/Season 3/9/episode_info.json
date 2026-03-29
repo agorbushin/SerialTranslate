@@ -1,0 +1,23 @@
+{
+  "series": "Game Of Throne",
+  "season": "Season 3",
+  "season_number": 3,
+  "episode_number": 9,
+  "subtitle_file": "game_of_throne_s3_e9.srt",
+  "analysis_date": "2026-03-24T03:29:10.007509",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 105897007,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 6,
+    "tier_2_random": 86,
+    "tier_3_common": 18,
+    "tier_4_rare_in_series": 3,
+    "tier_5_filtered": 333,
+    "tier_b1_words": 13,
+    "tier_b2_words": 19
+  },
+  "excluded_names_fantasy_count": 84
+}

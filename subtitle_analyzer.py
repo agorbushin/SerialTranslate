@@ -238,6 +238,8 @@ def categorize_words(
         "tier_3_common": [],
         "tier_4_rare_in_series": [],
         "tier_5_filtered": [],
+        "tier_b1_words": [],
+        "tier_b2_words": [],
     }
     LEVELS_BELOW_C = ("A1", "A2", "B1", "B2")
     for word, series_count in series_freqs.items():
@@ -257,10 +259,21 @@ def categorize_words(
             is_filtered, filter_reason = True, "Oxford 3000"
         elif (would_be_tier1 or would_be_tier2) and max_english_freq is not None and english_count > max_english_freq:
             is_filtered, filter_reason = True, f"High English frequency ({english_count:,} > {max_english_freq:,})"
-        elif (would_be_tier1 or would_be_tier2) and level_str in LEVELS_BELOW_C:
+        elif (would_be_tier1 or would_be_tier2) and level_str in ("A1", "A2"):
             is_filtered, filter_reason = True, f"Vocabulary level below C ({level_str})"
         if is_filtered and (would_be_tier1 or would_be_tier2):
             tiers["tier_5_filtered"].append((word, series_count, english_count, filter_reason, vocab_level))
+            continue
+        if (would_be_tier1 or would_be_tier2) and level_str == "B1":
+            tiers["tier_b1_words"].append((word, series_count, english_count, vocab_level))
+            continue
+        if (would_be_tier1 or would_be_tier2) and level_str == "B2":
+            tiers["tier_b2_words"].append((word, series_count, english_count, vocab_level))
+            continue
+        if (would_be_tier1 or would_be_tier2) and level_str in LEVELS_BELOW_C:
+            tiers["tier_5_filtered"].append(
+                (word, series_count, english_count, f"Vocabulary level below C ({level_str})", vocab_level)
+            )
             continue
         if would_be_tier1:
             tiers["tier_1_hard_usable"].append((word, series_count, english_count, vocab_level))
@@ -332,7 +345,8 @@ def save_tierlist_results_to_dir(
 ) -> None:
     """Write tier CSVs, episode_info.json, and README to output_episode_dir (Tier_lists layout).
     If excluded_words is set, rows whose word (lowercase) is in it are omitted (name/fantasy filter).
-    Words with vocabulary level below C (A1, A2, B1, B2) are omitted when level is determined.
+    Words with vocabulary level below C (A1, A2, B1, B2) are omitted when level is determined,
+    except dedicated B1/B2 tier outputs.
     For tier-1 specifically, words rated "low" by c1_assessment (C1 speakers likely know them)
     are also excluded so the list contains only genuinely advanced vocabulary.
     """
@@ -373,11 +387,13 @@ def save_tierlist_results_to_dir(
         "tier_3_common": "tier_3_common_words.csv",
         "tier_4_rare_in_series": "tier_4_rare_in_series.csv",
         "tier_5_filtered": "tier_5_filtered_words.csv",
+        "tier_b1_words": "tier_b1_words.csv",
+        "tier_b2_words": "tier_b2_words.csv",
     }
     word_counts = {}
     def _write_tier_csv(tier_key: str, filename: str) -> Tuple[str, int]:
         # Tier 5 holds filtered-out words; do not re-filter by level or c1 when writing
-        apply_level = tier_key != "tier_5_filtered"
+        apply_level = tier_key not in ("tier_5_filtered", "tier_b1_words", "tier_b2_words")
         # Only apply the c1_assessment "low" filter to tier-1 (the "hard words to learn" list)
         apply_c1 = tier_key == "tier_1_hard_usable"
         items = [it for it in tiers.get(tier_key, []) if keep(it, apply_level_filter=apply_level, apply_c1_filter=apply_c1)]
@@ -453,6 +469,8 @@ def save_tierlist_results_to_dir(
         f"- Tier 3 (Common): {word_counts.get('tier_3_common', 0)}\n"
         f"- Tier 4 (Rare in Series): {word_counts.get('tier_4_rare_in_series', 0)}\n"
         f"- Tier 5 (Filtered): {word_counts.get('tier_5_filtered', 0)}\n"
+        f"- Tier B1 (Intermediate): {word_counts.get('tier_b1_words', 0)}\n"
+        f"- Tier B2 (Upper-Intermediate): {word_counts.get('tier_b2_words', 0)}\n"
     )
     (output_episode_dir / "README.md").write_text(readme, encoding="utf-8")
     print(f"Saved tier lists to {output_episode_dir}/")
@@ -525,6 +543,7 @@ def run_pipeline(
     save_debug_csv: bool = False,
     debug_output_dir: Optional[Path] = None,
     openai_api_key: Optional[str] = None,
+    metrics_out: Optional[Dict[str, int]] = None,
 ) -> Optional[Path]:
     """
     Run full pipeline: load resources, parse subtitle, categorize, optionally filter
@@ -532,15 +551,36 @@ def run_pipeline(
     Returns the episode dir path where tier lists were written, or None.
     If openai_api_key is set, character names and fantasy entities are excluded from tier CSVs.
     """
+    import time
+    t0 = time.perf_counter()
+    phase_started = t0
+    timings_ms: Dict[str, int] = {
+        "preload_ms": 0,
+        "parse_subtitle_ms": 0,
+        "tier_build_ms": 0,
+        "gpt_filter_ms": 0,
+        "save_outputs_ms": 0,
+        "total_ms": 0,
+    }
+
+    def _set_metrics() -> None:
+        timings_ms["total_ms"] = int((time.perf_counter() - t0) * 1000)
+        if metrics_out is None:
+            return
+        metrics_out.clear()
+        metrics_out.update(timings_ms)
+
     base_dir = base_dir.resolve()
     subtitle_path = subtitle_path.resolve()
     if not subtitle_path.exists():
         print(f"Subtitle not found: {subtitle_path}")
+        _set_metrics()
         return None
     filters_dir = filters_dir or base_dir / "filters"
     freq_path = freq_path or base_dir / "Frequency list" / "English" / "unigram_freq.csv"
     if not freq_path.exists():
         print(f"Frequency list not found: {freq_path}")
+        _set_metrics()
         return None
     vocab_file = base_dir / "Frequency list" / "English" / "complete english vocabulary.xlsx"
     with ThreadPoolExecutor(max_workers=3) as pool:
@@ -552,11 +592,17 @@ def run_pipeline(
         excluded_words, oxford_filter, easy_words_filter = futures["filters"].result()
         english_freqs = futures["freqs"].result()
         vocabulary_levels = futures["vocab"].result()
+    timings_ms["preload_ms"] = int((time.perf_counter() - phase_started) * 1000)
+
+    phase_started = time.perf_counter()
     if subtitle_path.suffix.lower() == ".zip":
         series_freqs = extract_words_from_zip(subtitle_path, excluded_words)
     else:
         series_freqs = Counter(parse_srt_file(subtitle_path, excluded_words))
     series_freqs = Counter({w: c for w, c in series_freqs.items() if len(w) >= min_length})
+    timings_ms["parse_subtitle_ms"] = int((time.perf_counter() - phase_started) * 1000)
+
+    phase_started = time.perf_counter()
     series_threshold, english_threshold, _, _ = calculate_thresholds(series_freqs, english_freqs)
     tiers = categorize_words(
         series_freqs,
@@ -568,6 +614,7 @@ def run_pipeline(
         series_threshold=series_threshold,
         english_threshold=english_threshold,
     )
+    timings_ms["tier_build_ms"] = int((time.perf_counter() - phase_started) * 1000)
     if save_debug_csv and debug_output_dir:
         debug_output_dir.mkdir(parents=True, exist_ok=True)
         for tier_key, fname in [
@@ -576,6 +623,8 @@ def run_pipeline(
             ("tier_3_common", "tier_3_common_words.csv"),
             ("tier_4_rare_in_series", "tier_4_rare_in_series.csv"),
             ("tier_5_filtered", "tier_5_filtered_words.csv"),
+            ("tier_b1_words", "tier_b1_words.csv"),
+            ("tier_b2_words", "tier_b2_words.csv"),
         ]:
             path = debug_output_dir / fname
             with open(path, "w", newline="", encoding="utf-8") as f:
@@ -590,6 +639,7 @@ def run_pipeline(
                     for it in items:
                         w.writerow(it[:4] if len(it) >= 4 else [*it[:3], "N/A"])
     if not tierlist_base_dir:
+        _set_metrics()
         return None
     tierlist_base_dir = tierlist_base_dir.resolve()
     if is_movie:
@@ -612,6 +662,7 @@ def run_pipeline(
 
     excluded_words: Optional[Set[str]] = None
     c1_assessment: Optional[Dict[str, str]] = None
+    phase_started = time.perf_counter()
     if openai_api_key:
         try:
             from filter_tier_names import (
@@ -627,6 +678,8 @@ def run_pipeline(
                 "tier_3_common",
                 "tier_4_rare_in_series",
                 "tier_5_filtered",
+                "tier_b1_words",
+                "tier_b2_words",
             ):
                 for item in tiers.get(tier_key, []):
                     w = (item[0] or "").strip().lower()
@@ -643,6 +696,7 @@ def run_pipeline(
                 print(f"  Excluding {len(excluded_words)} words from tier lists")
         except Exception as e:
             print(f"Warning: Name/fantasy filter failed ({e}), saving tier lists without filtering")
+    timings_ms["gpt_filter_ms"] = int((time.perf_counter() - phase_started) * 1000)
 
     from download_subtitles import get_tierlist_episode_dir, get_tierlist_movie_dir
     if is_movie:
@@ -653,6 +707,7 @@ def run_pipeline(
         output_episode_dir = get_tierlist_episode_dir(
             tierlist_base_dir, series_name, season_number, episode_number
         )
+    phase_started = time.perf_counter()
     save_tierlist_results_to_dir(
         tiers,
         output_episode_dir,
@@ -668,8 +723,10 @@ def run_pipeline(
         is_movie=is_movie,
         movie_year=year if is_movie else None,
     )
+    timings_ms["save_outputs_ms"] = int((time.perf_counter() - phase_started) * 1000)
     if debug_output_dir and HAS_MATPLOTLIB:
         create_frequency_plot(tiers, series_threshold, english_threshold, debug_output_dir)
+    _set_metrics()
     return output_episode_dir
 
 

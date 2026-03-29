@@ -1,0 +1,23 @@
+{
+  "series": "The Studio S1 E1",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "the_studio_s1_e1.srt",
+  "analysis_date": "2026-03-24T15:10:01.355921",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 93253122,
+    "max_english_freq": 20000000
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 6,
+    "tier_2_random": 145,
+    "tier_3_common": 21,
+    "tier_4_rare_in_series": 9,
+    "tier_5_filtered": 377,
+    "tier_b1_words": 9,
+    "tier_b2_words": 22
+  },
+  "excluded_names_fantasy_count": 80
+}
