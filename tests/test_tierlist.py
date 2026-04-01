@@ -3,6 +3,7 @@ Test tier list creation: path layout, Game of Thrones S02E02 tier list, and inte
 """
 
 import csv
+import json
 import tempfile
 import pytest
 from pathlib import Path
@@ -96,3 +97,82 @@ def test_save_tierlist_excluded_words_omits_names() -> None:
         assert "joffrey" not in words
         assert "armor" in words
         assert "commander" in words
+
+
+def test_save_tierlist_splits_tier4_into_rare_c_and_rare_b() -> None:
+    """tier_4_rare_in_series is split: B1/B2 → tier_4_rare_b_words.csv; C1/C2 → tier_4_rare_c_words.csv; A-tier skipped."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "ep"
+        tiers = {
+            "tier_1_hard_usable": [],
+            "tier_2_random": [],
+            "tier_3_common": [],
+            "tier_4_rare_in_series": [
+                ("bword", 1, 50_000_000, "B1"),
+                ("cword", 1, 50_000_000, "C1"),
+                ("aword", 1, 50_000_000, "A1"),
+            ],
+            "tier_5_filtered": [],
+        }
+        subtitle_path = Path(tmp) / "dummy.srt"
+        subtitle_path.write_text("1\n00:00:00,000 --> 00:00:01,000\nTest\n", encoding="utf-8")
+        save_tierlist_results_to_dir(
+            tiers,
+            out,
+            subtitle_path,
+            series_threshold=2,
+            english_threshold=5_000_000,
+            max_english_freq=20_000_000,
+            series_name="Test Show",
+            season_number=1,
+            episode_number=1,
+        )
+        rare_b = out / "tier_4_rare_b_words.csv"
+        rare_c = out / "tier_4_rare_c_words.csv"
+        assert rare_b.exists()
+        assert rare_c.exists()
+        with open(rare_b, "r", encoding="utf-8") as f:
+            b_words = [row["word"] for row in csv.DictReader(f)]
+        with open(rare_c, "r", encoding="utf-8") as f:
+            c_words = [row["word"] for row in csv.DictReader(f)]
+        assert "bword" in b_words
+        assert "cword" in c_words
+        assert "aword" not in b_words and "aword" not in c_words
+
+        meta = json.loads((out / "episode_info.json").read_text(encoding="utf-8"))
+        wc = meta["word_counts"]
+        assert wc["tier_4_rare_c_words"] == 1
+        assert wc["tier_4_rare_b_words"] == 1
+
+
+def test_save_tierlist_tier4_na_not_in_rare_c() -> None:
+    """N/A in tier_4 must not be written to rare_c (only C1/C2 are)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "ep"
+        tiers = {
+            "tier_1_hard_usable": [],
+            "tier_2_random": [],
+            "tier_3_common": [],
+            "tier_4_rare_in_series": [
+                ("na_word", 1, 50_000_000, "N/A"),
+                ("cword", 1, 50_000_000, "C2"),
+            ],
+            "tier_5_filtered": [],
+        }
+        subtitle_path = Path(tmp) / "dummy.srt"
+        subtitle_path.write_text("1\n00:00:00,000 --> 00:00:01,000\nTest\n", encoding="utf-8")
+        save_tierlist_results_to_dir(
+            tiers,
+            out,
+            subtitle_path,
+            series_threshold=2,
+            english_threshold=5_000_000,
+            max_english_freq=20_000_000,
+            series_name="Test Show",
+            season_number=1,
+            episode_number=1,
+        )
+        with open(out / "tier_4_rare_c_words.csv", "r", encoding="utf-8") as f:
+            c_words = [row["word"] for row in csv.DictReader(f)]
+        assert "cword" in c_words
+        assert "na_word" not in c_words

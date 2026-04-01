@@ -1,0 +1,161 @@
+word,series_frequency,english_frequency,filter_reason,vocabulary_level
+maybe,12,51946944,Oxford 3000,A2
+guy,11,82889911,Oxford 3000,A2
+detective,11,5353706,Oxford 3000,B1
+heard,10,45436523,"High English frequency (45,436,523 > 20,000,000)",A2
+sir,10,20704773,Oxford 3000,B1
+anything,10,75999346,Oxford 3000,A1
+dinner,9,27843687,Oxford 3000,A1
+hear,8,49163786,"High English frequency (49,163,786 > 20,000,000)",A1
+heh,8,2645768,Vocabulary level below C (A2),A2
+hold,7,82741121,Oxford 3000,A2
+believe,7,75918053,Oxford 3000,A2
+nothing,7,73363579,Oxford 3000,A2
+outside,6,67458757,Oxford 3000,A1
+woman,6,71398090,Oxford 3000,A1
+missing,6,35813046,Oxford 3000,A2
+sorry,6,35595812,Oxford 3000,A1
+pick,5,55170145,Oxford 3000,B1
+knew,5,31636418,"High English frequency (31,636,418 > 20,000,000)",A2
+anybody,5,10367449,Oxford 3000,A2
+okay,5,15466771,Easy word (easy_words.csv),N/A
+door,5,76868330,Oxford 3000,A1
+drink,5,40392266,Oxford 3000,A1
+somebody,5,11159741,Easy word (easy_words.csv),A2
+stop,5,86868060,Oxford 3000,A1
+mind,5,84923564,Oxford 3000,B1
+saying,5,38415068,Easy word (easy_words.csv),C2
+police,5,64560602,Oxford 3000,A2
+couple,5,58208821,Oxford 3000,B1
+went,5,68130142,"High English frequency (68,130,142 > 20,000,000)",A2
+told,5,57248600,"High English frequency (57,248,600 > 20,000,000)",A2
+till,4,16477131,Oxford 3000,A2
+looked,4,31988351,"High English frequency (31,988,351 > 20,000,000)",A2
+ahead,4,28375319,Oxford 3000,B1
+seen,4,78381896,"High English frequency (78,381,896 > 20,000,000)",B2
+talking,4,36617848,"High English frequency (36,617,848 > 20,000,000)",A2
+stay,4,86241601,Oxford 3000,A1
+tomorrow,4,21262762,Oxford 3000,A1
+daddy,4,9928046,Easy word (easy_words.csv),N/A
+morning,4,55268727,Oxford 3000,A1
+asked,4,75532722,"High English frequency (75,532,722 > 20,000,000)",A2
+stuff,4,82013389,Oxford 3000,B1
+sleep,4,34887707,Oxford 3000,A1
+came,4,73311488,"High English frequency (73,311,488 > 20,000,000)",A2
+took,3,66297175,"High English frequency (66,297,175 > 20,000,000)",A2
+shut,3,12663576,Oxford 3000,A2
+birthday,3,33891046,Oxford 3000,A1
+wide,3,87710833,Oxford 3000,A2
+brain,3,37025785,Oxford 3000,A2
+smart,3,37455745,Oxford 3000,B1
+wanted,3,63301836,"High English frequency (63,301,836 > 20,000,000)",A2
+saw,3,50570151,"High English frequency (50,570,151 > 20,000,000)",A2
+mention,3,21084996,Oxford 3000,B1
+happen,3,47239250,Oxford 3000,A2
+happened,3,24951096,"High English frequency (24,951,096 > 20,000,000)",A2
+idea,3,65459222,Oxford 3000,A2
+wait,3,41363575,Oxford 3000,A1
+listen,3,44504101,Oxford 3000,A1
+anyway,3,26880093,"High English frequency (26,880,093 > 20,000,000)",A2
+caught,3,17749748,Vocabulary level below C (A2),A2
+nature,3,82008717,"High English frequency (82,008,717 > 20,000,000)",A2
+feeling,3,37845806,Easy word (easy_words.csv),B1
+walk,3,46873435,Oxford 3000,A1
+bed,3,82564175,Oxford 3000,A1
+nice,3,69395609,Oxford 3000,A1
+trouble,3,27529484,Oxford 3000,B1
+yesterday,3,35088074,Oxford 3000,A1
+later,3,84945415,Oxford 3000,A2
+doing,3,81188350,"High English frequency (81,188,350 > 20,000,000)",A2
+bound,3,26377045,"High English frequency (26,377,045 > 20,000,000)",C1
+busy,3,17390783,Easy word (easy_words.csv),A2
+excuse,3,6390272,Oxford 3000,B1
+loved,3,19719299,Vocabulary level below C (A2),A2
+exactly,3,31759653,Oxford 3000,A2
+appreciate,3,14762756,Oxford 3000,B2
+sense,3,52629633,Oxford 3000,B1
+shot,3,61225531,Oxford 3000,B2
+married,3,30232332,Oxford 3000,A2
+asking,3,19887691,Easy word (easy_words.csv),N/A
+correction,2,29236164,"High English frequency (29,236,164 > 20,000,000)",B1
+nobody,2,14624173,Easy word (easy_words.csv),A2
+seemed,2,20472519,"High English frequency (20,472,519 > 20,000,000)",B2
+raw,2,25202278,Oxford 3000,B1
+strange,2,18322738,Vocabulary level below C (A2),A2
+finally,2,48999091,Oxford 3000,A2
+murder,2,17118348,Oxford 3000,B1
+remember,2,84324100,Oxford 3000,A1
+burn,2,23062858,Oxford 3000,B1
+symbol,2,36364641,Oxford 3000,B2
+grid,2,20949341,"High English frequency (20,949,341 > 20,000,000)",B2
+license,2,85326896,"High English frequency (85,326,896 > 20,000,000)",B2
+taking,2,70312688,"High English frequency (70,312,688 > 20,000,000)",A2
+ankle,2,4978077,Oxford 3000,B1
+knee,2,12677700,Oxford 3000,B1
+moved,2,35713495,"High English frequency (35,713,495 > 20,000,000)",A2
+funny,2,34894102,Oxford 3000,A1
+taken,2,87019836,"High English frequency (87,019,836 > 20,000,000)",A2
+somewhere,2,14335599,Oxford 3000,A2
+break,2,67285982,Oxford 3000,A2
+fit,2,55284806,Oxford 3000,A2
+certain,2,73267676,Oxford 3000,B1
+regular,2,63400354,Oxford 3000,B1
+authority,2,80656063,Oxford 3000,B2
+steady,2,8220351,Oxford 3000,B2
+fantasy,2,43092529,"High English frequency (43,092,529 > 20,000,000)",B2
+odd,2,25154531,Oxford 3000,B2
+goe,2,47478275,"High English frequency (47,478,275 > 20,000,000)",C1
+evidence,2,62615980,Oxford 3000,B2
+anymore,2,10494227,Easy word (easy_words.csv),A2
+coming,2,70099649,"High English frequency (70,099,649 > 20,000,000)",A2
+evening,2,36714169,Oxford 3000,A1
+wife,2,47510357,Oxford 3000,A1
+exist,2,43987192,Oxford 3000,B1
+moment,2,47882449,Oxford 3000,A2
+myself,2,37983649,Oxford 3000,A2
+programming,2,50630393,"High English frequency (50,630,393 > 20,000,000)",B2
+lack,2,35178494,Oxford 3000,B2
+mouth,2,24325805,Oxford 3000,A1
+smell,2,8940822,Oxford 3000,B1
+silent,2,12835697,Oxford 3000,B1
+bring,2,74972410,Oxford 3000,A2
+guess,2,29330172,Oxford 3000,A2
+running,2,72955000,Oxford 3000,A2
+vice,2,33215970,Easy word (easy_words.csv),C2
+dead,2,48412882,Oxford 3000,A2
+talked,2,9582713,Vocabulary level below C (A2),A2
+pretty,2,51699969,Oxford 3000,A2
+soon,2,77038135,Oxford 3000,A2
+coffee,2,42858323,Oxford 3000,A1
+possession,2,10989526,Oxford 3000,B2
+lived,2,18050710,Vocabulary level below C (A2),A2
+almost,2,66408838,Oxford 3000,A2
+half,2,87382264,Oxford 3000,A2
+hay,2,7389264,Vocabulary level below C (A2),A2
+sometime,2,52184367,Oxford 3000,N/A
+hunt,2,15062955,Oxford 3000,B1
+lif,2,43191570,"High English frequency (43,191,570 > 20,000,000)",C1
+twice,2,19945569,Oxford 3000,A2
+lord,2,52474647,Oxford 3000,N/A
+cat,2,62574939,Oxford 3000,A1
+inside,2,74360351,Oxford 3000,A1
+auntie,2,686225,Vocabulary level below C (A2),A2
+birth,2,40153101,Oxford 3000,B1
+complaint,2,27091272,Oxford 3000,B1
+chased,2,999429,Vocabulary level below C (A2),A2
+cause,2,65904680,Oxford 3000,B2
+thursday,2,69519002,Oxford 3000,A1
+noon,2,9917780,Vocabulary level below C (A2),A2
+victim,2,27517312,Oxford 3000,B2
+crime,2,50877596,Oxford 3000,B1
+needed,2,76528079,"High English frequency (76,528,079 > 20,000,000)",A2
+bout,2,3818689,Easy word (easy_words.csv),N/A
+met,2,45111009,"High English frequency (45,111,009 > 20,000,000)",A2
+whole,2,85317360,Oxford 3000,A2
+ended,2,32588866,"High English frequency (32,588,866 > 20,000,000)",A2
+fired,2,8031937,Vocabulary level below C (A2),A2
+gun,2,35217715,Oxford 3000,B1
+pleasure,2,19379792,Oxford 3000,B1
+concerned,2,25490395,Oxford 3000,B2
+anti,2,61227238,"High English frequency (61,227,238 > 20,000,000)",B2
+played,2,34970056,"High English frequency (34,970,056 > 20,000,000)",A2

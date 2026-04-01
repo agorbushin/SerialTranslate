@@ -1,0 +1,75 @@
+{
+  "request_id": "809521ee92984118952aa6cac21f834f",
+  "mode": "series",
+  "raw_input": "True Detective S1E2",
+  "started_at": "2026-03-29T20:52:05.299169",
+  "finished_at": "2026-03-29T20:53:02.565141",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "True Detective",
+    "season": 1,
+    "episode": 2
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 2,
+    "download_subtitle": 2485,
+    "analyze_subtitle": 47689,
+    "translate": 5162
+  },
+  "timings_ms": {
+    "total_e2e_ms": 57265
+  },
+  "analyze_metrics": {
+    "preload_ms": 3553,
+    "parse_subtitle_ms": 5,
+    "gpt_cefr_ms": 4896,
+    "tier_build_ms": 7,
+    "gpt_filter_ms": 38376,
+    "save_outputs_ms": 7,
+    "total_ms": 46846,
+    "preload_cache_hit": 0,
+    "pipeline_skipped": 0
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 7,
+    "timings_ms": {
+      "prepare_ms": 8,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 0,
+      "total_ms": 5151,
+      "subtitle_read_skipped": 1,
+      "translations_reused": 0
+    },
+    "tier_b1_word_count": 0,
+    "tier_b2_word_count": 14,
+    "tiers": {
+      "tier_1": {
+        "word_count": 7,
+        "to_translate": 7,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b1": {
+        "word_count": 0,
+        "to_translate": 0,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b2": {
+        "word_count": 14,
+        "to_translate": 14,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      }
+    }
+  },
+  "error": null
+}

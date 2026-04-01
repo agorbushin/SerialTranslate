@@ -9,12 +9,17 @@ Runs the complete pipeline for 10 different TV series:
   4. Run translate_tier_translations (translate tier-1 words to Russian)
   5. Run translation_judge (LLM quality evaluation of translations)
 
+With --phrasal: after step 3 (translate), extracts and translates phrasal verbs into
+translations/.../phrasal_verbs.csv, then runs phrasal_judge (translation correctness +
+valid phrasal idiom), instead of tier-1 translation_judge.
+
 Saves all results to test_results/run_{timestamp}/.
 
 Usage:
     python test_runner.py
     python test_runner.py --model gpt-4o
     python test_runner.py --series "Breaking Bad" --season 1 --episode 2
+    python test_runner.py --phrasal --series "Game of Thrones" --season 1 --episode 1
     python test_runner.py --dry-run   # print plan without running
 """
 
@@ -191,7 +196,6 @@ def step_translate(
             api_key=_get_openai_key() or None,
             translations_base=TRANSLATIONS_BASE,
             subtitle_base=SUBTITLE_BASE,
-            model=translation_model,
         )
         if not ok:
             print(f"         ✗ Translation failed: {err}")
@@ -210,7 +214,17 @@ def step_translate(
         trans_dir = get_translations_episode_dir(
             TRANSLATIONS_BASE, series_name, season_num, episode_num
         )
-        if (trans_dir / "tier_1_translations.csv").exists():
+        has_any = any(
+            (trans_dir / name).exists()
+            for name in (
+                "tier_1_translations.csv",
+                "tier_b1_translations.csv",
+                "tier_b2_translations.csv",
+                "tier_4_rare_c_translations.csv",
+                "tier_4_rare_b_translations.csv",
+            )
+        )
+        if has_any:
             print(f"         ✓ Translations saved: {trans_dir.relative_to(BASE_DIR)}")
             return trans_dir
         print(f"         ✗ Translation CSV not found after run.")
@@ -258,6 +272,80 @@ def step_judge(
 
 
 # ---------------------------------------------------------------------------
+# Phrasal verbs: extract + translate into translations dir, then LLM judge
+# ---------------------------------------------------------------------------
+
+def step_phrasal_extract(
+    translations_dir: Path,
+    subtitle_path: Path,
+    series: str,
+) -> Dict[str, Any]:
+    """Run phrasal_verbs.extract_phrasal_verbs_from_episode into translations_dir."""
+    from phrasal_verbs import extract_phrasal_verbs_from_episode  # type: ignore
+
+    api_key = _get_openai_key()
+    if not api_key:
+        return {
+            "success": False,
+            "error": "OpenAI API key not set (needed for phrasal verify + translate).",
+        }
+
+    print(f"  [4/5] Extracting & translating phrasal verbs...")
+    try:
+        ok = extract_phrasal_verbs_from_episode(
+            subtitle_path=subtitle_path,
+            episode_dir=translations_dir,
+            series_name=series,
+            api_key=api_key,
+        )
+        csv_path = translations_dir / "phrasal_verbs.csv"
+        if ok and csv_path.exists():
+            import csv as _csv
+
+            with open(csv_path, encoding="utf-8") as cf:
+                n = sum(1 for _ in _csv.DictReader(cf))
+            print(f"         ✓ phrasal_verbs.csv ({n} rows)")
+            return {"success": True, "rows": n, "csv_path": str(csv_path)}
+        print(f"         ✗ Phrasal extraction returned no list or empty.")
+        return {"success": False, "error": "extract_phrasal_verbs_from_episode failed or empty."}
+    except Exception as e:
+        print(f"         ✗ Phrasal extract error: {e}")
+        traceback.print_exc()
+        return {"success": False, "error": str(e)}
+
+
+def step_judge_phrasal(
+    translations_dir: Path,
+    subtitle_path: Optional[Path],
+    model: str,
+) -> Dict[str, Any]:
+    """Run phrasal_judge on phrasal_verbs.csv."""
+    from phrasal_judge import judge_phrasal_translations  # type: ignore
+
+    print(f"  [5/5] Running phrasal LLM judge ({model})...")
+    try:
+        result = judge_phrasal_translations(
+            translations_dir=translations_dir,
+            subtitle_path=subtitle_path,
+            model=model,
+            subtitle_base=SUBTITLE_BASE,
+        )
+        error = result.get("error")
+        if error:
+            print(f"         ✗ Phrasal judge error: {error}")
+        else:
+            c1 = result.get("criterion_1", {}).get("score", "?")
+            c2 = result.get("criterion_2", {}).get("score", "?")
+            overall = result.get("overall_score", "N/A")
+            print(f"         ✓ Phrasal scores — C1:{c1}/10  C2:{c2}/10  Overall:{overall}/10")
+        return result
+    except Exception as e:
+        print(f"         ✗ Phrasal judge exception: {e}")
+        traceback.print_exc()
+        return {"error": str(e)}
+
+
+# ---------------------------------------------------------------------------
 # Run a single series end-to-end
 # ---------------------------------------------------------------------------
 
@@ -268,6 +356,7 @@ def run_single(
     model: str,
     translation_model: str = "gpt-4o-mini",
     skip_download: bool = False,
+    phrasal: bool = False,
 ) -> Dict[str, Any]:
     """
     Run the full pipeline for one series/episode.
@@ -284,6 +373,7 @@ def run_single(
         "episode": episode,
         "label": label,
         "translation_model": translation_model,
+        "pipeline": "phrasal_verbs" if phrasal else "tier1_hard_words",
         "started_at": datetime.now().isoformat(),
         "steps": {},
     }
@@ -347,11 +437,32 @@ def run_single(
         record["completed_at"] = datetime.now().isoformat()
         return record
 
-    # Step 4 — judge
+    if phrasal:
+        if subtitle_path is None:
+            record["status"] = "FAILED_PHRASAL_NO_SUBTITLE"
+            record["completed_at"] = datetime.now().isoformat()
+            return record
+        pe = step_phrasal_extract(translations_dir, subtitle_path, series)
+        record["steps"]["phrasal_extract"] = pe
+        if not pe.get("success"):
+            record["status"] = "FAILED_PHRASAL_EXTRACT"
+            record["completed_at"] = datetime.now().isoformat()
+            return record
+        judgment = step_judge_phrasal(translations_dir, subtitle_path, model)
+        record["steps"]["judge"] = judgment
+        record["overall_score"] = judgment.get("overall_score")
+        record["judge_error"] = judgment.get("error")
+        record["judge_kind"] = "phrasal_verbs"
+        record["status"] = "ERROR_JUDGE" if judgment.get("error") else "PASSED"
+        record["completed_at"] = datetime.now().isoformat()
+        return record
+
+    # Step 4 — tier-1 translation judge
     judgment = step_judge(translations_dir, subtitle_path, model)
     record["steps"]["judge"] = judgment
     record["overall_score"] = judgment.get("overall_score")
     record["judge_error"] = judgment.get("error")
+    record["judge_kind"] = "tier1_hard_words"
 
     record["status"] = "ERROR_JUDGE" if judgment.get("error") else "PASSED"
     record["completed_at"] = datetime.now().isoformat()
@@ -375,18 +486,37 @@ def save_report(results: List[Dict[str, Any]], run_dir: Path) -> None:
 
     # Markdown summary
     trans_models = list({r.get("translation_model", "?") for r in results})
+    all_phrasal = bool(results) and all(
+        r.get("pipeline") == "phrasal_verbs" for r in results
+    )
+    title = (
+        "# Phrasal Verbs Pipeline Test Report"
+        if all_phrasal
+        else "# Translation Pipeline Test Report"
+    )
     md_lines = [
-        "# Translation Pipeline Test Report",
+        title,
         f"\nRun: {run_dir.name}",
         f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
         f"Translation model: {', '.join(trans_models)}",
         "\n## Results Summary\n",
-        "| Series | S/E | Status | C1 Trans | C2 Entities | C3 C-Level | Overall |",
-        "|--------|-----|--------|----------|-------------|------------|---------|",
     ]
+    if all_phrasal:
+        md_lines.extend(
+            [
+                "| Series | S/E | Status | C1 Translation | C2 Valid phrasal | Overall |",
+                "|--------|-----|--------|----------------|------------------|---------|",
+            ]
+        )
+    else:
+        md_lines.extend(
+            [
+                "| Series | S/E | Status | C1 Trans | C2 Entities | C3 C-Level | Overall |",
+                "|--------|-----|--------|----------|-------------|------------|---------|",
+            ]
+        )
 
     for r in results:
-        label = r.get("label", "?")
         s, e = r.get("season", "?"), r.get("episode", "?")
         status = r.get("status", "?")
         judgment = r.get("steps", {}).get("judge", {})
@@ -395,9 +525,16 @@ def save_report(results: List[Dict[str, Any]], run_dir: Path) -> None:
         c3 = judgment.get("criterion_3", {}).get("score", "—")
         overall = r.get("overall_score", "—")
         series = r.get("series", "?")
-        md_lines.append(
-            f"| {series} | S{s}E{e} | {status} | {c1}/10 | {c2}/10 | {c3}/10 | {overall}/10 |"
-        )
+        is_pv = r.get("pipeline") == "phrasal_verbs"
+        if all_phrasal:
+            md_lines.append(
+                f"| {series} | S{s}E{e} | {status} | {c1}/10 | {c2}/10 | {overall}/10 |"
+            )
+        else:
+            c3_cell = "—" if is_pv else c3
+            md_lines.append(
+                f"| {series} | S{s}E{e} | {status} | {c1}/10 | {c2}/10 | {c3_cell}/10 | {overall}/10 |"
+            )
 
     # Averages
     scores = [r.get("overall_score") for r in results if isinstance(r.get("overall_score"), (int, float))]
@@ -414,29 +551,51 @@ def save_report(results: List[Dict[str, Any]], run_dir: Path) -> None:
         step_analyze = r.get("steps", {}).get("analyze", {})
         if step_analyze.get("tier1_word_count"):
             md_lines.append(f"- **Tier-1 words:** {step_analyze['tier1_word_count']}")
+        pe = r.get("steps", {}).get("phrasal_extract", {})
+        if pe.get("success") and pe.get("rows") is not None:
+            md_lines.append(f"- **Phrasal rows:** {pe['rows']}")
         judgment = r.get("steps", {}).get("judge", {})
+        is_pv = r.get("pipeline") == "phrasal_verbs"
         if judgment.get("error"):
             md_lines.append(f"- **Judge error:** {judgment['error']}")
         else:
             summary = judgment.get("summary", "")
             if summary:
                 md_lines.append(f"- **Judge summary:** {summary}")
-            for cname, clabel in [
-                ("criterion_1", "Completeness & Correctness"),
-                ("criterion_2", "No Non-English Entities"),
-                ("criterion_3", "C-Level Vocabulary"),
-            ]:
+            if is_pv:
+                crit_specs = [
+                    ("criterion_1", "Translation correctness"),
+                    ("criterion_2", "Valid phrasal idiom"),
+                ]
+            else:
+                crit_specs = [
+                    ("criterion_1", "Completeness & Correctness"),
+                    ("criterion_2", "No Non-English Entities"),
+                    ("criterion_3", "C-Level Vocabulary"),
+                ]
+            for cname, clabel in crit_specs:
                 c = judgment.get(cname, {})
                 if c:
                     score = c.get("score", "?")
                     reasoning = c.get("reasoning", "")[:300]
                     md_lines.append(f"- **{clabel}:** {score}/10 — {reasoning}")
-                    issues = c.get("issues") or c.get("violations") or c.get("not_c_level") or []
+                    issues = (
+                        c.get("issues")
+                        or c.get("violations")
+                        or c.get("not_c_level")
+                        or c.get("invalid_phrasals")
+                        or []
+                    )
                     if issues:
                         issue_words = []
                         for item in issues[:5]:
                             if isinstance(item, dict):
-                                issue_words.append(item.get("word") or str(item))
+                                issue_words.append(
+                                    item.get("word")
+                                    or item.get("phrasal_verb")
+                                    or item.get("phrase")
+                                    or str(item)
+                                )
                             else:
                                 issue_words.append(str(item))
                         if issue_words:
@@ -503,6 +662,14 @@ def main() -> None:
         metavar="N",
         help="Run up to N series in parallel (default: 1). Use 2-3 to speed up multi-series runs.",
     )
+    parser.add_argument(
+        "--phrasal",
+        action="store_true",
+        help=(
+            "After tier translation, build phrasal_verbs.csv in the translations folder "
+            "and run phrasal_judge (translation + valid-phrasal checks) instead of tier-1 judge."
+        ),
+    )
     args = parser.parse_args()
 
     # Build series list to test
@@ -519,6 +686,7 @@ def main() -> None:
         print("DRY RUN — test plan (no changes will be made):")
         print(f"  Translation model: {args.translation_model}")
         print(f"  Judge model: {args.model}")
+        print(f"  Pipeline: {'phrasal' if args.phrasal else 'tier-1 hard words'}")
         print(f"  Parallel: {args.parallel}")
         print(f"  Series to test ({len(series_to_test)}):")
         for s in series_to_test:
@@ -528,7 +696,11 @@ def main() -> None:
         print("    1. Download subtitle from OpenSubtitles")
         print("    2. Run subtitle_analyzer (tier lists + name filter)")
         print(f"    3. Run translate_tier_translations ({args.translation_model})")
-        print(f"    4. Run translation_judge ({args.model})")
+        if args.phrasal:
+            print("    4. Extract & translate phrasal verbs → translations/.../phrasal_verbs.csv")
+            print(f"    5. Run phrasal_judge ({args.model})")
+        else:
+            print(f"    4. Run translation_judge ({args.model})")
         print("\n  Results will be saved to test_results/run_YYYYMMDD_HHMMSS/")
         return
 
@@ -538,6 +710,7 @@ def main() -> None:
 
     print(f"Test run started: {timestamp}")
     print(f"Series to test: {len(series_to_test)}")
+    print(f"Pipeline: {'phrasal verbs + phrasal_judge' if args.phrasal else 'tier-1 + translation_judge'}")
     print(f"Translation model: {args.translation_model}")
     print(f"Judge model: {args.model}")
     print(f"Parallel: {args.parallel}")
@@ -551,6 +724,7 @@ def main() -> None:
             model=args.model,
             translation_model=args.translation_model,
             skip_download=args.skip_download,
+            phrasal=args.phrasal,
         )
 
     all_results: List[Dict[str, Any]] = []

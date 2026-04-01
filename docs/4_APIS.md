@@ -16,7 +16,7 @@ This document lists the external and internal “APIs” the system uses: HTTP A
 | **Alternative series name** | `telegram_bot.normalize_series_name_alternative()` | When download fails with the first name, asks for an alternative name the series might be known by (e.g. for search). |
 | **Name / fantasy-entity tagging** | `translate_words.py` (Stage 1) | Sends the list of words from a tier CSV plus subtitle context; asks which words are proper nouns, fantasy/series-specific entities, or made-up words. Returns a set or list; written to column `is_name_or_fantasy`. |
 | **Word translation with context** | `translate_words.translate_words_with_context_async()` (Stage 2) | Sends batches of words + subtitle context + example sentences; asks for translation (and optionally examples) in the target language. Returns a dict `word → { translation, example_en, example_translated }`. |
-| **Phrasal verb verification** | `phrasal_verbs.py` (e.g. `verify_phrasal_verbs_with_chatgpt`) | Sends extracted phrasal verbs; asks which are real phrasal verbs (vs. coincidental verb+particle). Used to filter the list before translation. |
+| **Phrasal verb verification** | `phrasal_verbs.verify_phrasal_verbs_with_chatgpt()` | After deterministic pre-filter (`filter_phrasal_candidates`), sends batches of candidates plus a subtitle excerpt; model returns JSON `valid` list of strings that are genuine phrasal / verb–particle idioms. Counts are preserved only for approved phrases; then translation runs. |
 | **Phrasal verb translation** | `phrasal_verbs.translate_phrasal_verbs()` | Translates phrasal verbs into the target language. |
 
 **Typical parameters:** Model (e.g. gpt-4o for name filtering, gpt-4o-mini for speed), API key, prompt text, JSON response format.

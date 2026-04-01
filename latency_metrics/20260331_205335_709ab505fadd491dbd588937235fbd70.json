@@ -1,0 +1,91 @@
+{
+  "request_id": "709ab505fadd491dbd588937235fbd70",
+  "mode": "series",
+  "raw_input": "fallout s1e8",
+  "started_at": "2026-03-31T20:52:48.039273",
+  "finished_at": "2026-03-31T20:53:35.158607",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Fallout",
+    "season": 1,
+    "episode": 8
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 0,
+    "download_subtitle": 1579,
+    "analyze_subtitle": 36416,
+    "translate": 7278
+  },
+  "timings_ms": {
+    "total_e2e_ms": 47119
+  },
+  "analyze_metrics": {
+    "preload_ms": 4193,
+    "parse_subtitle_ms": 4,
+    "gpt_cefr_ms": 3965,
+    "tier_build_ms": 6,
+    "gpt_filter_ms": 27481,
+    "save_outputs_ms": 4,
+    "total_ms": 35656,
+    "preload_cache_hit": 0,
+    "pipeline_skipped": 0
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 5,
+    "timings_ms": {
+      "prepare_ms": 2,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 1,
+      "total_ms": 7271,
+      "subtitle_read_skipped": 1,
+      "translations_reused": 0
+    },
+    "tier_b1_word_count": 0,
+    "tier_b2_word_count": 13,
+    "tier_4_rare_c_word_count": 0,
+    "tier_4_rare_b_word_count": 21,
+    "tiers": {
+      "tier_1": {
+        "word_count": 5,
+        "to_translate": 5,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b1": {
+        "word_count": 0,
+        "to_translate": 0,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b2": {
+        "word_count": 13,
+        "to_translate": 13,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "tier_4c": {
+        "word_count": 0,
+        "to_translate": 0,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "tier_4b": {
+        "word_count": 21,
+        "to_translate": 21,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      }
+    }
+  },
+  "error": null
+}

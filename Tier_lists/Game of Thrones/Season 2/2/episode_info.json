@@ -1,0 +1,24 @@
+{
+  "series": "Game of Thrones",
+  "season": "Season 2",
+  "season_number": 2,
+  "episode_number": 2,
+  "subtitle_file": "game_of_thrones_s2_e2.srt",
+  "analysis_date": "2026-03-31T16:27:01.120136",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 73664932,
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 5,
+    "tier_2_random": 246,
+    "tier_3_common": 27,
+    "tier_4_rare_in_series": 7,
+    "tier_5_filtered": 162,
+    "tier_b1_words": 3,
+    "tier_b2_words": 32
+  },
+  "excluded_names_fantasy_count": 79
+}

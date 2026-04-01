@@ -1,0 +1,91 @@
+{
+  "request_id": "f8ee178835554134bef3001bf53dca74",
+  "mode": "series",
+  "raw_input": "euphoria e2s2",
+  "started_at": "2026-03-31T21:02:59.567662",
+  "finished_at": "2026-03-31T21:04:03.483986",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Euphoria",
+    "season": 2,
+    "episode": 2
+  },
+  "phase_timings_ms": {
+    "parse_input": 1,
+    "find_existing": 1,
+    "download_subtitle": 1399,
+    "analyze_subtitle": 48313,
+    "translate": 12501
+  },
+  "timings_ms": {
+    "total_e2e_ms": 63916
+  },
+  "analyze_metrics": {
+    "preload_ms": 3363,
+    "parse_subtitle_ms": 5,
+    "gpt_cefr_ms": 8038,
+    "tier_build_ms": 4,
+    "gpt_filter_ms": 36335,
+    "save_outputs_ms": 5,
+    "total_ms": 47753,
+    "preload_cache_hit": 0,
+    "pipeline_skipped": 0
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 6,
+    "timings_ms": {
+      "prepare_ms": 3,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 1,
+      "total_ms": 12498,
+      "subtitle_read_skipped": 1,
+      "translations_reused": 0
+    },
+    "tier_b1_word_count": 2,
+    "tier_b2_word_count": 27,
+    "tier_4_rare_c_word_count": 1,
+    "tier_4_rare_b_word_count": 20,
+    "tiers": {
+      "tier_1": {
+        "word_count": 6,
+        "to_translate": 6,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b1": {
+        "word_count": 2,
+        "to_translate": 2,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b2": {
+        "word_count": 27,
+        "to_translate": 27,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "tier_4c": {
+        "word_count": 1,
+        "to_translate": 1,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "tier_4b": {
+        "word_count": 20,
+        "to_translate": 20,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      }
+    }
+  },
+  "error": null
+}

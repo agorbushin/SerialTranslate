@@ -214,7 +214,7 @@ def mock_context():
 def mock_callback_query(mock_update):
     """Create a mock CallbackQuery object."""
     query = Mock(spec=CallbackQuery)
-    query.data = "full_list"
+    query.data = "rare_c_series"
     query.answer = AsyncMock()
     query.message = mock_update.message
     query.edit_message_text = AsyncMock()

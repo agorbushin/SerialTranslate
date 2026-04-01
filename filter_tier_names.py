@@ -39,21 +39,9 @@ def _default_api_key() -> str:
 
 def get_subtitle_text(subtitle_path: Path) -> str:
     """Extract clean text from SRT for context (no timestamps, no HTML)."""
-    if not subtitle_path.exists():
-        return ""
-    try:
-        content = subtitle_path.read_text(encoding="utf-8", errors="ignore")
-        content = re.sub(
-            r"\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}", "", content
-        )
-        content = re.sub(r"^\d+$", "", content, flags=re.MULTILINE)
-        content = re.sub(r"<[^>]+>", "", content)
-        content = re.sub(r"\[.*?\]", "", content)
-        content = " ".join(content.split())
-        return content
-    except Exception as e:
-        print(f"Warning: Could not read subtitle: {e}")
-        return ""
+    from subtitle_text_utils import get_subtitle_text as _gst
+
+    return _gst(subtitle_path)
 
 
 def _build_filter_prompt(words_batch: List[str], subtitle_text: str, series_name: str) -> str:
@@ -108,6 +96,135 @@ Rules:
    - **"name/fantasy"** — if the word is in "exclude".
 
 Return the JSON:"""
+
+
+def _build_cefr_triage_prompt(words_batch: List[str], subtitle_text: str, series_name: str) -> str:
+    context = subtitle_text[:4000] if len(subtitle_text) > 4000 else subtitle_text
+    words_text = ", ".join(f'"{w}"' for w in words_batch)
+    return f"""You assign coarse English learning difficulty for words from "{series_name}".
+
+WORDS (each must appear as a key in cefr_coarse):
+{words_text}
+
+SUBTITLE CONTEXT:
+{context[:2000]}
+
+Return ONLY a JSON object:
+{{"cefr_coarse": {{"word1": "c", "word2": "b", ...}}}}
+
+Rules for cefr_coarse values (lowercase only: "c", "b", "a"):
+- **c** — C-level: advanced / specialized / literary or clearly low-frequency for a B learner.
+- **b** — B-level: general intermediate or upper-intermediate vocabulary.
+- **a** — A-level: basic everyday words a pre-intermediate learner likely knows.
+
+Include every word from the list exactly once as a key. Use only "c", "b", or "a" as values.
+"""
+
+
+async def assign_coarse_cefr_for_unlabeled_async(
+    words: List[str],
+    subtitle_text: str,
+    series_name: str,
+    async_client: AsyncOpenAI,
+    batch_size: int = 20,
+    max_concurrent: int = MAX_CONCURRENT_BATCHES,
+) -> Dict[str, str]:
+    """GPT labels for lemmas missing xlsx CEFR. Returns word -> 'c'|'b'|'a' (lowercase)."""
+    if not words:
+        return {}
+    out: Dict[str, str] = {}
+    semaphore = asyncio.Semaphore(max_concurrent)
+
+    async def process_batch(words_batch: List[str], batch_num: int) -> Dict[str, str]:
+        async with semaphore:
+            prompt = _build_cefr_triage_prompt(words_batch, subtitle_text, series_name)
+            try:
+                response = await async_client.chat.completions.create(
+                    model=NAME_FILTER_MODEL,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": (
+                                "You assign coarse CEFR-style difficulty labels c, b, or a for English words. "
+                                "Respond with valid JSON only, one object with key cefr_coarse mapping each "
+                                "input word to exactly one of c, b, a."
+                            ),
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=0.1,
+                    response_format={"type": "json_object"},
+                )
+                raw = (response.choices[0].message.content or "").strip()
+                result = json.loads(raw)
+                batch_map = result.get("cefr_coarse") or {}
+                print(
+                    f"  CEFR triage batch {batch_num}: labeled {len(batch_map)} words"
+                )
+                normalized: Dict[str, str] = {}
+                for k, v in batch_map.items():
+                    if not isinstance(k, str) or not isinstance(v, str):
+                        continue
+                    val = v.strip().lower()
+                    if val in ("c", "b", "a"):
+                        normalized[k.strip()] = val
+                return normalized
+            except Exception as e:
+                print(f"  Error CEFR triage batch {batch_num}: {e}")
+                return {}
+
+    batches = [
+        (words[i : i + batch_size], i // batch_size + 1)
+        for i in range(0, len(words), batch_size)
+    ]
+    results = await asyncio.gather(*[
+        process_batch(wb, num) for wb, num in batches
+    ])
+    for (words_batch, _), batch_map in zip(batches, results):
+        for w in words_batch:
+            w_lower = w.lower()
+            if w in batch_map:
+                out[w] = batch_map[w]
+            elif w_lower in batch_map:
+                out[w] = batch_map[w_lower]
+            else:
+                for k, v in batch_map.items():
+                    if k.lower() == w_lower:
+                        out[w] = v
+                        break
+    return out
+
+
+def assign_coarse_cefr_for_unlabeled(
+    words: List[str],
+    subtitle_text: str,
+    series_name: str,
+    openai_client: Union[OpenAI, AsyncOpenAI],
+    batch_size: int = 20,
+) -> Dict[str, str]:
+    """Sync entry: batched GPT coarse C/B/A for unlabeled lemmas."""
+    if not words:
+        return {}
+    if isinstance(openai_client, AsyncOpenAI):
+        return asyncio.run(
+            assign_coarse_cefr_for_unlabeled_async(
+                words, subtitle_text, series_name, openai_client, batch_size
+            )
+        )
+    api_key = getattr(openai_client, "api_key", None)
+    if not api_key:
+        raise ValueError("OpenAI client must have api_key for CEFR triage")
+    async_client = AsyncOpenAI(api_key=api_key)
+
+    async def _run() -> Dict[str, str]:
+        try:
+            return await assign_coarse_cefr_for_unlabeled_async(
+                words, subtitle_text, series_name, async_client, batch_size
+            )
+        finally:
+            await async_client.close()
+
+    return asyncio.run(_run())
 
 
 async def filter_names_and_fantasy_entities_async(
@@ -283,6 +400,8 @@ DEFAULT_TIER_FILES = [
     "tier_2_random_words.csv",
     "tier_3_common_words.csv",
     "tier_4_rare_in_series.csv",
+    "tier_4_rare_c_words.csv",
+    "tier_4_rare_b_words.csv",
     "tier_5_filtered_words.csv",
     "tier_b1_words.csv",
     "tier_b2_words.csv",

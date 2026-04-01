@@ -4,17 +4,21 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "sherlock_s1_e1.srt",
-  "analysis_date": "2026-03-21T17:59:42.018817",
+  "analysis_date": "2026-03-31T17:16:40.306346",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 75532722,
-    "max_english_freq": 20000000
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 86,
-    "tier_2_random": 212,
-    "tier_3_common": 31,
-    "tier_4_rare_in_series": 7,
-    "tier_5_filtered": 616
-  }
+    "tier_1_hard_usable": 17,
+    "tier_2_random": 245,
+    "tier_3_common": 30,
+    "tier_4_rare_in_series": 6,
+    "tier_5_filtered": 285,
+    "tier_b1_words": 6,
+    "tier_b2_words": 45
+  },
+  "excluded_names_fantasy_count": 53
 }

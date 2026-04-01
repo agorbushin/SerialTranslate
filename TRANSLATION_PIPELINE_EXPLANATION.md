@@ -44,6 +44,10 @@ When user requests a series, the system translates:
 - tier_4_rare_in_series.csv is **NOT** translated by default
 - tier_3 and tier_5 are also not translated
 
+#### Telegram bot path (`translate_tier_translations.py`)
+
+The live bot uses **`translate_tier_translations.run()`**, not `translate_episode()`. On first load it passes **`tier_ids` = frequent bands only** (`tier_1`, `b1`, `b2`), so users are not blocked on API work for rare-in-series lists they may never open. **`tier_4c` / `tier_4b`** are translated **on demand** when the user taps **Rare C** / **Rare B** or uses **`/full`** (same list as Rare C).
+
 #### Translation Steps (for tier_1 and tier_2)
 
 For each tier file that gets translated:

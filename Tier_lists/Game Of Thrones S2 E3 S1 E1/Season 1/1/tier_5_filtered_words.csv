@@ -1,0 +1,147 @@
+word,series_frequency,english_frequency,filter_reason,vocabulary_level
+lord,14,52474647,Oxford 3000,N/A
+father,14,54388623,Oxford 3000,A1
+hear,12,49163786,"High English frequency (49,163,786 > 20,000,000)",A1
+brother,10,56375413,Oxford 3000,A1
+sister,10,35155790,Oxford 3000,A1
+queen,10,39224762,Oxford 3000,A2
+saw,9,50570151,"High English frequency (50,570,151 > 20,000,000)",A2
+wall,7,74268226,Oxford 3000,A1
+dead,7,48412882,Oxford 3000,A2
+coming,7,70099649,"High English frequency (70,099,649 > 20,000,000)",A2
+throne,6,4208809,Easy word (easy_words.csv),C2
+lady,6,58395651,Oxford 3000,B1
+told,6,57248600,"High English frequency (57,248,600 > 20,000,000)",A2
+horse,5,58453720,Oxford 3000,A1
+gasp,5,1267829,Easy word (easy_words.csv),C2
+laughter,5,3783649,Oxford 3000,B2
+sorry,5,35595812,Oxford 3000,A1
+kingdom,5,83204500,"High English frequency (83,204,500 > 20,000,000)",B2
+pup,5,2733215,Easy word (easy_words.csv),N/A
+drink,5,40392266,Oxford 3000,A1
+playing,4,51019438,"High English frequency (51,019,438 > 20,000,000)",A2
+winter,4,53743632,Oxford 3000,A1
+mother,4,66782465,Oxford 3000,A1
+laugh,4,12662275,Oxford 3000,A2
+rode,4,2446864,Easy word (easy_words.csv),N/A
+oath,4,3167348,Easy word (easy_words.csv),N/A
+seven,4,44648436,Oxford 3000,A1
+direwolf,4,0,Easy word (easy_words.csv),N/A
+belong,4,16045395,Oxford 3000,B2
+door,4,76868330,Oxford 3000,A1
+leave,4,70957750,Oxford 3000,A1
+soon,4,77038135,Oxford 3000,A2
+seen,3,78381896,"High English frequency (78,381,896 > 20,000,000)",A2
+whatever,3,31901912,Oxford 3000,B1
+beautiful,3,58503804,Oxford 3000,A1
+laughing,3,5900004,Easy word (easy_words.csv),N/A
+lad,3,3212044,Easy word (easy_words.csv),C2
+cat,3,62574939,Oxford 3000,A1
+rest,3,55957144,Oxford 3000,A2
+gone,3,34511028,"High English frequency (34,511,028 > 20,000,000)",A2
+understand,3,65846056,Oxford 3000,A1
+kill,3,31335290,Oxford 3000,A2
+meant,3,17832930,Vocabulary level below C (A2),A2
+yourself,3,53653034,Oxford 3000,A2
+anything,3,75999346,Oxford 3000,A1
+fool,3,10735163,Easy word (easy_words.csv),B1
+husband,3,25002557,Oxford 3000,A1
+honor,3,24511949,"High English frequency (24,511,949 > 20,000,000)",B2
+took,3,66297175,"High English frequency (66,297,175 > 20,000,000)",A2
+brought,3,39794764,"High English frequency (39,794,764 > 20,000,000)",A2
+pretty,3,51699969,Oxford 3000,A2
+royal,3,47361578,Oxford 3000,B2
+doing,3,81188350,"High English frequency (81,188,350 > 20,000,000)",A2
+fat,3,51311873,Oxford 3000,A1
+wanted,3,63301836,"High English frequency (63,301,836 > 20,000,000)",A2
+feast,3,4656260,Easy word (easy_words.csv),C1
+guest,3,79375729,Oxford 3000,A2
+stay,3,86241601,Oxford 3000,A1
+army,3,46902606,Oxford 3000,C2
+capital,3,70933885,Oxford 3000,A2
+hope,3,83608473,Oxford 3000,A2
+tournament,3,28755559,"High English frequency (28,755,559 > 20,000,000)",B1
+fight,3,34268222,Oxford 3000,B1
+stop,3,86868060,Oxford 3000,A1
+murdered,3,2843529,Easy word (easy_words.csv),N/A
+gate,2,28235760,Oxford 3000,A2
+chain,2,45851350,Oxford 3000,A2
+savage,2,5686250,Easy word (easy_words.csv),N/A
+died,2,35803272,"High English frequency (35,803,272 > 20,000,000)",A2
+scream,2,5596631,Oxford 3000,B1
+theme,2,57194325,Oxford 3000,B2
+corrected,2,6122004,Easy word (easy_words.csv),N/A
+fine,2,75242969,Oxford 3000,A1
+quite,2,58809324,Oxford 3000,A2
+sigh,2,3737468,Easy word (easy_words.csv),B2
+quick,2,85624282,Oxford 3000,A1
+swore,2,663914,Easy word (easy_words.csv),N/A
+forever,2,17381863,Oxford 3000,B1
+whisper,2,3317334,Oxford 3000,B2
+sentence,2,20083296,Oxford 3000,A1
+die,2,54277728,Oxford 3000,A1
+mountain,2,69961397,Oxford 3000,A2
+lion,2,18511993,Oxford 3000,A2
+whine,2,967404,Easy word (easy_words.csv),N/A
+tough,2,13595406,Oxford 3000,B2
+death,2,94459595,Oxford 3000,B1
+cry,2,13637934,Oxford 3000,A2
+bury,2,3091991,Oxford 3000,B1
+worry,2,16187062,Oxford 3000,A2
+afraid,2,10858793,Oxford 3000,A2
+nothing,2,73363579,Oxford 3000,A2
+someone,2,76553113,Oxford 3000,A2
+knew,2,31636418,"High English frequency (31,636,418 > 20,000,000)",A2
+boar,2,1088492,Easy word (easy_words.csv),N/A
+hunting,2,19855263,Oxford 3000,B2
+outsider,2,2467802,Easy word (easy_words.csv),N/A
+northern,2,53902706,Oxford 3000,B1
+raven,2,6317523,Easy word (easy_words.csv),N/A
+getting,2,93506861,"High English frequency (93,506,861 > 20,000,000)",A2
+prince,2,25792740,Oxford 3000,B1
+hair,2,61313062,Oxford 3000,A1
+bark,2,3991327,Easy word (easy_words.csv),B2
+climbing,2,11117590,Vocabulary level below C (A2),A2
+promise,2,16019259,Oxford 3000,B1
+lie,2,29713856,Oxford 3000,A2
+groan,2,781298,Easy word (easy_words.csv),C2
+shut,2,12663576,Oxford 3000,A2
+twin,2,27964798,Oxford 3000,B1
+wait,2,41363575,Oxford 3000,A1
+teach,2,24679160,Oxford 3000,A1
+remember,2,84324100,Oxford 3000,A1
+listen,2,44504101,Oxford 3000,A1
+trying,2,57462639,"High English frequency (57,462,639 > 20,000,000)",B2
+lived,2,18050710,Vocabulary level below C (A2),A2
+son,2,71254769,Oxford 3000,A1
+daughter,2,33796898,Oxford 3000,A1
+woman,2,71398090,Oxford 3000,A1
+handsome,2,3764360,Easy word (easy_words.csv),B1
+clever,2,4865097,Oxford 3000,A1
+sundown,2,543397,Easy word (easy_words.csv),N/A
+alone,2,39326417,Oxford 3000,A2
+gull,2,2787046,Easy word (easy_words.csv),N/A
+forget,2,25685480,Oxford 3000,A2
+sweet,2,35276616,Oxford 3000,A1
+speaking,2,23813045,"High English frequency (23,813,045 > 20,000,000)",A2
+honored,2,4559668,Easy word (easy_words.csv),N/A
+defeated,2,4629690,Easy word (easy_words.csv),N/A
+whole,2,85317360,Oxford 3000,A2
+trust,2,61432231,Oxford 3000,B1
+married,2,30232332,Oxford 3000,A2
+someday,2,3127732,Easy word (easy_words.csv),N/A
+uncle,2,8649726,Oxford 3000,A2
+seat,2,46137154,Oxford 3000,A2
+anywhere,2,23947583,Oxford 3000,A2
+greatest,2,25547808,"High English frequency (25,547,808 > 20,000,000)",B2
+bear,2,54908230,Oxford 3000,A2
+grim,2,2650255,Easy word (easy_words.csv),C2
+beauty,2,89162366,Oxford 3000,B1
+dress,2,35921173,Oxford 3000,A1
+pardon,2,2210272,Easy word (easy_words.csv),A2
+funny,2,34894102,Oxford 3000,A1
+wedding,2,72287352,Oxford 3000,B1
+saying,2,38415068,Easy word (easy_words.csv),C2
+omen,2,1025291,Easy word (easy_words.csv),N/A
+serve,2,36697856,Oxford 3000,A2
+loyal,2,4498834,Easy word (easy_words.csv),B2

@@ -1,0 +1,75 @@
+{
+  "request_id": "4d314320346a4940a3d711fc4c8496d2",
+  "mode": "series",
+  "raw_input": "game of Thrones s2 e3)",
+  "started_at": "2026-03-29T20:36:19.049252",
+  "finished_at": "2026-03-29T20:37:05.290697",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "game of Thrones s2 e3)",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 1,
+    "download_subtitle": 1803,
+    "analyze_subtitle": 37186,
+    "translate": 5325
+  },
+  "timings_ms": {
+    "total_e2e_ms": 46241
+  },
+  "analyze_metrics": {
+    "preload_ms": 2809,
+    "parse_subtitle_ms": 4,
+    "gpt_cefr_ms": 3612,
+    "tier_build_ms": 1,
+    "gpt_filter_ms": 30003,
+    "save_outputs_ms": 6,
+    "total_ms": 36437,
+    "preload_cache_hit": 0,
+    "pipeline_skipped": 0
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 1,
+    "timings_ms": {
+      "prepare_ms": 3,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 1,
+      "total_ms": 5322,
+      "subtitle_read_skipped": 1,
+      "translations_reused": 0
+    },
+    "tier_b1_word_count": 1,
+    "tier_b2_word_count": 16,
+    "tiers": {
+      "tier_1": {
+        "word_count": 1,
+        "to_translate": 1,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b1": {
+        "word_count": 1,
+        "to_translate": 1,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b2": {
+        "word_count": 16,
+        "to_translate": 16,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      }
+    }
+  },
+  "error": null
+}

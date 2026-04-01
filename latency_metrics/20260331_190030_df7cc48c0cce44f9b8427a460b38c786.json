@@ -1,0 +1,25 @@
+{
+  "request_id": "df7cc48c0cce44f9b8427a460b38c786",
+  "mode": "series",
+  "raw_input": "falloue s1e6",
+  "started_at": "2026-03-31T19:00:28.807868",
+  "finished_at": "2026-03-31T19:00:30.112973",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Falloue",
+    "season": 1,
+    "episode": 6
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 10,
+    "download_subtitle": 601
+  },
+  "timings_ms": {
+    "total_e2e_ms": 1306
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

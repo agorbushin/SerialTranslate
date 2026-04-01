@@ -4,18 +4,21 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "the_sopranos_s1_e1.srt",
-  "analysis_date": "2026-03-21T15:13:33.324265",
+  "analysis_date": "2026-03-31T17:12:05.634299",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 85317360,
-    "max_english_freq": 20000000
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 16,
-    "tier_2_random": 189,
-    "tier_3_common": 24,
-    "tier_4_rare_in_series": 7,
-    "tier_5_filtered": 464
+    "tier_1_hard_usable": 9,
+    "tier_2_random": 246,
+    "tier_3_common": 25,
+    "tier_4_rare_in_series": 8,
+    "tier_5_filtered": 164,
+    "tier_b1_words": 3,
+    "tier_b2_words": 13
   },
-  "excluded_names_fantasy_count": 105
+  "excluded_names_fantasy_count": 106
 }

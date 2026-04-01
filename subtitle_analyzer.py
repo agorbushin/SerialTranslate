@@ -8,12 +8,13 @@ Writes tier lists to Tier_lists/{series_name}/Season N/{episode_number}/.
 import csv
 import json
 import re
+import threading
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import argparse
 
@@ -29,6 +30,12 @@ try:
     HAS_PANDAS = True
 except ImportError:
     HAS_PANDAS = False
+
+PIPELINE_FINGERPRINT_VERSION = 2
+FINGERPRINT_FILENAME = ".pipeline_fingerprint.json"
+
+_preload_lock = threading.Lock()
+_preload_cache: Dict[str, Tuple[Set[str], Set[str], Set[str], Dict[str, int], Dict[str, str]]] = {}
 
 
 def load_filter_from_csv(filter_file: Path, singularize: bool = True) -> Set[str]:
@@ -124,22 +131,36 @@ def parse_srt_content(content: str, excluded_words: Set[str]) -> List[str]:
     return words
 
 
-def parse_srt_file(srt_path: Path, excluded_words: Set[str]) -> List[str]:
-    """Parse SRT file and return list of words (lowercase, filtered)."""
+def parse_srt_file_with_content(srt_path: Path, excluded_words: Set[str]) -> Tuple[List[str], str]:
+    """Read SRT once; return (word list for tiering, raw file text for LLM / translate handoff)."""
     with open(srt_path, "r", encoding="utf-8", errors="ignore") as f:
         content = f.read()
-    return parse_srt_content(content, excluded_words)
+    return parse_srt_content(content, excluded_words), content
 
 
-def extract_words_from_zip(zip_path: Path, excluded_words: Set[str]) -> Counter:
-    """Extract SRT from ZIP and return word Counter."""
+def parse_srt_file(srt_path: Path, excluded_words: Set[str]) -> List[str]:
+    """Parse SRT file and return list of words (lowercase, filtered)."""
+    words, _ = parse_srt_file_with_content(srt_path, excluded_words)
+    return words
+
+
+def extract_words_from_zip_with_content(
+    zip_path: Path, excluded_words: Set[str]
+) -> Tuple[Counter, str]:
+    """Extract first .srt from ZIP; return (word Counter, raw SRT text)."""
     with zipfile.ZipFile(zip_path, "r") as zf:
         srt_files = [f for f in zf.namelist() if f.endswith(".srt")]
         if not srt_files:
             raise ValueError(f"No SRT in {zip_path}")
         content = zf.read(srt_files[0]).decode("utf-8", errors="ignore")
         words = parse_srt_content(content, excluded_words)
-    return Counter(words)
+    return Counter(words), content
+
+
+def extract_words_from_zip(zip_path: Path, excluded_words: Set[str]) -> Counter:
+    """Extract SRT from ZIP and return word Counter."""
+    c, _ = extract_words_from_zip_with_content(zip_path, excluded_words)
+    return c
 
 
 def load_vocabulary_levels(vocab_file: Path) -> Dict[str, str]:
@@ -162,6 +183,86 @@ def load_vocabulary_levels(vocab_file: Path) -> Dict[str, str]:
     except Exception as e:
         print(f"Warning: Could not load vocabulary levels: {e}")
         return {}
+
+
+_VALID_XLSX_CEFR_LEVELS = frozenset({"A1", "A2", "B1", "B2", "C1", "C2"})
+
+
+def word_has_xlsx_cefr(word: str, vocabulary_levels: Dict[str, str]) -> bool:
+    """True if word appears in the vocabulary workbook with a standard CEFR band."""
+    w = (word or "").strip().lower()
+    if not w:
+        return False
+    lvl = vocabulary_levels.get(w)
+    if not lvl:
+        return False
+    return str(lvl).strip().upper() in _VALID_XLSX_CEFR_LEVELS
+
+
+def map_gpt_coarse_to_xlsx_level(coarse: str) -> str:
+    """Map GPT coarse label to a fine level understood by categorize_words."""
+    c = (coarse or "").strip().lower()
+    if c == "c":
+        return "C1"
+    if c == "b":
+        return "B2"
+    if c == "a":
+        return "A2"
+    return "N/A"
+
+
+def collect_words_needing_gpt_cefr(
+    series_freqs: Counter,
+    english_freqs: Dict[str, int],
+    vocabulary_levels: Dict[str, str],
+    series_threshold: int,
+    english_threshold: int,
+    min_episode_count: int,
+    oxford_filter: Set[str],
+    easy_words_filter: Set[str],
+) -> List[str]:
+    """
+    Lemmas frequent enough in the episode, in low-English learner quadrants, lacking xlsx CEFR,
+    and not Oxford/easy (filtered later anyway).
+    """
+    out: List[str] = []
+    seen: Set[str] = set()
+    for word, series_count in series_freqs.items():
+        if series_count < min_episode_count:
+            continue
+        if word in easy_words_filter or word in oxford_filter:
+            continue
+        if word_has_xlsx_cefr(word, vocabulary_levels):
+            continue
+        english_count = english_freqs.get(word, 0)
+        is_high_series = series_count >= series_threshold
+        is_high_english = english_count >= english_threshold
+        would_be_tier1 = not is_high_english and is_high_series
+        would_be_tier2 = not is_high_english and not is_high_series
+        if not (would_be_tier1 or would_be_tier2):
+            continue
+        wl = word.lower()
+        if wl not in seen:
+            seen.add(wl)
+            out.append(word)
+    out.sort(key=str.lower)
+    return out
+
+
+def build_effective_vocabulary_levels(
+    vocabulary_levels: Dict[str, str],
+    gpt_coarse_by_word: Dict[str, str],
+) -> Dict[str, str]:
+    """Copy xlsx map and overlay GPT coarse labels (normalized to C1/B2/A2)."""
+    effective = dict(vocabulary_levels)
+    for w, coarse in gpt_coarse_by_word.items():
+        key = (w or "").strip().lower()
+        if not key:
+            continue
+        mapped = map_gpt_coarse_to_xlsx_level(coarse)
+        if mapped != "N/A":
+            effective[key] = mapped
+    return effective
 
 
 def load_english_frequencies(freq_file: Path) -> Dict[str, int]:
@@ -223,8 +324,11 @@ def categorize_words(
     vocabulary_levels: Optional[Dict[str, str]] = None,
     series_threshold: Optional[int] = None,
     english_threshold: Optional[int] = None,
+    min_episode_count: Optional[int] = 2,
 ) -> Dict[str, List[Tuple]]:
-    """Categorize words into 5 tiers. Returns dict of tier_key -> list of (word, series_count, english_count, ...)."""
+    """Categorize words into 5 tiers. Returns dict of tier_key -> list of (word, series_count, english_count, ...).
+    If min_episode_count is set and > 0, low-English learner quadrants with fewer episode mentions go to tier_2_random.
+    Pass None to disable."""
     if series_threshold is None or english_threshold is None:
         series_threshold, english_threshold, _, _ = calculate_thresholds(
             series_freqs, english_freqs
@@ -251,6 +355,12 @@ def categorize_words(
         is_high_english = english_count >= english_threshold
         would_be_tier1 = not is_high_english and is_high_series
         would_be_tier2 = not is_high_english and not is_high_series
+        freq_ok = True
+        if min_episode_count is not None and min_episode_count > 0:
+            freq_ok = series_count >= min_episode_count
+        if (would_be_tier1 or would_be_tier2) and not freq_ok:
+            tiers["tier_2_random"].append((word, series_count, english_count, vocab_level))
+            continue
         is_filtered = False
         filter_reason = ""
         if word in easy_words_filter:
@@ -342,6 +452,8 @@ def save_tierlist_results_to_dir(
     c1_assessment: Optional[Dict[str, str]] = None,
     is_movie: bool = False,
     movie_year: Optional[int] = None,
+    min_episode_count: Optional[int] = None,
+    gpt_coarse_cefr: Optional[Dict[str, str]] = None,
 ) -> None:
     """Write tier CSVs, episode_info.json, and README to output_episode_dir (Tier_lists layout).
     If excluded_words is set, rows whose word (lowercase) is in it are omitted (name/fantasy filter).
@@ -427,6 +539,41 @@ def save_tierlist_results_to_dir(
         for future in futures:
             tier_key, count = future.result()
             word_counts[tier_key] = count
+
+    # Split tier 4 (high English freq, low series freq) into C1–C2 vs B1–B2 rare-in-series lists.
+    # Only true CEFR C1/C2 go to rare_c; N/A/unknown must not (they are not "C-level" — often basic words
+    # missing from the vocabulary sheet, e.g. men, color).
+    raw_t4 = tiers.get("tier_4_rare_in_series", [])
+    rare_c_items: List[Tuple] = []
+    rare_b_items: List[Tuple] = []
+    for item in raw_t4:
+        if len(item) < 4:
+            continue
+        word = (item[0] or "").strip()
+        if not word or word.lower() in excluded_lower:
+            continue
+        lvl = str(item[3]).strip().upper()
+        if lvl in ("B1", "B2"):
+            rare_b_items.append(item)
+        elif lvl in ("C1", "C2"):
+            rare_c_items.append(item)
+        # A1, A2, N/A, unknown: omit from both rare-in-series translation lists
+    for fname, items in (
+        ("tier_4_rare_c_words.csv", rare_c_items),
+        ("tier_4_rare_b_words.csv", rare_b_items),
+    ):
+        path = output_episode_dir / fname
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["word", "series_frequency", "english_frequency", "vocabulary_level"])
+            for it in items:
+                if len(it) >= 4:
+                    w.writerow(list(it[:4]))
+                else:
+                    w.writerow([*it[:3], "N/A"])
+    word_counts["tier_4_rare_c_words"] = len(rare_c_items)
+    word_counts["tier_4_rare_b_words"] = len(rare_b_items)
+
     metadata = {
         "series": series_name,
         "season": season_label,
@@ -438,6 +585,7 @@ def save_tierlist_results_to_dir(
             "series_threshold": series_threshold,
             "english_threshold": english_threshold,
             "max_english_freq": max_english_freq,
+            **({"min_episode_count": min_episode_count} if min_episode_count is not None else {}),
         },
         "word_counts": word_counts,
     }
@@ -446,10 +594,12 @@ def save_tierlist_results_to_dir(
         metadata["year"] = movie_year
     if excluded_words:
         metadata["excluded_names_fantasy_count"] = len(excluded_words)
-    if excluded_words is not None or c1_assessment:
+    if excluded_words is not None or c1_assessment or gpt_coarse_cefr:
         payload: Dict = {"excluded": sorted(excluded_words or []), "series": series_name}
         if c1_assessment:
             payload["c1_assessment"] = c1_assessment
+        if gpt_coarse_cefr:
+            payload["gpt_coarse_cefr"] = dict(sorted(gpt_coarse_cefr.items(), key=lambda x: x[0].lower()))
         (output_episode_dir / "excluded_names_fantasy.json").write_text(
             json.dumps(payload, indent=2),
             encoding="utf-8",
@@ -468,6 +618,8 @@ def save_tierlist_results_to_dir(
         f"- Tier 2 (Random): {word_counts.get('tier_2_random', 0)}\n"
         f"- Tier 3 (Common): {word_counts.get('tier_3_common', 0)}\n"
         f"- Tier 4 (Rare in Series): {word_counts.get('tier_4_rare_in_series', 0)}\n"
+        f"- Rare in series (C1–C2): {word_counts.get('tier_4_rare_c_words', 0)}\n"
+        f"- Rare in series (B1–B2): {word_counts.get('tier_4_rare_b_words', 0)}\n"
         f"- Tier 5 (Filtered): {word_counts.get('tier_5_filtered', 0)}\n"
         f"- Tier B1 (Intermediate): {word_counts.get('tier_b1_words', 0)}\n"
         f"- Tier B2 (Upper-Intermediate): {word_counts.get('tier_b2_words', 0)}\n"
@@ -527,6 +679,133 @@ def create_frequency_plot(
         print(f"Could not create plot: {e}")
 
 
+def _fingerprint_preload_sources(filters_dir: Path, freq_path: Path, vocab_file: Path) -> str:
+    parts: List[str] = []
+    if filters_dir.exists():
+        for p in sorted(filters_dir.glob("*.csv")):
+            try:
+                st = p.stat()
+                parts.append(f"{p.name}:{st.st_mtime_ns}:{st.st_size}")
+            except OSError:
+                parts.append(f"{p.name}:missing")
+    else:
+        parts.append("no_filters_dir")
+    if freq_path.exists():
+        try:
+            st = freq_path.stat()
+            parts.append(f"freq:{st.st_mtime_ns}:{st.st_size}")
+        except OSError:
+            parts.append("freq:missing")
+    else:
+        parts.append("no_freq")
+    if vocab_file.exists():
+        try:
+            st = vocab_file.stat()
+            parts.append(f"vocab:{st.st_mtime_ns}:{st.st_size}")
+        except OSError:
+            parts.append("vocab:missing")
+    else:
+        parts.append("no_vocab")
+    return "|".join(parts)
+
+
+def _get_preloaded_bundle(
+    filters_dir: Path, freq_path: Path, vocab_file: Path
+) -> Tuple[Set[str], Set[str], Set[str], Dict[str, int], Dict[str, str], bool]:
+    """Load filters, freqs, vocab; use process cache when inputs unchanged. Returns (..., cache_hit)."""
+    key = _fingerprint_preload_sources(filters_dir, freq_path, vocab_file)
+    with _preload_lock:
+        cached = _preload_cache.get(key)
+    if cached is not None:
+        ex, ox, ez, ef, vl = cached
+        return ex, ox, ez, ef, vl, True
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        futures = {
+            "filters": pool.submit(load_all_filters, filters_dir, True),
+            "freqs": pool.submit(load_english_frequencies, freq_path),
+            "vocab": pool.submit(load_vocabulary_levels, vocab_file),
+        }
+        excluded_words, oxford_filter, easy_words_filter = futures["filters"].result()
+        english_freqs = futures["freqs"].result()
+        vocabulary_levels = futures["vocab"].result()
+    bundle = (excluded_words, oxford_filter, easy_words_filter, english_freqs, vocabulary_levels)
+    with _preload_lock:
+        _preload_cache[key] = bundle
+    return excluded_words, oxford_filter, easy_words_filter, english_freqs, vocabulary_levels, False
+
+
+def _subtitle_source_fingerprint(subtitle_path: Path) -> Dict[str, Any]:
+    st = subtitle_path.stat()
+    return {
+        "version": PIPELINE_FINGERPRINT_VERSION,
+        "mtime_ns": st.st_mtime_ns,
+        "size": st.st_size,
+        "path_suffix": subtitle_path.suffix.lower(),
+    }
+
+
+def _try_skip_fresh_pipeline(
+    subtitle_path: Path,
+    tierlist_base_dir: Path,
+    is_movie: bool,
+    series_name: Optional[str],
+    season_number: Optional[int],
+    episode_number: Optional[int],
+    year: Optional[int],
+) -> Optional[Path]:
+    """If tier outputs exist and fingerprint matches subtitle file stat, return episode dir."""
+    from download_subtitles import get_tierlist_episode_dir, get_tierlist_movie_dir
+
+    sn = series_name
+    sea_n = season_number
+    ep_n = episode_number
+    yr = year
+    if is_movie:
+        if sn is None or yr is None:
+            info = extract_movie_info(subtitle_path)
+            if sn is None:
+                sn = info["series"]
+            if yr is None and info.get("year"):
+                yr = int(info["year"])
+        if not sn:
+            return None
+        output_episode_dir = get_tierlist_movie_dir(tierlist_base_dir, sn, yr or 0)
+    else:
+        if sn is None or sea_n is None or ep_n is None:
+            info = extract_series_info(subtitle_path)
+            if sn is None:
+                sn = info["series"]
+            if sea_n is None or ep_n is None:
+                if info["season"] and info["episode"]:
+                    sea_n = int(re.search(r"\d+", info["season"]).group())
+                    ep_n = int(re.search(r"\d+", info["episode"]).group())
+                else:
+                    if sea_n is None:
+                        sea_n = 1
+                    if ep_n is None:
+                        ep_n = 1
+        output_episode_dir = get_tierlist_episode_dir(
+            tierlist_base_dir, sn, sea_n, ep_n
+        )
+    tier1 = output_episode_dir / "tier_1_hard_usable_words.csv"
+    fp_path = output_episode_dir / FINGERPRINT_FILENAME
+    if not tier1.is_file() or not fp_path.is_file():
+        return None
+    try:
+        stored = json.loads(fp_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    current = _subtitle_source_fingerprint(subtitle_path)
+    if (
+        stored.get("version") != PIPELINE_FINGERPRINT_VERSION
+        or stored.get("mtime_ns") != current["mtime_ns"]
+        or stored.get("size") != current["size"]
+        or stored.get("path_suffix") != current["path_suffix"]
+    ):
+        return None
+    return output_episode_dir
+
+
 def run_pipeline(
     subtitle_path: Path,
     base_dir: Path,
@@ -539,17 +818,24 @@ def run_pipeline(
     freq_path: Optional[Path] = None,
     filters_dir: Optional[Path] = None,
     max_english_freq: int = 20_000_000,
+    min_episode_count: int = 2,
     min_length: int = 3,
     save_debug_csv: bool = False,
     debug_output_dir: Optional[Path] = None,
     openai_api_key: Optional[str] = None,
     metrics_out: Optional[Dict[str, int]] = None,
+    handoff_out: Optional[Dict[str, Any]] = None,
+    skip_if_outputs_fresh: bool = False,
 ) -> Optional[Path]:
     """
     Run full pipeline: load resources, parse subtitle, categorize, optionally filter
     names/fantasy with ChatGPT, save to Tier_lists.
     Returns the episode dir path where tier lists were written, or None.
     If openai_api_key is set, character names and fantasy entities are excluded from tier CSVs.
+
+    handoff_out: if provided, sets key "subtitle_raw" (decoded SRT text) for reuse in translate.
+    skip_if_outputs_fresh: when True, skip work if tier_1 exists and .pipeline_fingerprint.json
+    matches subtitle file mtime/size/suffix (PIPELINE_FINGERPRINT_VERSION).
     """
     import time
     t0 = time.perf_counter()
@@ -557,10 +843,13 @@ def run_pipeline(
     timings_ms: Dict[str, int] = {
         "preload_ms": 0,
         "parse_subtitle_ms": 0,
+        "gpt_cefr_ms": 0,
         "tier_build_ms": 0,
         "gpt_filter_ms": 0,
         "save_outputs_ms": 0,
         "total_ms": 0,
+        "preload_cache_hit": 0,
+        "pipeline_skipped": 0,
     }
 
     def _set_metrics() -> None:
@@ -583,36 +872,125 @@ def run_pipeline(
         _set_metrics()
         return None
     vocab_file = base_dir / "Frequency list" / "English" / "complete english vocabulary.xlsx"
-    with ThreadPoolExecutor(max_workers=3) as pool:
-        futures = {
-            "filters": pool.submit(load_all_filters, filters_dir, True),
-            "freqs": pool.submit(load_english_frequencies, freq_path),
-            "vocab": pool.submit(load_vocabulary_levels, vocab_file),
-        }
-        excluded_words, oxford_filter, easy_words_filter = futures["filters"].result()
-        english_freqs = futures["freqs"].result()
-        vocabulary_levels = futures["vocab"].result()
+
+    tierlist_base_resolved = tierlist_base_dir.resolve() if tierlist_base_dir else None
+    if skip_if_outputs_fresh and tierlist_base_resolved:
+        skipped_dir = _try_skip_fresh_pipeline(
+            subtitle_path,
+            tierlist_base_resolved,
+            is_movie,
+            series_name,
+            season_number,
+            episode_number,
+            year,
+        )
+        if skipped_dir is not None:
+            timings_ms["pipeline_skipped"] = 1
+            _set_metrics()
+            return skipped_dir
+    timings_ms["pipeline_skipped"] = 0
+
+    (
+        excluded_words,
+        oxford_filter,
+        easy_words_filter,
+        english_freqs,
+        vocabulary_levels,
+        preload_hit,
+    ) = _get_preloaded_bundle(filters_dir, freq_path, vocab_file)
+    timings_ms["preload_cache_hit"] = 1 if preload_hit else 0
     timings_ms["preload_ms"] = int((time.perf_counter() - phase_started) * 1000)
 
     phase_started = time.perf_counter()
     if subtitle_path.suffix.lower() == ".zip":
-        series_freqs = extract_words_from_zip(subtitle_path, excluded_words)
+        series_freqs, subtitle_raw = extract_words_from_zip_with_content(
+            subtitle_path, excluded_words
+        )
     else:
-        series_freqs = Counter(parse_srt_file(subtitle_path, excluded_words))
+        word_list, subtitle_raw = parse_srt_file_with_content(subtitle_path, excluded_words)
+        series_freqs = Counter(word_list)
+    if handoff_out is not None:
+        handoff_out["subtitle_raw"] = subtitle_raw
     series_freqs = Counter({w: c for w, c in series_freqs.items() if len(w) >= min_length})
     timings_ms["parse_subtitle_ms"] = int((time.perf_counter() - phase_started) * 1000)
 
+    # Resolve series/episode for GPT prompts (same logic as output paths)
+    if is_movie:
+        if series_name is None or year is None:
+            info = extract_movie_info(subtitle_path)
+            if series_name is None:
+                series_name = info["series"]
+            if year is None and info.get("year"):
+                year = int(info["year"])
+        season_number = 0
+        episode_number = 0
+    elif series_name is None or season_number is None or episode_number is None:
+        info = extract_series_info(subtitle_path)
+        if series_name is None:
+            series_name = info["series"]
+        if info["season"] and info["episode"]:
+            season_number = int(re.search(r"\d+", info["season"]).group())
+            episode_number = int(re.search(r"\d+", info["episode"]).group())
+        else:
+            if season_number is None:
+                season_number = 1
+            if episode_number is None:
+                episode_number = 1
+
     phase_started = time.perf_counter()
     series_threshold, english_threshold, _, _ = calculate_thresholds(series_freqs, english_freqs)
+    gpt_coarse_cefr: Dict[str, str] = {}
+    effective_vocab = vocabulary_levels
+    if openai_api_key and min_episode_count > 0:
+        try:
+            from subtitle_text_utils import get_subtitle_text_from_content
+            from filter_tier_names import assign_coarse_cefr_for_unlabeled
+            from openai import OpenAI
+
+            need_cefr = collect_words_needing_gpt_cefr(
+                series_freqs,
+                english_freqs,
+                vocabulary_levels,
+                series_threshold,
+                english_threshold,
+                min_episode_count,
+                oxford_filter,
+                easy_words_filter,
+            )
+            if need_cefr:
+                subtitle_text_cefr = get_subtitle_text_from_content(subtitle_raw)
+                print(
+                    f"CEFR triage (GPT) for {len(need_cefr)} unlabeled frequent learner lemmas..."
+                )
+                client_cefr = OpenAI(api_key=openai_api_key)
+                gpt_coarse_cefr = assign_coarse_cefr_for_unlabeled(
+                    need_cefr,
+                    subtitle_text_cefr,
+                    series_name or "Unknown",
+                    client_cefr,
+                )
+                print(f"  Received coarse labels for {len(gpt_coarse_cefr)} words")
+            if gpt_coarse_cefr:
+                effective_vocab = build_effective_vocabulary_levels(
+                    vocabulary_levels, gpt_coarse_cefr
+                )
+        except Exception as e:
+            print(f"Warning: CEFR GPT triage failed ({e}), using xlsx levels only")
+            gpt_coarse_cefr = {}
+            effective_vocab = vocabulary_levels
+    timings_ms["gpt_cefr_ms"] = int((time.perf_counter() - phase_started) * 1000)
+
+    phase_started = time.perf_counter()
     tiers = categorize_words(
         series_freqs,
         english_freqs,
         max_english_freq=max_english_freq,
         oxford_filter=oxford_filter,
         easy_words_filter=easy_words_filter,
-        vocabulary_levels=vocabulary_levels,
+        vocabulary_levels=effective_vocab,
         series_threshold=series_threshold,
         english_threshold=english_threshold,
+        min_episode_count=min_episode_count if min_episode_count > 0 else None,
     )
     timings_ms["tier_build_ms"] = int((time.perf_counter() - phase_started) * 1000)
     if save_debug_csv and debug_output_dir:
@@ -642,33 +1020,14 @@ def run_pipeline(
         _set_metrics()
         return None
     tierlist_base_dir = tierlist_base_dir.resolve()
-    if is_movie:
-        if series_name is None or year is None:
-            info = extract_movie_info(subtitle_path)
-            series_name = info["series"]
-            if year is None and info.get("year"):
-                year = int(info["year"])
-        season_number = 0
-        episode_number = 0
-    elif series_name is None or season_number is None or episode_number is None:
-        info = extract_series_info(subtitle_path)
-        series_name = info["series"]
-        if info["season"] and info["episode"]:
-            season_number = int(re.search(r"\d+", info["season"]).group())
-            episode_number = int(re.search(r"\d+", info["episode"]).group())
-        else:
-            season_number = 1
-            episode_number = 1
 
     excluded_words: Optional[Set[str]] = None
     c1_assessment: Optional[Dict[str, str]] = None
     phase_started = time.perf_counter()
     if openai_api_key:
         try:
-            from filter_tier_names import (
-                get_subtitle_text as get_subtitle_text_filter,
-                filter_names_and_fantasy_entities,
-            )
+            from subtitle_text_utils import get_subtitle_text_from_content
+            from filter_tier_names import filter_names_and_fantasy_entities
             from openai import OpenAI
             seen_lower = set()
             words_to_check = []
@@ -687,7 +1046,7 @@ def run_pipeline(
                         seen_lower.add(w)
                         words_to_check.append((item[0] or "").strip())
             if words_to_check:
-                subtitle_text = get_subtitle_text_filter(subtitle_path)
+                subtitle_text = get_subtitle_text_from_content(subtitle_raw)
                 client = OpenAI(api_key=openai_api_key)
                 print("Filtering names and fantasy entities with ChatGPT...")
                 excluded_words, c1_assessment = filter_names_and_fantasy_entities(
@@ -722,8 +1081,17 @@ def run_pipeline(
         c1_assessment=c1_assessment,
         is_movie=is_movie,
         movie_year=year if is_movie else None,
+        min_episode_count=min_episode_count if min_episode_count > 0 else None,
+        gpt_coarse_cefr=gpt_coarse_cefr if gpt_coarse_cefr else None,
     )
     timings_ms["save_outputs_ms"] = int((time.perf_counter() - phase_started) * 1000)
+    try:
+        fp_payload = json.dumps(
+            _subtitle_source_fingerprint(subtitle_path), indent=2, ensure_ascii=False
+        )
+        (output_episode_dir / FINGERPRINT_FILENAME).write_text(fp_payload, encoding="utf-8")
+    except OSError:
+        pass
     if debug_output_dir and HAS_MATPLOTLIB:
         create_frequency_plot(tiers, series_threshold, english_threshold, debug_output_dir)
     _set_metrics()
@@ -741,6 +1109,12 @@ def main() -> None:
     parser.add_argument("--year", type=int, default=None, help="Movie release year (for movies)")
     parser.add_argument("--freq-list", type=Path, help="English frequency CSV")
     parser.add_argument("--max-english-freq", type=int, default=20_000_000, help="Max English freq for Tier 1")
+    parser.add_argument(
+        "--min-episode-count",
+        type=int,
+        default=2,
+        help="Min mentions in this episode for learner-tier paths (B/C/A); 0 disables",
+    )
     parser.add_argument("--min-length", type=int, default=3, help="Min word length")
     parser.add_argument("--output", "-o", type=Path, help="Debug output dir (optional)")
     parser.add_argument("--openai-api-key", type=str, default=None, help="OpenAI API key for name/fantasy filter (or set OPENAI_API_KEY)")
@@ -772,6 +1146,7 @@ def main() -> None:
         year=args.year,
         freq_path=args.freq_list or base_dir / "Frequency list" / "English" / "unigram_freq.csv",
         max_english_freq=args.max_english_freq,
+        min_episode_count=args.min_episode_count,
         min_length=args.min_length,
         save_debug_csv=bool(args.output),
         debug_output_dir=args.output and (base_dir / args.output),

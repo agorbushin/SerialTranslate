@@ -1,0 +1,26 @@
+{
+  "series": "Euphoria S2 E2",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "euphoria_s2_e2.srt",
+  "analysis_date": "2026-03-31T21:03:50.085480",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 86868060,
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 6,
+    "tier_2_random": 190,
+    "tier_3_common": 20,
+    "tier_4_rare_in_series": 5,
+    "tier_5_filtered": 136,
+    "tier_b1_words": 2,
+    "tier_b2_words": 27,
+    "tier_4_rare_c_words": 1,
+    "tier_4_rare_b_words": 20
+  },
+  "excluded_names_fantasy_count": 52
+}

@@ -4,14 +4,14 @@
 
 **Subtitle**: `true_detective_s1_e1.srt`
 
-**Analysis**: 2026-03-24 14:00
+**Analysis**: 2026-03-29 20:40
 
 ## Word counts
 
-- Tier 1 (Hard Usable): 4
-- Tier 2 (Random): 179
-- Tier 3 (Common): 18
-- Tier 4 (Rare in Series): 6
-- Tier 5 (Filtered): 394
-- Tier B1 (Intermediate): 13
-- Tier B2 (Upper-Intermediate): 26
+- Tier 1 (Hard Usable): 11
+- Tier 2 (Random): 244
+- Tier 3 (Common): 23
+- Tier 4 (Rare in Series): 8
+- Tier 5 (Filtered): 159
+- Tier B1 (Intermediate): 0
+- Tier B2 (Upper-Intermediate): 15

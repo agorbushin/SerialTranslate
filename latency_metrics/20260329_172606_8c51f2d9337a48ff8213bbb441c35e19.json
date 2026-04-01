@@ -1,0 +1,49 @@
+{
+  "request_id": "8c51f2d9337a48ff8213bbb441c35e19",
+  "mode": "series",
+  "raw_input": "true detective s2e3",
+  "started_at": "2026-03-29T17:25:19.816352",
+  "finished_at": "2026-03-29T17:26:06.290319",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "True Detective",
+    "season": 2,
+    "episode": 3
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 3,
+    "download_subtitle": 1614,
+    "analyze_subtitle": 40672,
+    "translate": 2570
+  },
+  "timings_ms": {
+    "total_e2e_ms": 46474
+  },
+  "analyze_metrics": {
+    "preload_ms": 2910,
+    "parse_subtitle_ms": 5,
+    "tier_build_ms": 1,
+    "gpt_filter_ms": 36949,
+    "save_outputs_ms": 7,
+    "total_ms": 39875,
+    "preload_cache_hit": 0,
+    "pipeline_skipped": 0
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 13,
+    "timings_ms": {
+      "prepare_ms": 18,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 0,
+      "total_ms": 2564,
+      "translations_reused": 0,
+      "subtitle_read_skipped": 1
+    }
+  },
+  "error": null
+}

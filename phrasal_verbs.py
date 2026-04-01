@@ -9,7 +9,7 @@ import csv
 import json
 from pathlib import Path
 from collections import Counter
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Set
 from openai import OpenAI
 import argparse
 
@@ -62,6 +62,11 @@ COMMON_PHRASAL_VERBS = [
     'write down', 'write up', 'write out', 'write off', 'write back'
 ]
 
+# First-token artifacts from splitting contractions with \\b\\w+\\b (e.g. what's -> s + next).
+CONTRACTION_FRAGMENTS = frozenset({'s', 't', 'm', 're', 've', 'll', 'd'})
+
+_COMMON_PHRASAL_SET = frozenset(COMMON_PHRASAL_VERBS)
+
 
 def parse_srt_file(srt_path: Path) -> str:
     """Parse SRT subtitle file and return clean text.
@@ -105,66 +110,172 @@ def parse_srt_file(srt_path: Path) -> str:
         return ""
 
 
-def extract_phrasal_verbs(text: str) -> Counter:
+def _to_token_filter_drop(phrase: str) -> bool:
+    """True if phrase should be dropped due to project 'to' heuristics."""
+    return (
+        ' to ' in phrase
+        or phrase.endswith(' to')
+        or phrase.startswith('to ')
+    )
+
+
+def extract_phrasal_verbs(text: str) -> Tuple[Counter, Set[str]]:
     """Extract phrasal verbs from text.
-    
-    Args:
-        text: Text content to analyze
-        
+
+    Tokenization uses ``\\b\\w+\\b`` (contraction-safe parsing deferred); dynamic
+    hits are tagged separately for deterministic filtering.
+
     Returns:
-        Counter of phrasal verbs with their frequencies
+        (counter, from_dictionary): counts after merging dict + dynamic passes,
+        and the set of phrases that matched COMMON_PHRASAL_VERBS (not dynamic-only).
     """
-    phrasal_verbs = Counter()
+    dict_counter: Counter = Counter()
+    dynamic_counter: Counter = Counter()
     text_lower = text.lower()
-    
-    # Convert text to words with positions for context
+
     words = re.findall(r'\b\w+\b', text_lower)
-    
-    # Check for common phrasal verbs first (excluding those with "to")
+
     for pv in COMMON_PHRASAL_VERBS:
-        # Skip phrasal verbs containing "to"
-        if ' to ' in pv or pv.endswith(' to') or pv.startswith('to '):
+        if _to_token_filter_drop(pv):
             continue
-        # Use word boundaries to match whole phrases
         pattern = r'\b' + re.escape(pv) + r'\b'
         matches = len(re.findall(pattern, text_lower))
         if matches > 0:
-            phrasal_verbs[pv] += matches
-    
-    # Also detect verb + particle patterns dynamically
-    # Look for verb followed by particle within 1-2 words
+            dict_counter[pv] += matches
+
     for i in range(len(words) - 1):
         word = words[i]
         next_word = words[i + 1] if i + 1 < len(words) else None
-        
-        # Check if next word is a particle (but not "to")
+
         if next_word and next_word in PHRASAL_PARTICLES and next_word != 'to':
             phrasal_verb = f"{word} {next_word}"
-            # Only add if not already in common list (to avoid duplicates)
-            # and if it doesn't contain "to"
-            if phrasal_verb not in COMMON_PHRASAL_VERBS and ' to ' not in phrasal_verb:
-                phrasal_verbs[phrasal_verb] += 1
-        
-        # Check for verb + particle + preposition (e.g., "come up with")
-        # BUT exclude phrasal verbs ending with "to"
+            if phrasal_verb not in _COMMON_PHRASAL_SET and not _to_token_filter_drop(
+                phrasal_verb
+            ):
+                dynamic_counter[phrasal_verb] += 1
+
         if i + 2 < len(words):
             word_after = words[i + 2]
-            if (next_word in PHRASAL_PARTICLES and 
-                word_after in ['with', 'for', 'on', 'in', 'at', 'by']):  # Removed 'to'
+            if next_word in PHRASAL_PARTICLES and word_after in [
+                'with',
+                'for',
+                'on',
+                'in',
+                'at',
+                'by',
+            ]:
                 phrasal_verb = f"{word} {next_word} {word_after}"
-                if phrasal_verb not in COMMON_PHRASAL_VERBS:
-                    phrasal_verbs[phrasal_verb] += 1
-    
-    # Filter out any phrasal verbs containing "to"
-    # This catches any that might have been detected dynamically
-    filtered_phrasal_verbs = Counter()
-    for pv, count in phrasal_verbs.items():
-        # Skip if phrasal verb contains " to " or ends with " to" or starts with "to "
-        if ' to ' in pv or pv.endswith(' to') or pv.startswith('to '):
+                if phrasal_verb not in _COMMON_PHRASAL_SET:
+                    dynamic_counter[phrasal_verb] += 1
+
+    merged = dict_counter + dynamic_counter
+    filtered = Counter()
+    for pv, count in merged.items():
+        if _to_token_filter_drop(pv):
             continue
-        filtered_phrasal_verbs[pv] = count
-    
-    return filtered_phrasal_verbs
+        filtered[pv] = count
+
+    from_dictionary = set(dict_counter.keys()) & set(filtered.keys())
+    return filtered, from_dictionary
+
+
+def filter_phrasal_candidates(counter: Counter, from_dictionary: Set[str]) -> Counter:
+    """Drop tokenizer junk and weak dynamic heads; never weaken dictionary matches."""
+    out = Counter()
+    for phrase, count in counter.items():
+        if phrase in from_dictionary:
+            out[phrase] = count
+            continue
+        parts = phrase.split()
+        if not parts:
+            continue
+        head = parts[0]
+        if head in CONTRACTION_FRAGMENTS:
+            continue
+        if len(head) < 2:
+            continue
+        out[phrase] = count
+    return out
+
+
+def verify_phrasal_verbs_with_chatgpt(
+    candidates: List[str],
+    subtitle_text: str,
+    series_name: str,
+    api_key: str,
+    batch_size: int = 25,
+) -> Set[str]:
+    """Ask the model which strings are real phrasal / verb-particle idioms.
+
+    Returns a subset of ``candidates`` (exact string match). Invalid adjacency
+    and non-idiomatic pairs should be excluded by the model.
+    """
+    if not candidates:
+        return set()
+
+    client = OpenAI(api_key=api_key)
+    approved: Set[str] = set()
+    context = subtitle_text[:3000] if len(subtitle_text) > 3000 else subtitle_text
+    ctx_snip = context[:2000]
+
+    for batch_start in range(0, len(candidates), batch_size):
+        batch = candidates[batch_start : batch_start + batch_size]
+        numbered = "\n".join(f"{i + 1}. {p}" for i, p in enumerate(batch))
+
+        prompt = f"""You are a linguist judging English multiword units for the TV series "{series_name}".
+
+Below is a numbered list of candidate PHRASES (2–3 words) taken from subtitles. Many are NOT real phrasal verbs: they may be random adjacency (e.g. "you in", "man in"), tokenizer garbage (e.g. "s up" from contractions), or ordinary grammar — not lexical phrasal verbs / idiomatic verb–particle combinations.
+
+Keep ONLY phrases that are genuine phrasal verbs or established verb–particle / verb–preposition idioms in English (e.g. "give up", "come on", "look for", "put up with").
+
+CANDIDATES:
+{numbered}
+
+SUBTITLE EXCERPT (for context only):
+{ctx_snip}
+
+Return ONLY a JSON object with this exact shape:
+{{"valid": ["phrase1", "phrase2", ...]}}
+
+Rules:
+- Each string in "valid" MUST be copied EXACTLY from the candidate list above (same spelling, same spacing).
+- If none qualify, return {{"valid": []}}.
+"""
+
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You judge phrasal verbs. Respond only with valid JSON: an object with key 'valid' whose value is an array of strings.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.1,
+                response_format={"type": "json_object"},
+            )
+            raw = response.choices[0].message.content
+            result = json.loads(raw) if raw else {}
+            valid_list = result.get("valid") or []
+            batch_set = set(batch)
+            for s in valid_list:
+                if isinstance(s, str) and s in batch_set:
+                    approved.add(s)
+            print(
+                f"Verified batch {batch_start // batch_size + 1}: "
+                f"{len([x for x in valid_list if isinstance(x, str) and x in batch_set])}/"
+                f"{len(batch)} kept"
+            )
+        except Exception as e:
+            print(f"Error verifying batch {batch_start // batch_size + 1}: {e}")
+
+    return approved
+
+
+def apply_verified_phrasals(counter: Counter, approved: Set[str]) -> Counter:
+    """Keep only keys present in ``approved``, preserving counts."""
+    return Counter({k: counter[k] for k in counter if k in approved})
 
 
 def translate_phrasal_verbs(phrasal_verbs: List[Tuple[str, int]], 
@@ -343,35 +454,57 @@ def extract_phrasal_verbs_from_episode(subtitle_path: Path,
         return False
     
     print(f"Extracted {len(subtitle_text)} characters of text")
-    
-    # Extract phrasal verbs
+
     print("\nExtracting phrasal verbs...")
-    phrasal_verbs = extract_phrasal_verbs(subtitle_text)
-    
+    phrasal_verbs, from_dictionary = extract_phrasal_verbs(subtitle_text)
+
     if not phrasal_verbs:
         print("No phrasal verbs found")
         return False
-    
-    print(f"Found {len(phrasal_verbs)} unique phrasal verbs")
-    print(f"Total occurrences: {sum(phrasal_verbs.values())}")
-    
-    # Sort by frequency for translation
-    sorted_pvs = sorted(phrasal_verbs.items(), key=lambda x: x[1], reverse=True)
-    
-    # Extract examples
+
+    print(
+        f"After extract: {len(phrasal_verbs)} unique, "
+        f"{sum(phrasal_verbs.values())} occurrences"
+    )
+
+    filtered = filter_phrasal_candidates(phrasal_verbs, from_dictionary)
+    print(
+        f"After deterministic filter: {len(filtered)} unique, "
+        f"{sum(filtered.values())} occurrences"
+    )
+    if not filtered:
+        print("No phrasal verbs left after deterministic filter")
+        return False
+
+    ordered_for_verify = sorted(filtered.items(), key=lambda x: x[1], reverse=True)
+    candidate_strings = [p for p, _ in ordered_for_verify]
+
+    print("\nVerifying phrasal verbs with ChatGPT...")
+    approved = verify_phrasal_verbs_with_chatgpt(
+        candidate_strings, subtitle_text, series_name, api_key
+    )
+    verified = apply_verified_phrasals(filtered, approved)
+    print(
+        f"After LLM verification: {len(verified)} unique, "
+        f"{sum(verified.values())} occurrences"
+    )
+    if not verified:
+        print("No phrasal verbs left after LLM verification")
+        return False
+
+    sorted_pvs = sorted(verified.items(), key=lambda x: x[1], reverse=True)
+
     print("\nExtracting example sentences...")
     pv_list = [pv for pv, _ in sorted_pvs]
     examples = extract_examples_for_phrasal_verbs(subtitle_text, pv_list)
-    
-    # Translate phrasal verbs
+
     print("\nTranslating phrasal verbs...")
     translations = translate_phrasal_verbs(
         sorted_pvs, subtitle_text, series_name, api_key
     )
-    
-    # Save results
+
     print("\nSaving results...")
-    save_phrasal_verbs(phrasal_verbs, translations, examples, episode_dir)
+    save_phrasal_verbs(verified, translations, examples, episode_dir)
     
     print(f"\n{'='*60}")
     print("PHRASAL VERB EXTRACTION COMPLETE")

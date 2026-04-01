@@ -4,12 +4,14 @@
 
 **Subtitle**: `peaky_blinders_s1_e1.srt`
 
-**Analysis**: 2026-03-21 17:17
+**Analysis**: 2026-03-31 17:15
 
 ## Word counts
 
-- Tier 1 (Hard Usable): 47
-- Tier 2 (Random): 165
-- Tier 3 (Common): 19
+- Tier 1 (Hard Usable): 6
+- Tier 2 (Random): 201
+- Tier 3 (Common): 17
 - Tier 4 (Rare in Series): 8
-- Tier 5 (Filtered): 387
+- Tier 5 (Filtered): 125
+- Tier B1 (Intermediate): 2
+- Tier B2 (Upper-Intermediate): 16

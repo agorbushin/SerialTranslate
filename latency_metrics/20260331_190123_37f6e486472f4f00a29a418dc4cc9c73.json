@@ -1,0 +1,75 @@
+{
+  "request_id": "37f6e486472f4f00a29a418dc4cc9c73",
+  "mode": "series",
+  "raw_input": "Fallout s2e5",
+  "started_at": "2026-03-31T19:00:37.111628",
+  "finished_at": "2026-03-31T19:01:23.601213",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Fallout",
+    "season": 2,
+    "episode": 5
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 1,
+    "download_subtitle": 0,
+    "analyze_subtitle": 37222,
+    "translate": 7440
+  },
+  "timings_ms": {
+    "total_e2e_ms": 46490
+  },
+  "analyze_metrics": {
+    "preload_ms": 7,
+    "parse_subtitle_ms": 187,
+    "gpt_cefr_ms": 5417,
+    "tier_build_ms": 4,
+    "gpt_filter_ms": 31593,
+    "save_outputs_ms": 5,
+    "total_ms": 37217,
+    "preload_cache_hit": 1,
+    "pipeline_skipped": 0
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 7,
+    "timings_ms": {
+      "prepare_ms": 3,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 2,
+      "total_ms": 7439,
+      "subtitle_read_skipped": 1,
+      "translations_reused": 3
+    },
+    "tier_b1_word_count": 2,
+    "tier_b2_word_count": 13,
+    "tiers": {
+      "tier_1": {
+        "word_count": 7,
+        "to_translate": 4,
+        "reused": 3,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b1": {
+        "word_count": 2,
+        "to_translate": 2,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b2": {
+        "word_count": 13,
+        "to_translate": 13,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      }
+    }
+  },
+  "error": null
+}

@@ -4,17 +4,21 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "narcos_s1_e1.srt",
-  "analysis_date": "2026-03-21T19:54:59.679699",
+  "analysis_date": "2026-03-31T17:10:44.037061",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 96287961,
-    "max_english_freq": 20000000
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 78,
-    "tier_2_random": 194,
-    "tier_3_common": 23,
+    "tier_1_hard_usable": 9,
+    "tier_2_random": 214,
+    "tier_3_common": 22,
     "tier_4_rare_in_series": 4,
-    "tier_5_filtered": 482
-  }
+    "tier_5_filtered": 178,
+    "tier_b1_words": 4,
+    "tier_b2_words": 19
+  },
+  "excluded_names_fantasy_count": 88
 }

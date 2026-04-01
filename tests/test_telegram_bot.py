@@ -73,14 +73,28 @@ class TestCommandHandlers:
         assert parse_mode == 'Markdown'
     
     @pytest.mark.asyncio
-    async def test_full_command_with_context(self, mock_update, mock_context, sample_episode_dir):
-        """Test /full command - verify full list is sent when episode context exists."""
+    async def test_full_command_with_context(self, mock_update, mock_context, temp_dir):
+        """Test /full command - verify rare-in-series (C) full list when translations exist."""
         from telegram_bot import send_full_list
-        
-        # Set context
-        mock_context.user_data['last_episode_dir'] = str(sample_episode_dir)
-        mock_context.user_data['last_series_name'] = 'Test Series'
-        
+
+        trans_dir = temp_dir / "translations" / "Test Series" / "Season 1" / "1"
+        trans_dir.mkdir(parents=True)
+        (trans_dir / "translation_info.json").write_text(
+            json.dumps(
+                {"series": "Test Series", "season_number": 1, "episode_number": 1},
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        with open(trans_dir / "tier_4_rare_c_translations.csv", "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["word", "translation_ru"])
+            w.writerow(["alpha", "альфа"])
+            w.writerow(["beta", "бета"])
+
+        mock_context.user_data["last_translations_dir"] = str(trans_dir)
+        mock_context.user_data["last_series_name"] = "Test Series"
+
         await send_full_list(mock_update, mock_context)
         
         # Should have replied
@@ -113,64 +127,65 @@ class TestCommandHandlers:
             or "loaded yet" in message.lower()
             or "title first" in message.lower()
         )
-        # The message should mention /full or the command itself
-        assert "/full" in message or "full" in message.lower() or "complete list" in message.lower()
+        # The message should mention /full or rare-in-series prompt
+        assert "/full" in message or "full" in message.lower() or "rare" in message.lower()
     
     @pytest.mark.asyncio
     async def test_full_command_message_length_limit(self, mock_update, mock_context, temp_dir):
         """Test /full command - verify message length limits (Telegram 4096 char limit)."""
         from telegram_bot import send_full_list
-        from conftest import create_tier_file, create_episode_info
-        
-        # Create episode dir with very long tier list
-        episode_dir = temp_dir / "S01E01"
-        episode_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Create tier file with many words (to exceed 4096 chars)
-        words_data = []
-        for i in range(500):  # Large number of words
-            words_data.append({
-                'word': f'word{i}',
-                'series_frequency': '5',
-                'english_frequency': '1000000',
-                'vocabulary_level': 'B1',
-                'translation': f'перевод{i}',
-                'example_en': f'This is example {i}',
-                'example_translated': f'Это пример {i}',
-                'is_name_or_fantasy': ''
-            })
-        
-        create_tier_file(episode_dir, "tier_1_hard_usable_words", words_data)
-        create_episode_info(episode_dir, "Test Series", "Season 1", "Episode 01")
-        
-        # Set context
-        mock_context.user_data['last_episode_dir'] = str(episode_dir)
-        mock_context.user_data['last_series_name'] = 'Test Series'
-        
+
+        trans_dir = temp_dir / "translations" / "Test Series" / "Season 1" / "1"
+        trans_dir.mkdir(parents=True)
+        (trans_dir / "translation_info.json").write_text(
+            json.dumps(
+                {"series": "Test Series", "season_number": 1, "episode_number": 1},
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        with open(trans_dir / "tier_4_rare_c_translations.csv", "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["word", "translation_ru"])
+            for i in range(500):
+                w.writerow([f"word{i}", f"перевод{i}"])
+
+        mock_context.user_data["last_translations_dir"] = str(trans_dir)
+        mock_context.user_data["last_series_name"] = "Test Series"
+
         await send_full_list(mock_update, mock_context)
         
         # Should handle long messages (either split or send as document)
         assert mock_update.message.reply_text.called or mock_update.message.reply_document.called
     
     @pytest.mark.asyncio
-    async def test_phrasal_command_with_context(self, mock_update, mock_context, sample_episode_dir):
+    async def test_phrasal_command_with_context(self, mock_update, mock_context, temp_dir):
         """Test /phrasal command - verify phrasal verbs list is sent."""
         from telegram_bot import send_phrasal_verbs
-        
-        # Create phrasal verbs file
-        phrasal_file = sample_episode_dir / "phrasal_verbs.csv"
-        with open(phrasal_file, 'w', newline='', encoding='utf-8') as f:
+
+        trans_dir = temp_dir / "translations" / "Test Series" / "Season 1" / "1"
+        trans_dir.mkdir(parents=True)
+        (trans_dir / "translation_info.json").write_text(
+            json.dumps(
+                {"series": "Test Series", "season_number": 1, "episode_number": 1},
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        phrasal_file = trans_dir / "phrasal_verbs.csv"
+        with open(phrasal_file, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
-            writer.writerow(['verb', 'frequency'])
-            writer.writerow(['look up', '3'])
-            writer.writerow(['give up', '2'])
-        
-        # Set context
-        mock_context.user_data['last_episode_dir'] = str(sample_episode_dir)
-        mock_context.user_data['last_series_name'] = 'Test Series'
-        
+            writer.writerow(
+                ["phrasal_verb", "frequency", "translation", "example"]
+            )
+            writer.writerow(["look up", "3", "искать", ""])
+            writer.writerow(["give up", "2", "сдаваться", ""])
+
+        mock_context.user_data["last_translations_dir"] = str(trans_dir)
+        mock_context.user_data["last_series_name"] = "Test Series"
+
         await send_phrasal_verbs(mock_update, mock_context)
-        
+
         # Should have replied
         assert mock_update.message.reply_text.called
     
@@ -189,10 +204,18 @@ class TestCommandHandlers:
         call_args = mock_update.message.reply_text.call_args
         message = call_args[0][0]
         
-        # Check for correct error message content
-        assert "No series" in message or "no series" in message.lower()
-        assert "requested" in message.lower() or "series first" in message.lower()
-        # The message should mention /phrasal or phrasal verbs
+        # Check for correct error message content (aligned with send_full_list / send_b_level_words)
+        assert (
+            "No series" in message
+            or "no series" in message.lower()
+            or "episode or movie" in message.lower()
+        )
+        assert (
+            "requested" in message.lower()
+            or "series first" in message.lower()
+            or "loaded yet" in message.lower()
+            or "title first" in message.lower()
+        )
         assert "/phrasal" in message or "phrasal" in message.lower()
 
 
@@ -200,8 +223,34 @@ class TestCommandHandlers:
 # TESTS FOR MESSAGE HANDLING
 # ============================================================================
 
+def test_should_auto_route_movie_from_series_mode() -> None:
+    from telegram_bot import _should_auto_route_movie_from_series_mode
+
+    assert _should_auto_route_movie_from_series_mode("the matrix 1999")
+    assert _should_auto_route_movie_from_series_mode("Dune (2021)")
+    assert not _should_auto_route_movie_from_series_mode("Fallout s2 e3")
+    assert not _should_auto_route_movie_from_series_mode("Game of Thrones")
+    assert not _should_auto_route_movie_from_series_mode("breaking bad season 1")
+
+
 class TestMessageHandling:
     """Test suite for message handling functionality."""
+
+    @pytest.mark.asyncio
+    async def test_series_mode_auto_routes_title_with_year_to_movie(
+        self, mock_update, mock_context
+    ):
+        """Movie-shaped text (title + year) in series mode delegates to movie handler."""
+        mock_context.user_data["mode"] = "series"
+        mock_update.message.text = "the matrix 1999"
+        with patch("telegram_bot._handle_message_movie", new_callable=AsyncMock) as m_movie:
+            from telegram_bot import handle_message
+
+            await handle_message(mock_update, mock_context)
+        m_movie.assert_called_once()
+        assert m_movie.call_args[0][0] is mock_update
+        assert m_movie.call_args[0][1] is mock_context
+        assert m_movie.call_args[0][2] == "the matrix 1999"
     
     @pytest.mark.asyncio
     async def test_series_name_input_valid(self, mock_update, mock_context, monkeypatch):

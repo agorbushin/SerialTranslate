@@ -1,0 +1,24 @@
+{
+  "request_id": "86868b17a4184187b3a9b61cff6fc3cf",
+  "mode": "series",
+  "raw_input": "AB",
+  "started_at": "2026-03-29T16:49:59.050681",
+  "finished_at": "2026-03-29T16:49:59.514979",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "AB",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 2
+  },
+  "timings_ms": {
+    "total_e2e_ms": 464
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "OpenSubtitles search failed: 400 Client Error: Bad Request for url: https://api.opensubtitles.com/api/v1/subtitles?episode_number=1&languages=en&query=ab&season_number=1"
+}

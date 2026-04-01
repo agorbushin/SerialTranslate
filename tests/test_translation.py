@@ -760,5 +760,26 @@ class TestEdgeCases:
                 assert result is True
 
 
+def test_resolve_subtitle_path_fallback_mismatched_series_folder() -> None:
+    """Phrasal/translate: find .srt by basename when tier metadata folder != Subtitle/ layout."""
+    from translate_tier_translations import resolve_subtitle_path
+
+    root = Path(__file__).resolve().parent.parent
+    sub = root / "Subtitle"
+    fixture = sub / "Fallout" / "Season 2" / "fallout_s2_e5.srt"
+    if not fixture.is_file():
+        pytest.skip("Workspace Subtitle/Fallout fixture missing")
+    info = {
+        "series": "Fallout S2 E5",
+        "subtitle_file": "fallout_s2_e5.srt",
+        "season_number": 1,
+        "episode_number": 1,
+        "is_movie": False,
+    }
+    p = resolve_subtitle_path(root, info, sub, None)
+    assert p is not None and p.is_file()
+    assert p.resolve() == fixture.resolve()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

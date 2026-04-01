@@ -1,0 +1,25 @@
+{
+  "request_id": "ca3cc7400c864fe9ba969452924d6c7f",
+  "mode": "series",
+  "raw_input": "the matrix 1999",
+  "started_at": "2026-03-31T20:52:32.634637",
+  "finished_at": "2026-03-31T20:52:34.213519",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "The Matrix 1999",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 1,
+    "find_existing": 3,
+    "download_subtitle": 551
+  },
+  "timings_ms": {
+    "total_e2e_ms": 1578
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

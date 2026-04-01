@@ -4,18 +4,23 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "fallout_s2_e6.srt",
-  "analysis_date": "2026-03-24T00:35:48.304383",
+  "analysis_date": "2026-03-31T19:56:47.538818",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 92129504,
-    "max_english_freq": 20000000
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 27,
-    "tier_2_random": 171,
-    "tier_3_common": 23,
+    "tier_1_hard_usable": 16,
+    "tier_2_random": 222,
+    "tier_3_common": 24,
     "tier_4_rare_in_series": 4,
-    "tier_5_filtered": 436
+    "tier_5_filtered": 166,
+    "tier_b1_words": 3,
+    "tier_b2_words": 23,
+    "tier_4_rare_c_words": 4,
+    "tier_4_rare_b_words": 36
   },
-  "excluded_names_fantasy_count": 50
+  "excluded_names_fantasy_count": 44
 }
