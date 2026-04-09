@@ -1,0 +1,137 @@
+{
+  "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.761104",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "idiomatic_expressions",
+  "series": "Euphoria S1 E6",
+  "season": 1,
+  "episode": 1,
+  "expression_count": 18,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 2,
+    "reasoning": "Step 1: The output provides Russian translations for all listed expressions, so there are no empty or obviously missing glosses. Step 2: However, the task asks for correctness in the episode context, and the provided data contains no subtitle matches and no dialogue context, so the translations cannot be validated against actual usage in this episode. Step 3: Several glosses are also overly literal or unnatural as learner-facing Russian: for example, 'tequila makes me' → 'текила делает меня' is incomplete and not idiomatic Russian; 'however strong you think you are' → 'насколько бы сильным ты себя ни считал, ты сильнее' is self-contradictory and likely not a faithful gloss; 'i m a burden' → 'я бремя' is unnatural without a copula or contextual phrasing; 'real fucked up' → 'по-настоящему накосяченный' is awkward and not a standard collocation. Step 4: Some entries are acceptable in a rough sense, such as 'i m sorry' → 'извини' and 'good to see you' → 'рад тебя видеть', but overall the set is dominated by literal, generic, or context-unverified translations. Therefore the translation quality is low and only partially usable.",
+    "issues": [
+      {
+        "expression": "tequila makes me",
+        "translation": "текила делает меня",
+        "issue": "Overly literal and incomplete Russian; not a natural learner gloss without the rest of the sentence."
+      },
+      {
+        "expression": "however strong you think you are",
+        "translation": "насколько бы сильным ты себя ни считал, ты сильнее",
+        "issue": "The Russian gloss is internally awkward and semantically suspicious; it appears to add a contradictory second clause."
+      },
+      {
+        "expression": "i m a burden",
+        "translation": "я бремя",
+        "issue": "Unnatural Russian phrasing; would normally need a copular construction or a more idiomatic rendering."
+      },
+      {
+        "expression": "real fucked up",
+        "translation": "по-настоящему накосяченный",
+        "issue": "Awkward and not a standard Russian equivalent; sounds forced and not learner-friendly."
+      },
+      {
+        "expression": "fucked up shit",
+        "translation": "накосяченные вещи",
+        "issue": "Too literal and unnatural; misses the strong colloquial force of the English expression."
+      },
+      {
+        "expression": "i think we re gonna",
+        "translation": "я думаю, мы собираемся",
+        "issue": "Overly literal and incomplete; in Russian this usually needs a future construction rather than 'собираемся' alone."
+      },
+      {
+        "expression": "i m gonna be honest",
+        "translation": "я буду честен",
+        "issue": "Acceptable but slightly stiff; context may require a more natural discourse formula like 'скажу честно'."
+      },
+      {
+        "expression": "gonna be honest with you",
+        "translation": "буду честен с тобой",
+        "issue": "Acceptable but somewhat literal; may be better as 'скажу тебе честно'."
+      },
+      {
+        "expression": "can t i can t",
+        "translation": "не могу, не могу",
+        "issue": "Possible, but repetitive and context-dependent; without episode context it may not capture the intended emotional force."
+      },
+      {
+        "expression": "just couldn t",
+        "translation": "просто не смог",
+        "issue": "Too generic; may be correct in isolation but not necessarily the best contextual gloss."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 3,
+    "reasoning": "Step 1: A few entries are genuine formulaic units worth studying, such as 'i m sorry', 'good to see you', 'i m gonna be honest', and 'gonna be honest with you'. Step 2: But many items are not idioms or special formulas; they are ordinary compositional chunks, partial clauses, or high-frequency grammatical sequences. Step 3: Several are especially weak as idiom candidates because they are incomplete fragments ('tequila makes me', 'i think we re gonna', 'i don t know what', 'however strong you think you are') rather than stable expressions. Step 4: Others are just transparent conversational language or accidental n-grams ('liked the way', 'made him feel', 'just couldn t', 'can t i can t', 'yeah come on yeah come'), which are not strong idiomatic units. Overall, the list contains some useful discourse formulas but is dominated by false positives and fragmentary strings.",
+    "invalid_expressions": [
+      {
+        "expression": "liked the way",
+        "reason": "Transparent compositional phrase, not an idiom or fixed formula."
+      },
+      {
+        "expression": "tequila makes me",
+        "reason": "Incomplete clause fragment, not a stable expression."
+      },
+      {
+        "expression": "however strong you think you are",
+        "reason": "Ordinary clause fragment, not an idiom; also syntactically incomplete as a standalone unit."
+      },
+      {
+        "expression": "made him feel",
+        "reason": "Plain compositional wording, not a formulaic expression."
+      },
+      {
+        "expression": "i think we re gonna",
+        "reason": "Incomplete predictive clause; not an idiom or fixed phrase."
+      },
+      {
+        "expression": "real fucked up",
+        "reason": "Colloquial intensifier plus adjective, but not a distinct idiom-type unit."
+      },
+      {
+        "expression": "fucked up shit",
+        "reason": "Vulgar but transparent noun phrase; not a stable idiom."
+      },
+      {
+        "expression": "i mean i mean i",
+        "reason": "Disfluency/repetition, not a formulaic expression worth studying as an idiom."
+      },
+      {
+        "expression": "can t i can t",
+        "reason": "Repetition of a basic modal negation, not an idiom."
+      },
+      {
+        "expression": "yeah come on yeah come",
+        "reason": "Fragmentary speech noise/partial repetition, not a fixed expression."
+      },
+      {
+        "expression": "i don t know what",
+        "reason": "Common clause starter, not an idiom."
+      },
+      {
+        "expression": "i m a burden",
+        "reason": "Literal self-description, not an idiom or formula."
+      },
+      {
+        "expression": "just couldn t",
+        "reason": "Incomplete auxiliary phrase, not a fixed expression."
+      }
+    ]
+  },
+  "overall_score": 2.5,
+  "summary": "The translations are present, but many are literal, awkward, or impossible to verify because no actual subtitle matches or episode context are provided. The source list also contains many non-idiomatic fragments and transparent conversational chunks, so only a small subset qualifies as useful formulaic language.",
+  "improvement_suggestions": [
+    "Require actual subtitle lines with surrounding context before approving glosses, so translations can be checked for episode-specific meaning.",
+    "Add a filtering step that rejects incomplete fragments, disfluencies, and transparent clause chunks unless they recur as a clearly fixed discourse formula.",
+    "Prefer natural Russian learner glosses that reflect spoken usage, e.g. 'скажу честно' over literal calques like 'я буду честен'."
+  ],
+  "tokens_used": {
+    "prompt": 1187,
+    "completion": 1626,
+    "total": 2813
+  }
+}

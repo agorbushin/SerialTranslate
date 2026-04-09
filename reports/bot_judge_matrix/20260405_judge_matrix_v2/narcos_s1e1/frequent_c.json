@@ -1,0 +1,108 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Narcos/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.766742",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Narcos",
+  "season": 1,
+  "episode": 1,
+  "word_count": 9,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Narcos/Season 1/narcos_s1_e1.srt",
+  "criterion_1": {
+    "score": 7,
+    "reasoning": "Most entries are translated correctly for the episode context. 'trafficker' → 'наркоторговец', 'communist' → 'коммунист', 'contraband' → 'контрабанда', and 'distill' → 'перегонять' are acceptable. The main problems are that several translations include explanatory notes rather than a clean lexical translation, and one item is only partially handled: 'cockroach' is rendered as a character-name note plus the dictionary meaning, which is contextually understandable but not a pure translation. 'holocaust' is translated as 'ядерный холокост', which matches the subtitle context, though it is more of a phrase than a single-word equivalent. 'cuca' and 'gacha' are treated as names in the series with dictionary glosses, which is acceptable in this dataset. Overall, the translations are mostly correct, with minor issues of format and one or two entries that are not ideal as standalone vocabulary translations.",
+    "issues": [
+      {
+        "word": "cockroach",
+        "translation": "Кокроч (имя в сериале), словарный перевод — таракан",
+        "issue": "Not a clean lexical translation; it mixes a phonetic name note with the dictionary meaning. In context it refers to the nickname 'Cockroach', but the output is still awkward and not a direct Russian equivalent."
+      },
+      {
+        "word": "cuca",
+        "translation": "Кука (имя в сериале), словарный перевод — кука",
+        "issue": "The translation is mostly a note rather than a real Russian lexical equivalent; 'кука' is not a meaningful standalone translation here."
+      },
+      {
+        "word": "gacha",
+        "translation": "Гача (имя в сериале), словарный перевод — удача",
+        "issue": "The output relies on a name note and a gloss. The gloss 'удача' does not match the subtitle context as a direct translation of the proper name, so it is not a clean vocabulary translation."
+      },
+      {
+        "word": "holocaust",
+        "translation": "ядерный холокост",
+        "issue": "Contextually correct, but it is a phrase rather than a direct single-word translation; still acceptable, but slightly less precise as a vocabulary entry."
+      },
+      {
+        "word": "das",
+        "translation": "ДАС, колумбийская спецслужба",
+        "issue": "This is an acronym/proper institutional name rather than a translated vocabulary item; acceptable for context, but not a standard lexical translation."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "Several source items are not ordinary English vocabulary words and should have been filtered out before translation. 'cockroach' is a real English word, but in the subtitle it is also a nickname; 'cuca' and 'gacha' are not standard English vocabulary items in this context and function as names or foreign-language forms. 'das' is an acronym for a Colombian agency, not a vocabulary word. The list therefore contains multiple non-vocabulary entities that violate the intended filtering rule.",
+    "violations": [
+      "cockroach",
+      "cuca",
+      "gacha",
+      "das"
+    ]
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is not well aligned with a C1/C2 vocabulary-learning goal. Several items are basic, high-frequency words that most intermediate learners would already know, such as 'cockroach', 'communist', 'contraband', and 'trafficker' in the sense used here. 'holocaust' is advanced, but the overall set is dominated by lower-level or non-lexical items, so it fails the C-level requirement.",
+    "not_c_level": [
+      {
+        "word": "cockroach",
+        "estimated_level": "B1",
+        "reason": "A common concrete noun; not advanced vocabulary."
+      },
+      {
+        "word": "trafficker",
+        "estimated_level": "B2",
+        "reason": "Fairly common derived noun; understandable for intermediate learners."
+      },
+      {
+        "word": "cuca",
+        "estimated_level": "B1",
+        "reason": "Not a C-level English vocabulary item; here it functions as a name/foreign form."
+      },
+      {
+        "word": "communist",
+        "estimated_level": "B1",
+        "reason": "Common political adjective/noun, typically known before C1."
+      },
+      {
+        "word": "gacha",
+        "estimated_level": "B1",
+        "reason": "Not a standard advanced English vocabulary item; appears to be a name/foreign term."
+      },
+      {
+        "word": "das",
+        "estimated_level": "B1",
+        "reason": "An acronym/proper noun, not C-level vocabulary."
+      },
+      {
+        "word": "contraband",
+        "estimated_level": "B2",
+        "reason": "Useful but not especially advanced; many learners know it at intermediate level."
+      },
+      {
+        "word": "distill",
+        "estimated_level": "B2",
+        "reason": "A standard academic/scientific verb, but generally below C1."
+      }
+    ]
+  },
+  "overall_score": 4.3,
+  "summary": "The translations are mostly understandable and several are contextually correct, but the list contains multiple non-vocabulary entities and several items that are too basic for a C-level set. The biggest weakness is not the Russian itself so much as the source list quality and the inclusion of names, acronyms, and intermediate-level words.",
+  "tokens_used": {
+    "prompt": 2311,
+    "completion": 1238,
+    "total": 3549
+  }
+}

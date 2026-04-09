@@ -1,0 +1,170 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Breaking Bad/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.757416",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Breaking Bad",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 163,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Breaking Bad/Season 1/breaking_bad_s1_e1.srt",
+  "criterion_1": {
+    "score": 3,
+    "reasoning": "Step 1: A small subset of the entries are correct and context-appropriate, such as 'come on' → 'давай', 'listen up' → 'послушайте', 'wake up' → 'проснись', 'look for' → 'искать', 'turn on' → 'включить', and 'shut up' → 'замолчи'. Step 2: However, many translations are either missing, marked N/A, or are too literal/generic for the episode context. Examples include 'how about' → 'как насчет' (acceptable but the stored example is ungrammatical in English), 'get off' → 'сойти' (wrong for 'Get off me' = 'Отстань/Слезь с меня'), 'you in' → 'ты в деле' (context is 'I only had you in my heart', so this is not the right sense), 'it out' → 'разобраться' (for 'check it out' the sense is 'посмотри/проверь'), and 'worked out' → 'разобраться' (wrong sense for 'worked out of there'). Step 3: There are also many entries that are not actually translated into natural Russian or are awkward calques, such as 'way out' → 'выход', 'you around' → 'тебя вокруг', 'me off' → 'меня отвлекать', 'brother in' → 'включить брата', and 'stick up' → 'вытаскивать'. Step 4: Because a minority of items are correct but a large number are incomplete, wrong-sense, or overly literal, the overall translation quality is low.",
+    "issues": [
+      {
+        "phrasal_verb": "get off",
+        "translation": "сойти",
+        "issue": "Wrong sense in context: 'Get off me!' means 'Слезь с меня!' / 'Отстань!', not 'сойти'."
+      },
+      {
+        "phrasal_verb": "you in",
+        "translation": "ты в деле",
+        "issue": "Not the right meaning for the episode example 'I only had you in my heart'; this is not 'be in on something'."
+      },
+      {
+        "phrasal_verb": "it out",
+        "translation": "разобраться",
+        "issue": "For 'check it out' the natural Russian is 'посмотри/проверь', not 'разобраться'."
+      },
+      {
+        "phrasal_verb": "worked out",
+        "translation": "разобраться",
+        "issue": "Wrong sense for 'worked out of there'; this is not 'figure out'."
+      },
+      {
+        "phrasal_verb": "way out",
+        "translation": "выход",
+        "issue": "Too literal and incomplete; in context it means 'далеко/очень далеко', not a noun 'exit'."
+      },
+      {
+        "phrasal_verb": "you around",
+        "translation": "тебя вокруг",
+        "issue": "Literal calque; the idiomatic meaning in context is 'доставать/водить за нос/мурыжить'."
+      },
+      {
+        "phrasal_verb": "me off",
+        "translation": "меня отвлекать",
+        "issue": "Wrong sense; in 'drop me off' the meaning is 'подвезти/высадить', not 'distract me'."
+      },
+      {
+        "phrasal_verb": "brother in",
+        "translation": "включить брата",
+        "issue": "Not a valid translation for the context and not a natural Russian gloss."
+      },
+      {
+        "phrasal_verb": "stick up",
+        "translation": "вытаскивать",
+        "issue": "Wrong meaning for the example; 'stick up his ass' is an idiom meaning 'заносчивый/с застрявшей палкой в заднице', not 'pull out'."
+      },
+      {
+        "phrasal_verb": "worked out",
+        "translation": "разобраться",
+        "issue": "The gloss does not match the episode usage and is too generic."
+      },
+      {
+        "phrasal_verb": "right on",
+        "translation": "правильно",
+        "issue": "Acceptable only loosely; in context it is an interjection like 'круто/отлично', not simply 'correct'."
+      },
+      {
+        "phrasal_verb": "come on",
+        "translation": "давай",
+        "issue": "Mostly acceptable, but it is context-dependent; in the repeated plea it is more like 'ну же'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "Step 1: Many entries are genuine phrasal verbs or established verb-particle/verb-preposition combinations, such as 'come on', 'wake up', 'get off', 'look for', 'turn on', 'shut up', 'get out', 'hold up', 'look into', 'pay up', 'cheer up', 'hang out', and 'zip up'. Step 2: But a substantial number are not lexical phrasal idioms; they are accidental word adjacency, fragments, or ordinary grammatical sequences extracted by token matching. Examples include 'you in', 's up', 'and over', 'it out', 's in', 'me in', 'money before', 'person in', 'yeah with', 'richards with', 'brother in', 'them in', 'suspects by', 'day for', 'dent in', 'excitement in', and many similar noun/preposition chunks. Step 3: Some entries are borderline or phraseological rather than textbook phrasal verbs, but the list contains too many false positives and tokenizer artifacts to count as mostly valid. Step 4: Therefore the set is mixed, with a large proportion of invalid source strings.",
+    "invalid_phrasals": [
+      {
+        "phrase": "you in",
+        "reason": "Accidental pronoun + preposition sequence, not a phrasal verb or established idiom."
+      },
+      {
+        "phrase": "s up",
+        "reason": "Tokenizer fragment from 'what's up'; not a lexical phrasal idiom."
+      },
+      {
+        "phrase": "and over",
+        "reason": "Not a verb-particle idiom; just part of the repetition 'over and over'."
+      },
+      {
+        "phrase": "it out",
+        "reason": "Incomplete fragment from 'check it out'; by itself it is not a phrasal verb entry."
+      },
+      {
+        "phrase": "s in",
+        "reason": "Fragment from 'heart's in'; not a phrasal idiom."
+      },
+      {
+        "phrase": "me in",
+        "reason": "Accidental adjacency, not a phrasal verb."
+      },
+      {
+        "phrase": "money before",
+        "reason": "Noun + preposition sequence, not a phrasal verb."
+      },
+      {
+        "phrase": "person in",
+        "reason": "Ordinary noun phrase with preposition, not a phrasal idiom."
+      },
+      {
+        "phrase": "yeah with",
+        "reason": "Not a verb-particle construction; just discourse plus preposition."
+      },
+      {
+        "phrase": "richards with",
+        "reason": "Proper noun + preposition, not a phrasal idiom."
+      },
+      {
+        "phrase": "brother in",
+        "reason": "Noun + preposition fragment, not a phrasal verb."
+      },
+      {
+        "phrase": "them in",
+        "reason": "Pronoun + preposition fragment; not a lexical idiom."
+      },
+      {
+        "phrase": "suspects by",
+        "reason": "Noun + preposition sequence, not a phrasal verb."
+      },
+      {
+        "phrase": "day for",
+        "reason": "Noun phrase, not a phrasal idiom."
+      },
+      {
+        "phrase": "dent in",
+        "reason": "Noun + preposition sequence; not a phrasal verb."
+      },
+      {
+        "phrase": "excitement in",
+        "reason": "Noun + preposition sequence, not a phrasal verb."
+      },
+      {
+        "phrase": "me off",
+        "reason": "Fragment from 'drop me off'; by itself it is incomplete and not the full idiom."
+      },
+      {
+        "phrase": "forward for",
+        "reason": "Preposition sequence extracted from a sentence; not a phrasal verb."
+      },
+      {
+        "phrase": "house on",
+        "reason": "Noun + preposition sequence, not a phrasal idiom."
+      },
+      {
+        "phrase": "name in",
+        "reason": "Noun + preposition fragment, not a phrasal verb."
+      }
+    ]
+  },
+  "overall_score": 3.5,
+  "summary": "The list contains a handful of solid phrasal verbs with decent translations, but many glosses are wrong, overly literal, or mismatched to the episode context. It also includes a large number of non-phrasal fragments and accidental word pairings, so the source list is only partially valid as a phrasal-verb inventory.",
+  "tokens_used": {
+    "prompt": 8596,
+    "completion": 2068,
+    "total": 10664
+  }
+}

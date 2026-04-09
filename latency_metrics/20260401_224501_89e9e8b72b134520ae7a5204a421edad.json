@@ -1,0 +1,26 @@
+{
+  "request_id": "89e9e8b72b134520ae7a5204a421edad",
+  "mode": "series",
+  "raw_input": "Fallout S02E01",
+  "started_at": "2026-04-01T22:45:01.681300",
+  "finished_at": "2026-04-01T22:45:01.688931",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Fallout",
+    "season": 2,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "spellfix_title": 0,
+    "find_existing": 0,
+    "download_subtitle": 2
+  },
+  "timings_ms": {
+    "total_e2e_ms": 7
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

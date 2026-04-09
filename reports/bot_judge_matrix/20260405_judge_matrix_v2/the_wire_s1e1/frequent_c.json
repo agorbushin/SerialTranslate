@@ -1,0 +1,55 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/The Wire/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.761609",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "The Wire",
+  "season": 1,
+  "episode": 1,
+  "word_count": 4,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/The Wire/Season 1/the_wire_s1_e1.srt",
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "1) \"narcotic\" → \"наркотик\" is broadly correct as a dictionary translation, but in this episode context it is used as a law-enforcement/drug-related term, so the translation is acceptable. 2) \"scroggin\" → \"(empty)\" is missing, so this is a clear failure. 3) \"decomp\" → \"разложившийся труп\" captures the intended meaning in the subtitle context (a decomposed body/corpse found in a vacant apartment), though it is slightly more specific than the English slang term itself; still contextually correct. 4) \"surveillance\" → \"наружное наблюдение\" is correct and fits the police context in the episode. Overall, 3 of 4 entries are usable, with one missing translation.",
+    "issues": [
+      {
+        "word": "scroggin",
+        "translation": "(empty)",
+        "issue": "Missing translation."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 7,
+    "reasoning": "Most source items are genuine English vocabulary words. \"narcotic\", \"decomp\", and \"surveillance\" are valid English terms. \"scroggin\" is problematic: it is not a standard common English vocabulary item in this context and appears to be slang/rare jargon, possibly not suitable for a general vocabulary list. It is not a clear character or place name, but it is questionable as a source-list item because it is obscure and may not be a stable English lemma for learners.",
+    "violations": [
+      "scroggin"
+    ]
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is intended for C1/C2 vocabulary, but several items are much more basic. \"narcotic\" is around B2/C1 depending on usage, and \"surveillance\" is C1-ish, but \"decomp\" is slang/abbreviation rather than a standard advanced vocabulary item, and \"scroggin\" is obscure but not clearly a useful C-level English word. The list therefore mixes advanced terms with non-C-level or non-lexical items, which weakens it substantially as a C-level learning set.",
+    "not_c_level": [
+      {
+        "word": "decomp",
+        "estimated_level": "B2",
+        "reason": "This is an abbreviated slang form of 'decomposition/decompensation' rather than a standard C1/C2 vocabulary item; it is too informal and episode-specific for a C-level word list."
+      },
+      {
+        "word": "scroggin",
+        "estimated_level": "B2",
+        "reason": "This is obscure slang/rare usage rather than a clearly teachable advanced vocabulary item; it does not function like a standard C1/C2 lemma."
+      }
+    ]
+  },
+  "overall_score": 5.0,
+  "summary": "The translations are mostly correct where provided, but one entry is missing and one source item is questionable as a vocabulary target. The list also does not consistently meet the intended C1/C2 level, since it includes slangy or non-standard items alongside advanced terms.",
+  "tokens_used": {
+    "prompt": 2132,
+    "completion": 702,
+    "total": 2834
+  }
+}

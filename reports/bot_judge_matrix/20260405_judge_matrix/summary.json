@@ -1,0 +1,496 @@
+{
+  "run_label": "20260405_judge_matrix",
+  "manifest": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/manifests/default_10.json",
+  "model": "gpt-5.4-mini",
+  "max_workers": 36,
+  "parallel_judge_tasks": 36,
+  "finished_at": "2026-04-05T22:55:45.694173",
+  "episodes": [
+    {
+      "key": "matrix_1999",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+      "subtitle_used": null,
+      "started_at": "2026-04-05T22:55:11.799897",
+      "episode_index": 0,
+      "status": "ok",
+      "parts": {
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "rare_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 173, in _rc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "rare_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 189, in _rb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "phrasal": {
+          "overall_score": 5.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_judge_matrix/matrix_1999/phrasal.json"
+        }
+      },
+      "skip_count": 1,
+      "error_count": 4,
+      "completed_at": "2026-04-05T22:55:45.694037"
+    },
+    {
+      "key": "game_of_thrones_s3e3",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+      "subtitle_used": null,
+      "started_at": "2026-04-05T22:55:11.800613",
+      "episode_index": 1,
+      "status": "ok",
+      "parts": {
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "rare_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 173, in _rc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "rare_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 189, in _rb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "phrasal": {
+          "overall_score": 6.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_judge_matrix/game_of_thrones_s3e3/phrasal.json"
+        }
+      },
+      "skip_count": 1,
+      "error_count": 4,
+      "completed_at": "2026-04-05T22:55:45.694100"
+    },
+    {
+      "key": "euphoria_s2e2",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+      "subtitle_used": null,
+      "started_at": "2026-04-05T22:55:11.801300",
+      "episode_index": 2,
+      "status": "ok",
+      "parts": {
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "rare_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 189, in _rb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "rare_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 173, in _rc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "phrasal": {
+          "overall_score": 4.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_judge_matrix/euphoria_s2e2/phrasal.json"
+        }
+      },
+      "skip_count": 1,
+      "error_count": 4,
+      "completed_at": "2026-04-05T22:55:45.694115"
+    },
+    {
+      "key": "fallout_s2e3",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+      "subtitle_used": null,
+      "started_at": "2026-04-05T22:55:11.801809",
+      "episode_index": 3,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "rare_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 189, in _rb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "phrasal": {
+          "overall_score": 4.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_judge_matrix/fallout_s2e3/phrasal.json"
+        }
+      },
+      "skip_count": 2,
+      "error_count": 3,
+      "completed_at": "2026-04-05T22:55:45.694119"
+    },
+    {
+      "key": "euphoria_s1e6",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+      "subtitle_used": null,
+      "started_at": "2026-04-05T22:55:11.802338",
+      "episode_index": 4,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "phrasal": {
+          "overall_score": 6.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_judge_matrix/euphoria_s1e6/phrasal.json"
+        },
+        "idioms": {
+          "overall_score": 1.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_judge_matrix/euphoria_s1e6/idioms.json"
+        }
+      },
+      "skip_count": 2,
+      "error_count": 2,
+      "completed_at": "2026-04-05T22:55:45.694122"
+    },
+    {
+      "key": "the_wire_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/The Wire/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/The Wire/Season 1/the_wire_s1_e1.srt",
+      "started_at": "2026-04-05T22:55:11.803009",
+      "episode_index": 5,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "phrasal": {
+          "overall_score": 1.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_judge_matrix/the_wire_s1e1/phrasal.json"
+        }
+      },
+      "skip_count": 3,
+      "error_count": 2,
+      "completed_at": "2026-04-05T22:55:45.694146"
+    },
+    {
+      "key": "breaking_bad_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Breaking Bad/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Breaking Bad/Season 1/breaking_bad_s1_e1.srt",
+      "started_at": "2026-04-05T22:55:11.803455",
+      "episode_index": 6,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "phrasal": {
+          "overall_score": 2.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_judge_matrix/breaking_bad_s1e1/phrasal.json"
+        }
+      },
+      "skip_count": 3,
+      "error_count": 2,
+      "completed_at": "2026-04-05T22:55:45.694149"
+    },
+    {
+      "key": "black_mirror_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Black Mirror/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Black Mirror/Season 1/black_mirror_s1_e1.srt",
+      "started_at": "2026-04-05T22:55:11.804254",
+      "episode_index": 7,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "phrasal": {
+          "overall_score": 2.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_judge_matrix/black_mirror_s1e1/phrasal.json"
+        }
+      },
+      "skip_count": 3,
+      "error_count": 2,
+      "completed_at": "2026-04-05T22:55:45.694153"
+    },
+    {
+      "key": "narcos_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Narcos/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Narcos/Season 1/narcos_s1_e1.srt",
+      "started_at": "2026-04-05T22:55:11.804920",
+      "episode_index": 8,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "phrasal": {
+          "skipped": true,
+          "skipped_reason": "missing phrasal_verbs.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        }
+      },
+      "skip_count": 4,
+      "error_count": 2,
+      "completed_at": "2026-04-05T22:55:45.694156"
+    },
+    {
+      "key": "sherlock_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Sherlock/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Sherlock/Season 1/sherlock_s1_e1.srt",
+      "started_at": "2026-04-05T22:55:11.805498",
+      "episode_index": 9,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "phrasal": {
+          "skipped": true,
+          "skipped_reason": "missing phrasal_verbs.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 141, in _fc\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        },
+        "frequent_b": {
+          "overall_score": null,
+          "error": "judge_translations() got an unexpected keyword argument 'translation_csvs'",
+          "report_path": null,
+          "exception": true,
+          "traceback": "Traceback (most recent call last):\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 312, in _run_single_judge_job\n    payload = fn()\n              ^^^^\n  File \"/Users/arseniygorbushin/Documents/SerialTranslate/run_bot_output_judge_matrix.py\", line 157, in _fb\n    return judge_translations(\n           ^^^^^^^^^^^^^^^^^^^\nTypeError: judge_translations() got an unexpected keyword argument 'translation_csvs'\n"
+        }
+      },
+      "skip_count": 4,
+      "error_count": 2,
+      "completed_at": "2026-04-05T22:55:45.694159"
+    }
+  ],
+  "episodes_ok": 10,
+  "episodes_failed": 0,
+  "mean_overall_score_by_part": {
+    "frequent_c": null,
+    "frequent_b": null,
+    "rare_c": null,
+    "rare_b": null,
+    "phrasal": 4.0,
+    "idioms": 1.5
+  },
+  "skipped_count_by_part": {
+    "frequent_c": 0,
+    "frequent_b": 0,
+    "rare_c": 7,
+    "rare_b": 6,
+    "phrasal": 2,
+    "idioms": 9
+  },
+  "judge_error_count_by_part": {
+    "frequent_c": 10,
+    "frequent_b": 10,
+    "rare_c": 3,
+    "rare_b": 4,
+    "phrasal": 0,
+    "idioms": 0
+  }
+}

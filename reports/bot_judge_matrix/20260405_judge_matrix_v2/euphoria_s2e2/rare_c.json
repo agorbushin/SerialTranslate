@@ -1,0 +1,48 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.756160",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_c",
+  "translation_csvs": [
+    "tier_4_rare_c_translations.csv"
+  ],
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "word_count": 1,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "The pair provided is not empty and the Russian word \"сам\" is a real Russian word. However, without a subtitle example, the intended sense of English \"self\" in this episode cannot be fully verified. In English, \"self\" can mean \"oneself\", \"identity\", or be part of compounds like \"self-esteem\"; the bare translation \"сам\" is only partially equivalent and can be too narrow or context-dependent. So the translation is plausible but not fully context-secure.",
+    "issues": [
+      {
+        "word": "self",
+        "translation": "сам",
+        "issue": "Potentially incomplete/context-dependent translation; without episode context, \"сам\" may not capture all senses of English \"self\" (e.g. identity/oneself)."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "The source list contains one item, \"self\", which is a genuine English vocabulary word. It is not a character name, place name, personal name, or foreign-language term. No filtering violation is present.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 1,
+    "reasoning": "The source word \"self\" is a very common English word, not an advanced C1/C2 item. It belongs to basic vocabulary and is therefore misaligned with an advanced rare-word list. Since the list contains only this item, the band mismatch is severe.",
+    "not_c_level": [
+      {
+        "word": "self",
+        "estimated_level": "A2",
+        "reason": "Common basic vocabulary; not an advanced rare word suitable for a C-band list."
+      }
+    ]
+  },
+  "overall_score": 5.7,
+  "summary": "The translation is acceptable but somewhat underspecified: \"self\" → \"сам\" is plausible, yet context is missing and the match is not fully verifiable. The source item is a valid English word, but it is far too basic for an advanced vocabulary list.",
+  "tokens_used": {
+    "prompt": 937,
+    "completion": 456,
+    "total": 1393
+  }
+}

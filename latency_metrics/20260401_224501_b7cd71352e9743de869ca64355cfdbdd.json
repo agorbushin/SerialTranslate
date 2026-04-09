@@ -1,0 +1,26 @@
+{
+  "request_id": "b7cd71352e9743de869ca64355cfdbdd",
+  "mode": "series",
+  "raw_input": "Better Call Saul",
+  "started_at": "2026-04-01T22:45:01.636340",
+  "finished_at": "2026-04-01T22:45:01.639683",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Better Call Saul",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "spellfix_title": 0,
+    "find_existing": 1,
+    "download_subtitle": 1
+  },
+  "timings_ms": {
+    "total_e2e_ms": 3
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

@@ -1,0 +1,108 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.753819",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 24,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most translations are semantically correct and complete: 'nephew'→'племянник', 'sword'→'меч', 'fought'→'сражался', 'wolf'→'волк', 'maiden'→'дева', 'funeral'→'похороны', 'blunder'→'ошибка', 'patience'→'терпение', 'absence'→'отсутствие', 'godly'→'благочестивый', 'believed'→'верили', 'finest'→'лучший', 'richer'→'богаче', 'spear'→'копьё' are all acceptable. A few entries are weaker or context-dependent: 'smelled'→'учуял' is a narrower, more animal-like sense than the general past tense 'smelled' and may be correct only if the scene implies tracking by scent; 'beating'→'побеждать' is not a direct match because 'beating' is usually a noun ('избиение', 'биение') or a participle, not the infinitive 'to beat'; 'bow'→'лук; кланяться' is ambiguous and may be acceptable only if the episode context supports both senses, but it is not a clean single translation; 'staying'→'остаться' is an infinitive rather than the gerund/participle form and is slightly off; 'lying'→'лживость' is a noun, while 'lying' in context is often 'лгать' or 'лживый/лживость' depending on usage, so this may be too generic or wrong-sense; 'landing'→'Гавань' is a proper-name translation for King's Landing, which is contextually fine if the source word is the place name, but as a standalone vocabulary item it is not a direct lexical equivalent; 'timer' is missing entirely. Overall the list is mostly accurate, with a few form/sense issues and one empty translation.",
+    "issues": [
+      {
+        "word": "smelled",
+        "translation": "учуял",
+        "issue": "Possibly too specific; 'smelled' is a general past tense, while 'учуял' implies detecting by scent/tracking and may not fit all contexts."
+      },
+      {
+        "word": "beating",
+        "translation": "побеждать",
+        "issue": "Wrong grammatical form and likely wrong sense; 'beating' is not the infinitive 'побеждать'."
+      },
+      {
+        "word": "bow",
+        "translation": "лук; кланяться",
+        "issue": "Ambiguous multi-translation; acceptable only if both senses are relevant, but not a precise single equivalent."
+      },
+      {
+        "word": "staying",
+        "translation": "остаться",
+        "issue": "Form mismatch; 'staying' should usually be rendered as 'оставаясь', 'пребывание', or 'оставаться' depending on context, not the perfective infinitive 'остаться'."
+      },
+      {
+        "word": "lying",
+        "translation": "лживость",
+        "issue": "Potential wrong sense or too nominal; 'lying' often means 'лгать' or 'лживый', not necessarily the noun 'лживость'."
+      },
+      {
+        "word": "landing",
+        "translation": "Гавань",
+        "issue": "This is a proper-name translation ('King's Landing' = 'Королевская Гавань'), not a direct lexical translation of the standalone word 'landing'."
+      },
+      {
+        "word": "timer",
+        "translation": "(empty)",
+        "issue": "Missing translation."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 7,
+    "reasoning": "Most source items are genuine English vocabulary words. However, several entries are not suitable as standalone vocabulary items because they are proper names or episode-specific named entities: 'pie' is annotated as 'Пай (имя в сериале)', which indicates a character name rather than the common noun 'pie'; 'pod' is annotated as 'Подрик (имя в сериале)', again a character name rather than the common noun 'pod'; 'landing' is likely 'King's Landing', a place name, not a general vocabulary item; and 'timer' is a valid English word but the list includes an empty translation, which is a separate issue not a source-word violation. The rest are ordinary English words. So the list has a few slipped-through non-vocabulary entities, but not many.",
+    "violations": [
+      "pie",
+      "pod",
+      "landing"
+    ]
+  },
+  "criterion_3": {
+    "score": 6,
+    "reasoning": "The list is mixed in difficulty. Many [B2] items are indeed B2-appropriate or at least reasonable in a fantasy-dialogue context: 'smelled', 'fought', 'maiden', 'funeral', 'blunder', 'patience', 'absence', 'godly', 'believed', 'finest', 'richer', 'spear'. However, several tagged [B2] words are too easy and belong closer to A1/A2/B1: 'sword', 'wolf', 'bow', 'landing' (as a place-name component), and 'beating' in the sense intended here is not clearly B2 vocabulary. 'staying' is also basic A2/B1. On the [B1] side, 'nephew', 'pie', and 'dull' are plausible B1 items, though 'pie' is only valid if treated as the common noun and not the character name. Overall the banding is somewhat inflated on several [B2] rows, so the calibration is imperfect.",
+    "not_c_level": [
+      {
+        "word": "sword",
+        "estimated_level": "A1",
+        "reason": "Very basic concrete noun; too easy for B2."
+      },
+      {
+        "word": "wolf",
+        "estimated_level": "A1",
+        "reason": "Common animal noun; not B2-level."
+      },
+      {
+        "word": "bow",
+        "estimated_level": "A2",
+        "reason": "Common word with basic senses ('лук', 'кланяться'); too easy for B2."
+      },
+      {
+        "word": "staying",
+        "estimated_level": "A2",
+        "reason": "Basic gerund/participle form of a common verb; not B2-level."
+      },
+      {
+        "word": "landing",
+        "estimated_level": "A2",
+        "reason": "As a common noun/verb, 'landing' is not B2-level; in the episode it is likely part of a proper name."
+      },
+      {
+        "word": "beating",
+        "estimated_level": "A2",
+        "reason": "Common verb/noun form; the item is not clearly B2 and the translation suggests a basic meaning."
+      }
+    ]
+  },
+  "overall_score": 7.0,
+  "summary": "The translation set is mostly accurate, with several strong Russian equivalents and only a few clear problems such as the empty 'timer' entry and some form/sense mismatches. The main weaknesses are source-list quality issues (names/place names mixed into vocabulary) and several [B2] tags that are too easy for the claimed level.",
+  "tokens_used": {
+    "prompt": 1583,
+    "completion": 1630,
+    "total": 3213
+  }
+}

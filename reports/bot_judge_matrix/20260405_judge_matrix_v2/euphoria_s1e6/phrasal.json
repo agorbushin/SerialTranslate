@@ -1,0 +1,54 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.760282",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Euphoria S1 E6",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 9,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 4,
+    "reasoning": "Step 1: Several translations are broadly acceptable as learner glosses, but the dataset provides no matched subtitle lines in this episode context, so episode-specific verification is weak. Step 2: 'run away' → 'убежать' is correct and natural. 'come on' → 'давай' is acceptable in many contexts, though it is somewhat underspecified because 'come on' can also mean 'ну давай', 'да ладно', or 'пошли'. Step 3: 'blacked out' → 'потерять сознание' is a reasonable gloss for the sense of losing consciousness, though in the stored example it refers to drug/alcohol-induced blackout, so 'отключиться' or 'потерять сознание' would both work. Step 4: 'hooked up with' → 'переспал с' is contextually plausible if the intended meaning is sexual intercourse, but the phrase can also mean 'had a casual sexual encounter' or 'made out with', so it is somewhat narrow. Step 5: 'fuck up' → 'провалиться' is not a good match for the stored example, because 'get the fuck up' means 'вставай/поднимайся', not 'fail'. This is a clear wrong-sense translation. Step 6: 'whine about' → 'ныть о' is correct and natural. Step 7: 'fuck off' → 'отвали' is correct and natural. Step 8: 'hooked up' → 'переспал' is acceptable but again somewhat narrow and context-dependent. Step 9: 'ran into' → 'встретил' is correct, though 'случайно встретил/наткнулся на' would be more precise for the usual meaning. Overall, most entries are usable, but one is clearly wrong and a few are overly narrow or slightly generic.",
+    "issues": [
+      {
+        "phrasal_verb": "fuck up",
+        "translation": "провалиться",
+        "issue": "Wrong sense for the stored example. 'Get the fuck up' means 'вставай/поднимайся', not 'провалиться'."
+      },
+      {
+        "phrasal_verb": "come on",
+        "translation": "давай",
+        "issue": "Overly generic gloss; depending on context it may need 'ну давай', 'пошли', 'да ладно', or 'ну же'."
+      },
+      {
+        "phrasal_verb": "hooked up with",
+        "translation": "переспал с",
+        "issue": "Contextually plausible but somewhat narrow; the phrase can mean a casual sexual encounter more broadly, not only explicit 'slept with'."
+      },
+      {
+        "phrasal_verb": "hooked up",
+        "translation": "переспал",
+        "issue": "Contextually plausible but somewhat narrow; the phrase can also mean a casual hookup or making out, depending on context."
+      },
+      {
+        "phrasal_verb": "ran into",
+        "translation": "встретил",
+        "issue": "Acceptable but slightly underspecified; 'случайно встретил' or 'наткнулся на' is often closer to the idiomatic meaning."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "Step 1: All listed English sources are genuine phrasal verbs or established verb-particle / verb-preposition idioms. Step 2: 'run away' is a standard phrasal verb. Step 3: 'come on' is a well-established multiword idiom/interjection with phrasal-verb-like behavior. Step 4: 'blacked out' is the past tense of 'black out', a standard phrasal verb meaning lose consciousness or memory. Step 5: 'hooked up with' and 'hooked up' are established colloquial idioms meaning to have a casual sexual encounter or connect. Step 6: 'fuck up' is a real phrasal verb meaning to mess up or fail, even though the stored example uses a different phrase. Step 7: 'whine about' is a valid verb-preposition construction and idiomatic enough for learner lists. Step 8: 'fuck off' is a real phrasal/idiomatic expression meaning go away. Step 9: 'ran into' is a standard phrasal verb meaning meet by chance. None of the entries look like accidental adjacency or tokenizer garbage.",
+    "invalid_phrasals": []
+  },
+  "overall_score": 7.0,
+  "summary": "Most of the English entries are genuine phrasal-type idioms, so criterion 2 is strong. Criterion 1 is weaker because one translation is clearly wrong in context ('fuck up' → 'провалиться'), and several others are somewhat generic or narrowly glossed.",
+  "tokens_used": {
+    "prompt": 1026,
+    "completion": 1074,
+    "total": 2100
+  }
+}

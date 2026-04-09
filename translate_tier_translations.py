@@ -36,7 +36,10 @@ FREQUENT_TRANSLATION_TIER_IDS: FrozenSet[str] = frozenset(
     {TIER_ID_TIER_1, TIER_ID_B1, TIER_ID_B2}
 )
 
-from subtitle_text_utils import TIMING_LINE_RE, get_subtitle_text_from_content
+from subtitle_text_utils import (
+    extract_word_examples_from_srt_content,
+    get_subtitle_text_from_content,
+)
 
 BATCH_SIZE = 1
 MAX_CONCURRENT_BATCHES = 5
@@ -73,12 +76,6 @@ def translation_csv_files_present(translations_dir: Path) -> List[str]:
     return out
 
 
-INDEX_LINE_RE = re.compile(r"^\d+$")
-HTML_TAG_RE = re.compile(r"<[^>]+>")
-BRACKET_RE = re.compile(r"\[.*?\]")
-SRT_BLOCK_SPLIT_RE = re.compile(r"\n\s*\n")
-
-
 def get_subtitle_text(subtitle_path: Path) -> str:
     """Extract clean text from subtitle file for context."""
     from subtitle_text_utils import get_subtitle_text as _gst
@@ -96,48 +93,12 @@ def extract_examples_from_subtitle(
 ) -> Dict[str, List[str]]:
     """Extract example lines from SRT where each word appears (word-boundary match).
     Returns word -> list of cleaned subtitle lines, each truncated to MAX_EXAMPLE_LINE_CHARS."""
-    examples: Dict[str, List[str]] = {w: [] for w in words}
-    if not subtitle_content:
-        return examples
-    try:
-        blocks = SRT_BLOCK_SPLIT_RE.split(subtitle_content)
-        word_patterns: Dict[str, re.Pattern[str]] = {
-            w: re.compile(r"\b" + re.escape(w) + r"\b", re.IGNORECASE) for w in words
-        }
-        for block in blocks:
-            lines = [line.strip() for line in block.split("\n") if line.strip()]
-            if len(lines) < 3:
-                continue
-            text_lines = []
-            for line in lines:
-                if INDEX_LINE_RE.match(line):
-                    continue
-                if TIMING_LINE_RE.match(line):
-                    continue
-                text_lines.append(line)
-            if not text_lines:
-                continue
-            subtitle_line = " ".join(text_lines)
-            subtitle_line = HTML_TAG_RE.sub("", subtitle_line)
-            subtitle_line = BRACKET_RE.sub("", subtitle_line)
-            subtitle_line = " ".join(subtitle_line.split())
-            if len(subtitle_line) < 10:
-                continue
-            subtitle_lower = subtitle_line.lower()
-            for word in words:
-                if len(examples[word]) >= max_per_word:
-                    continue
-                if word_patterns[word].search(subtitle_lower):
-                    short = (
-                        subtitle_line[:MAX_EXAMPLE_LINE_CHARS]
-                        if len(subtitle_line) > MAX_EXAMPLE_LINE_CHARS
-                        else subtitle_line
-                    )
-                    if short and short not in examples[word]:
-                        examples[word].append(short)
-    except Exception as e:
-        print(f"Warning: Could not extract examples from subtitle: {e}")
-    return examples
+    return extract_word_examples_from_srt_content(
+        subtitle_content,
+        words,
+        max_per_word=max_per_word,
+        max_line_chars=MAX_EXAMPLE_LINE_CHARS,
+    )
 
 
 def load_episode_info(episode_dir: Path) -> Optional[Dict[str, Any]]:
@@ -617,21 +578,11 @@ def run(
     )
     timings_ms["prepare_ms"] = int((time.perf_counter() - started_phase) * 1000)
 
-    api_key = api_key or os.environ.get("OPENAI_API_KEY")
+    from env_config import resolve_openai_api_key
+
+    api_key = resolve_openai_api_key(api_key)
     if not api_key:
-        try:
-            import sys
-            from pathlib import Path
-            _root = Path(__file__).resolve().parent
-            if str(_root) not in sys.path:
-                sys.path.insert(0, str(_root))
-            from telegram_bot import OPENAI_API_KEY as _bot_key
-            if _bot_key and _bot_key.strip():
-                api_key = _bot_key.strip()
-        except Exception:
-            pass
-    if not api_key:
-        msg = "OpenAI API key not set (OPENAI_API_KEY or telegram_bot fallback)."
+        msg = "OpenAI API key not set (OPENAI_API_KEY environment variable)."
         print(msg)
         _set_metrics("error", msg)
         return False, msg

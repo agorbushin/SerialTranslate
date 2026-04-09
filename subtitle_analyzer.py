@@ -1119,19 +1119,9 @@ def main() -> None:
     parser.add_argument("--output", "-o", type=Path, help="Debug output dir (optional)")
     parser.add_argument("--openai-api-key", type=str, default=None, help="OpenAI API key for name/fantasy filter (or set OPENAI_API_KEY)")
     args = parser.parse_args()
-    import os
-    openai_key = args.openai_api_key or os.environ.get("OPENAI_API_KEY")
-    if not openai_key or not str(openai_key).strip():
-        try:
-            import sys
-            _root = Path(__file__).resolve().parent
-            if str(_root) not in sys.path:
-                sys.path.insert(0, str(_root))
-            from telegram_bot import OPENAI_API_KEY as _k
-            if _k and str(_k).strip():
-                openai_key = _k.strip()
-        except Exception:
-            pass
+    from env_config import resolve_openai_api_key
+
+    openai_key = resolve_openai_api_key(args.openai_api_key)
     base_dir = Path(__file__).resolve().parent
     subtitle_path = (base_dir / args.subtitle) if not Path(args.subtitle).is_absolute() else Path(args.subtitle)
     tierlist_base = (base_dir / args.tierlist_base_dir) if not args.tierlist_base_dir.is_absolute() else args.tierlist_base_dir

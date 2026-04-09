@@ -1,0 +1,26 @@
+{
+  "series": "Game Of Thrones S3 E3",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "game_of_thrones_s3_e3.srt",
+  "analysis_date": "2026-04-03T22:20:01.096496",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 87382264,
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 4,
+    "tier_2_random": 213,
+    "tier_3_common": 19,
+    "tier_4_rare_in_series": 5,
+    "tier_5_filtered": 155,
+    "tier_b1_words": 3,
+    "tier_b2_words": 21,
+    "tier_4_rare_c_words": 1,
+    "tier_4_rare_b_words": 31
+  },
+  "excluded_names_fantasy_count": 86
+}

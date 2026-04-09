@@ -1,0 +1,118 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.758047",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 70,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 2,
+    "reasoning": "Step 1: Most entries are not supported by any subtitle line in the provided episode context, so there is no evidence that the stored Russian glosses are being checked against actual usage in this episode. Step 2: A large number of translations are either too generic, semantically off, or not natural for the phrasal meaning (for example, 'looking for' → 'ищущий' is a participial adjective rather than a learner-friendly gloss; 'checked out' → 'проверил' misses the common meaning 'выключился/отключился'; 'getting off' → 'сходить' is incomplete and context-dependent; 'go down' → 'опуститься' is too literal for the police-station example). Step 3: Some entries are acceptable as broad dictionary glosses ('care about' → 'заботиться о', 'find out' → 'узнать', 'figure out' → 'разобраться', 'count on' → 'рассчитывать на'), but many others are either missing, overly generic, or mismatched in register. Step 4: Because the list is long and the majority of items cannot be verified from context and several are clearly weak or wrong, the overall completeness and contextual correctness is very low.",
+    "issues": [
+      {
+        "phrasal_verb": "looking for",
+        "translation": "ищущий",
+        "issue": "Overly literal participle; for learners a verbal gloss like 'искать' is more natural and context-appropriate."
+      },
+      {
+        "phrasal_verb": "checked out",
+        "translation": "проверил",
+        "issue": "Wrong sense for the common colloquial use in context; often means 'отключился/выпал из разговора', not 'checked'."
+      },
+      {
+        "phrasal_verb": "getting off",
+        "translation": "сходить",
+        "issue": "Incomplete and ambiguous; in the example it refers to leaving the phone, so 'сойти с/слезать' or 'заканчивать' would be more context-sensitive."
+      },
+      {
+        "phrasal_verb": "go down",
+        "translation": "опуститься",
+        "issue": "Too literal and not the best match for the example; the idiomatic sense here is closer to 'спуститься/произойти/случиться' depending on context."
+      },
+      {
+        "phrasal_verb": "brought out",
+        "translation": "выявил",
+        "issue": "Possible but awkward; in the example it means 'вызвал/проявил худшее', not simply 'identified'."
+      },
+      {
+        "phrasal_verb": "bring out",
+        "translation": "выявить",
+        "issue": "Too narrow and slightly unnatural; the idiomatic sense is often 'выявлять/проявлять/вытаскивать наружу'."
+      },
+      {
+        "phrasal_verb": "come on",
+        "translation": "давай",
+        "issue": "Acceptable in many contexts, but very broad; can also mean 'ну же', 'да ладно'."
+      },
+      {
+        "phrasal_verb": "fucking with",
+        "translation": "ебаться с",
+        "issue": "Wrong register and meaning; in the example it means 'прикалываться над/издеваться над', not sexual intercourse."
+      },
+      {
+        "phrasal_verb": "fuck out",
+        "translation": "выебать",
+        "issue": "Incorrect gloss; in the common phrase 'get the fuck out' the meaning is 'убирайся/пошёл вон', not 'fuck out'."
+      },
+      {
+        "phrasal_verb": "it off",
+        "translation": "с этим",
+        "issue": "Not a valid standalone phrasal gloss; this looks like a fragment from 'wash it off' and the translation is not a phrasal meaning."
+      },
+      {
+        "phrasal_verb": "going on with",
+        "translation": "продолжать с",
+        "issue": "Wrong sense; in the example it means 'что происходит с', not 'continue with'."
+      },
+      {
+        "phrasal_verb": "out for",
+        "translation": "в поисках",
+        "issue": "Too generic and the stored example does not support this gloss; likely a fragment rather than a stable phrasal meaning."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 6,
+    "reasoning": "Step 1: Many entries are genuine phrasal verbs or established verb-particle/verb-preposition combinations: 'get in', 'get out', 'get back', 'find out', 'figure out', 'work out', 'bring out', 'come up', 'get on', 'move on', 'let go', 'count on', 'backed down', 'came over', 'hangs up', 'talk about', 'go down', and others are valid idiomatic forms. Step 2: However, several items are not clean phrasal idioms but fragments, participles, or ordinary grammar strings, such as 'goin on', 'hangin out', 'hangin out with', 'it off', 'been up', 'been up for', and 'going on with'. Step 3: Some entries are borderline because they are not full phrasal verbs in the textbook sense but still idiomatic multiword expressions; these should be counted as valid only if they are established combinations. Step 4: Because a noticeable minority of the list consists of malformed fragments or non-lexical strings, the set is not fully valid, but the majority are real phrasal-type idioms.",
+    "invalid_phrasals": [
+      {
+        "phrase": "goin on",
+        "reason": "Nonstandard spelling/fragment of 'going on'; not a clean dictionary headword."
+      },
+      {
+        "phrase": "hangin out",
+        "reason": "Colloquial spelling fragment of 'hanging out'; not a canonical source form."
+      },
+      {
+        "phrase": "hangin out with",
+        "reason": "Fragmentary colloquial spelling; should be 'hanging out with'."
+      },
+      {
+        "phrase": "it off",
+        "reason": "Not a standalone phrasal verb; appears to be a fragment from a larger expression like 'wash it off'."
+      },
+      {
+        "phrase": "been up",
+        "reason": "Ordinary auxiliary + adjective/participle sequence, not a lexical phrasal idiom."
+      },
+      {
+        "phrase": "been up for",
+        "reason": "Fragmentary auxiliary construction; not a stable phrasal verb entry as written."
+      },
+      {
+        "phrase": "going on with",
+        "reason": "This is a grammatical phrase, but as written it is not a standard phrasal-verb headword; it is a fragment of 'going on with something'."
+      }
+    ]
+  },
+  "overall_score": 4.0,
+  "summary": "The list contains many real phrasal verbs, but the translation layer is weak: several glosses are too literal, too generic, or clearly wrong for learner use. A number of source strings are also malformed fragments rather than clean phrasal-verb entries, which lowers the overall quality.",
+  "tokens_used": {
+    "prompt": 3252,
+    "completion": 1621,
+    "total": 4873
+  }
+}

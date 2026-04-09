@@ -1,0 +1,119 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Black Mirror/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.757865",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Black Mirror",
+  "season": 1,
+  "episode": 1,
+  "word_count": 14,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Black Mirror/Season 1/black_mirror_s1_e1.srt",
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most English words are translated correctly and in the right episode-specific sense. The strongest matches are deadline → \"крайний срок\", precisely → \"точно\", intercourse → \"половой акт\", uploaded → \"загруженный\" (though slightly participial), ransom → \"требование выкупа\", humiliation → \"унижение\", whoever → \"кто бы ни\", destroyed → \"уничтожен\", and advised → \"предупреждены\". A few items are less precise or slightly off in context: performer → \"исполнитель\" is acceptable but a bit generic for a live TV performer; happening → \"происходить\" is grammatical but not the most natural equivalent for \"that's not happening\"; timeline → \"лента новостей\" is contextually plausible but not the same as the social-media/feed sense used here; bizarre → \"нелепый\" is weaker than \"странный/чудовищный\" for the ransom demand; advising → \"советующий\" is awkward for the ongoing action in dialogue. Overall, the translations are mostly complete and semantically usable, with only a few context/nuance issues.",
+    "issues": [
+      {
+        "word": "performer",
+        "translation": "исполнитель",
+        "issue": "Correct in general, but somewhat generic; in this TV context it refers to a live performer/performing person, so \"исполнитель\" is acceptable but not the most natural nuance."
+      },
+      {
+        "word": "happening",
+        "translation": "происходить",
+        "issue": "Meaning is correct, but as a subtitle translation for \"that's not happening\" it is less natural than an idiomatic refusal like \"не может быть\" / \"не пойдет\"."
+      },
+      {
+        "word": "timeline",
+        "translation": "лента новостей",
+        "issue": "Contextually plausible, but slightly too specific and not an exact match for the social-media/feed meaning of \"timeline\" in this episode."
+      },
+      {
+        "word": "bizarre",
+        "translation": "нелепый",
+        "issue": "Not wrong, but weaker than the episode sense; here it means \"strange/odd/abnormal\" rather than specifically \"ridiculous\"."
+      },
+      {
+        "word": "advising",
+        "translation": "советующий",
+        "issue": "Grammatically understandable, but awkward in context; the subtitle uses an ongoing action, and a more natural rendering would be closer to \"советует\" / \"предлагает\" depending on context."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words used in the episode. None of the listed words are character names, place names, invented terms, or non-English borrowings that should have been filtered out.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list is heavily skewed toward B2 and above, with several items that are clearly more advanced than the stated band. Some entries are legitimate B2 vocabulary in this episode context, but others are specialist, formal, or C1-level terms. The main miscalibrations are intercourse, uploaded, timeline, ransom, humiliation, and advised, which are not typical B1/B2 general vocabulary items in the way this list suggests. A few B1-tagged items are also too easy or too generic for B1, such as performer and happening.",
+    "not_c_level": [
+      {
+        "word": "performer",
+        "estimated_level": "A2",
+        "reason": "Common everyday word; too easy for a B1 label."
+      },
+      {
+        "word": "happening",
+        "estimated_level": "A2",
+        "reason": "Very basic verb form/usage; not strong B1 vocabulary."
+      },
+      {
+        "word": "intercourse",
+        "estimated_level": "C1",
+        "reason": "Formal/specialist sexual term; much more advanced than B2 in typical CEFR vocabulary lists."
+      },
+      {
+        "word": "uploaded",
+        "estimated_level": "B1",
+        "reason": "Reasonable B1/B2 digital vocabulary, but the form here is a common past participle rather than a distinct B2 lexical item."
+      },
+      {
+        "word": "timeline",
+        "estimated_level": "C1",
+        "reason": "In the social-media/news-feed sense used here, this is a modern platform-specific term that is more advanced and domain-specific than B2."
+      },
+      {
+        "word": "bizarre",
+        "estimated_level": "B2",
+        "reason": "Acceptable B2 adjective."
+      },
+      {
+        "word": "ransom",
+        "estimated_level": "B2",
+        "reason": "Acceptable B2 vocabulary."
+      },
+      {
+        "word": "humiliation",
+        "estimated_level": "C1",
+        "reason": "Abstract noun with a more advanced register; often beyond standard B2."
+      },
+      {
+        "word": "advising",
+        "estimated_level": "B1",
+        "reason": "The gerund/participle form is not itself a distinct B2 lexical item; the base verb advise is B1/B2."
+      },
+      {
+        "word": "destroyed",
+        "estimated_level": "B1",
+        "reason": "Common past participle of a basic verb; not especially B2."
+      },
+      {
+        "word": "advised",
+        "estimated_level": "B1",
+        "reason": "Common past participle of advise; the form is not a strong B2 vocabulary item."
+      }
+    ]
+  },
+  "overall_score": 7.3,
+  "summary": "The translations are mostly accurate and usable, with only a few nuance issues in context. The main weakness is vocabulary calibration: several items are too advanced or too basic for the stated B1/B2 bands, especially the more formal or domain-specific terms.",
+  "tokens_used": {
+    "prompt": 2565,
+    "completion": 1334,
+    "total": 3899
+  }
+}

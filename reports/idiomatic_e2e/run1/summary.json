@@ -1,0 +1,287 @@
+{
+  "run_label": "run1",
+  "episodes": [
+    {
+      "key": "game_of_thrones_s1e1",
+      "series": "Game of Thrones",
+      "subtitle": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Game of Thrones/Season 1/game_of_thrones_s1_e1.srt",
+      "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/game_of_thrones_s1e1",
+      "extract_ok": true,
+      "judge": {
+        "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/game_of_thrones_s1e1",
+        "judged_at": "2026-04-01T23:01:42.382916",
+        "model": "gpt-5.4-mini",
+        "judge_kind": "idiomatic_expressions",
+        "series": "Game of Thrones",
+        "season": 1,
+        "episode": 1,
+        "expression_count": 14,
+        "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Game of Thrones/Season 1/game_of_thrones_s1_e1.srt",
+        "criterion_1": {
+          "score": 8,
+          "reasoning": "Step 1: Most translations are present and in natural Russian: \"winter is coming\" → \"зима близко\", \"the seven kingdoms\" → \"семь королевств\", \"the rightful king\" → \"законный король\", \"the hand of the king\" → \"рука короля\", \"right royal prick\" → \"настоящий королевский мудак\", \"back to the wall\" → \"назад к стене\", \"gods be good\" → \"да будут боги добры\", and \"the first men\" → \"первые люди\". Step 2: Several entries are contextually correct in this episode, especially the political titles and fixed phrases around Robert, Ned, and the Night's Watch. Step 3: A few glosses are slightly awkward or overly literal, but still understandable for learners. For example, \"back to the wall\" is rendered literally as \"назад к стене\"; in context it is a directional phrase, not an idiom, so the gloss is acceptable but not idiomatic Russian. Step 4: The main weakness is that some source strings are not really idiomatic units, but that affects criterion 2 more than translation quality. Step 5: No major mistranslations are present, and no translation is missing or left in English.",
+          "issues": [
+            {
+              "expression": "back to the wall",
+              "translation": "назад к стене",
+              "issue": "Literal and somewhat awkward in Russian; acceptable in context, but not a natural idiomatic gloss."
+            },
+            {
+              "expression": "thank you in dothraki",
+              "translation": "спасибо на дотракийском",
+              "issue": "Overly generic meta-gloss rather than a real translation of the phrase as used in dialogue; it describes the language instead of the expression."
+            }
+          ]
+        },
+        "criterion_2": {
+          "score": 4,
+          "reasoning": "Step 1: Some entries are genuine formulaic or episode-specific repeated units worth studying, such as \"winter is coming\", \"the rightful king\", \"the hand of the king\", \"the night's watch\", and \"gods be good\". Step 2: However, many items are not idioms in the usual sense; they are transparent title fragments or compositional noun phrases. Examples include \"the seven kingdoms\", \"king's landing\", \"of house targaryen\", \"the first men\", and \"king of the andals and\". Step 3: Several are just proper names or title formulas from the lore, which may be useful for comprehension but are not idiomatic expressions. Step 4: \"i don't fight in tournaments\" is a plain sentence, not a formulaic unit. Step 5: Overall, the list mixes a few strong recurring formulas with many false positives from named entities and compositional title strings, so it is only partially valid as an idiom list.",
+          "invalid_expressions": [
+            {
+              "expression": "king s landing",
+              "reason": "Proper noun/place name, not an idiom or formulaic expression."
+            },
+            {
+              "expression": "the seven kingdoms",
+              "reason": "Transparent title phrase; lore-specific but not idiomatic."
+            },
+            {
+              "expression": "king of the andals and",
+              "reason": "Fragment of a longer title, not a standalone idiom."
+            },
+            {
+              "expression": "of house targaryen",
+              "reason": "Compositional house-name phrase, not an idiom."
+            },
+            {
+              "expression": "back to the wall",
+              "reason": "Ordinary directional phrase here, not a fixed idiom in this context."
+            },
+            {
+              "expression": "i don t fight in tournaments",
+              "reason": "Plain sentence, not a formulaic expression."
+            },
+            {
+              "expression": "thank you in dothraki",
+              "reason": "Meta-description of language use, not an idiom."
+            },
+            {
+              "expression": "the first men",
+              "reason": "Lore term/proper noun, not an idiom."
+            }
+          ]
+        },
+        "overall_score": 6.0,
+        "summary": "The translations are mostly accurate and usable for learners, with only minor awkwardness in a few glosses. The bigger problem is selection quality: the list contains many proper names and transparent title fragments that are not genuine idioms or formulaic expressions.",
+        "improvement_suggestions": [
+          "Add a filtering step that excludes proper nouns, title fragments, and compositional noun phrases unless they function as repeated discourse formulas.",
+          "Require each candidate to be validated against a definition of idiomaticity or formulaicity, not just frequency in the episode transcript."
+        ],
+        "tokens_used": {
+          "prompt": 2342,
+          "completion": 1037,
+          "total": 3379
+        }
+      },
+      "judge_report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/game_of_thrones_s1e1/idiomatic_judge_report.json"
+    },
+    {
+      "key": "euphoria_s1e4",
+      "series": "Euphoria S1 E4",
+      "subtitle": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Euphoria/Season 1/euphoria_s1_e4.srt",
+      "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/euphoria_s1e4",
+      "extract_ok": true,
+      "judge": {
+        "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/euphoria_s1e4",
+        "judged_at": "2026-04-01T23:02:12.701585",
+        "model": "gpt-5.4-mini",
+        "judge_kind": "idiomatic_expressions",
+        "series": "Euphoria S1 E4",
+        "season": 1,
+        "episode": 4,
+        "expression_count": 22,
+        "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Euphoria/Season 1/euphoria_s1_e4.srt",
+        "criterion_1": {
+          "score": 4,
+          "reasoning": "Step 1: Several translations are present and broadly correct in context, e.g. \"oh my god\" → \"о боже мой\", \"i swear to god\" → \"клянусь богом\", \"ruin my life\" → \"разрушить мою жизнь\", \"is everything okay\" → \"все в порядке?\", and \"the quiet room\" → \"тихая комната\". Step 2: However, a number of glosses are too generic or slightly off for the actual episode usage. For example, \"whatever the fuck\" is not just \"что угодно\"; in context it is an emphatic, rude \"что бы ни / что угодно, черт возьми\". \"having the best time\" is better rendered as \"мне очень хорошо / я отлично провожу время\"; the provided gloss is acceptable but a bit flat. \"that big of a deal\" and \"it is a big deal\" are okay but lose the contrastive emphasis. Step 3: Some entries are incomplete or awkwardly matched to the subtitle form, such as \"s just going straight to voicemail\" which is missing the initial \"It\" and should be a full natural Russian sentence. Step 4: \"dressed like a hooker\" is semantically correct but stylistically blunt; still acceptable for subtitles. Step 5: Overall, most translations are usable, but there are enough generic or slightly mismatched glosses that the set is not fully reliable for learners.",
+          "issues": [
+            {
+              "expression": "whatever the fuck",
+              "translation": "что угодно",
+              "issue": "Too generic; misses the rude/emphatic force and the 'whatever it is' sense in context."
+            },
+            {
+              "expression": "having the best time",
+              "translation": "отлично проводим время",
+              "issue": "Acceptable but slightly unnatural as a fixed gloss; context is first-person 'I'm having the best time' / 'We having the best time'."
+            },
+            {
+              "expression": "that big of a deal",
+              "translation": "это так важно",
+              "issue": "Reasonable, but loses the idiomatic emphasis on degree ('that big')."
+            },
+            {
+              "expression": "it is a big deal",
+              "translation": "это важно",
+              "issue": "Correct but somewhat flattened; context contrasts with 'it's really not'."
+            },
+            {
+              "expression": "s just going straight to voicemail",
+              "translation": "просто идет прямиком на голосовую почту",
+              "issue": "Awkward and incomplete; should preserve the full sentence and sound natural in Russian."
+            },
+            {
+              "expression": "way you re full of shit",
+              "translation": "ты полон чепухи",
+              "issue": "This entry is not matched in the subtitles and the gloss is too mild for 'full of shit' (usually 'врёшь' / 'несёшь чушь')."
+            }
+          ]
+        },
+        "criterion_2": {
+          "score": 3,
+          "reasoning": "Step 1: A few items are genuine formulaic or idiomatic units worth studying, such as 'oh my god', 'i swear to god', 'no fucking way', 'i'm sorry', and 'is everything okay'. Step 2: But many entries are transparent compositional chunks rather than idioms or strong collocations. Examples include 'ruin my life', 'a hundred percent', 'it is a big deal', 'this wasn’t', 'i’m gonna', and 'am i supposed to know'—these are common sentence fragments or grammar patterns, not idioms. Step 3: Some are phrasal/lexical chunks that may be useful for subtitles but are not idioms in the strict sense, such as 'going straight to voicemail', 'dressed like a hooker', 'the quiet room', and 'ride the carousel'. Step 4: The list therefore contains a mix of true discourse formulas and many false positives, so it is not a strong idiom inventory.",
+          "invalid_expressions": [
+            {
+              "expression": "whatever the fuck",
+              "reason": "More of an emphatic phrase than a stable idiom; still formulaic, but not a strong opaque idiom."
+            },
+            {
+              "expression": "having the best time",
+              "reason": "Transparent compositional phrase, not idiomatic."
+            },
+            {
+              "expression": "that big of a deal",
+              "reason": "Common degree construction, not an idiom."
+            },
+            {
+              "expression": "ruin my life",
+              "reason": "Literal compositional phrase; not idiomatic."
+            },
+            {
+              "expression": "it is a big deal",
+              "reason": "Plain evaluative statement, not an idiom."
+            },
+            {
+              "expression": "this wasn t",
+              "reason": "Incomplete grammar fragment, not a formulaic expression."
+            },
+            {
+              "expression": "a hundred percent",
+              "reason": "Ordinary quantifier/intensifier, not an idiom."
+            },
+            {
+              "expression": "i m gonna",
+              "reason": "Reduced future auxiliary, a speech form rather than an idiom."
+            },
+            {
+              "expression": "s just going straight to voicemail",
+              "reason": "Transparent descriptive phrase; useful subtitle chunk but not idiomatic."
+            },
+            {
+              "expression": "ride the carousel",
+              "reason": "Literal phrase in context; not a fixed idiom."
+            },
+            {
+              "expression": "lot of shit",
+              "reason": "Very common colloquial noun phrase, but not a distinct idiom."
+            },
+            {
+              "expression": "the quiet room",
+              "reason": "Literal institutional term, not an idiom."
+            },
+            {
+              "expression": "am i supposed to know",
+              "reason": "Common question frame, not an idiom."
+            }
+          ]
+        },
+        "overall_score": 3.5,
+        "summary": "The translation set is partially usable, with several correct subtitle-friendly Russian glosses, but some entries are too generic, awkward, or incomplete. As an idiom list, it is weak: many items are ordinary grammar chunks or transparent phrases rather than genuine idiomatic/formulaic units.",
+        "improvement_suggestions": [
+          "Filter candidates with a stricter idiom/formula test: keep only expressions that are opaque, strongly conventionalized, or clearly discourse-formulaic, and exclude plain grammar frames and literal phrases.",
+          "Require context-sensitive Russian glosses that preserve register and force, especially for profanity and emphasis (e.g. 'whatever the fuck', 'no fucking way').",
+          "Normalize subtitle fragments before evaluation so entries include missing auxiliaries/articles and can be translated as full natural Russian utterances."
+        ],
+        "tokens_used": {
+          "prompt": 2566,
+          "completion": 1483,
+          "total": 4049
+        }
+      },
+      "judge_report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/euphoria_s1e4/idiomatic_judge_report.json"
+    },
+    {
+      "key": "fallout_s2e3",
+      "series": "Fallout S2 E3",
+      "subtitle": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Fallout/Season 2/fallout_s2_e3.srt",
+      "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/fallout_s2e3",
+      "extract_ok": true,
+      "judge": {
+        "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/fallout_s2e3",
+        "judged_at": "2026-04-01T23:02:34.930112",
+        "model": "gpt-5.4-mini",
+        "judge_kind": "idiomatic_expressions",
+        "series": "Fallout S2 E3",
+        "season": 2,
+        "episode": 3,
+        "expression_count": 8,
+        "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Fallout/Season 2/fallout_s2_e3.srt",
+        "criterion_1": {
+          "score": 8,
+          "reasoning": "Step 1: Most translation pairs are present and not missing. All listed items have Russian glosses, and none are left in English or marked N/A. Step 2: Several glosses are contextually correct in this episode: \"gotta be ready\" → \"нужно быть готовым\" fits the imperative readiness context; \"chain of command\" → \"цепочка командования\" is acceptable in military hierarchy context; \"like cats and dogs\" → \"как кошки с собаками\" matches the conflict description; \"a civil war\" → \"гражданская война\" is correct; \"the first time\" → \"в первый раз\" is fine. Step 3: A few entries are slightly awkward or overly literal but still understandable. \"well you know how it\" → \"ну, вы знаете, как это\" is incomplete as a standalone gloss because the English source is truncated and the Russian is also a fragment; it is usable but not ideal. \"the cold fusion\" → \"холодный синтез\" is technically correct as a term, but in the episode it refers to a named relic/object, so the definite article and noun phrase feel a bit generic; still acceptable. Step 4: The main weakness is that some glosses are too generic for the exact usage, especially the truncated discourse formula and the named-object reference, but there are no major wrong-sense translations. Overall the set is mostly correct with minor contextual/format issues.",
+          "issues": [
+            {
+              "expression": "well you know how it",
+              "translation": "ну, вы знаете, как это",
+              "issue": "Source is a truncated discourse formula, and the Russian gloss is also fragmentary; it is acceptable but incomplete and somewhat generic."
+            },
+            {
+              "expression": "the cold fusion",
+              "translation": "холодный синтез",
+              "issue": "Technically correct, but in context it refers to a specific named relic/object, so the gloss is a bit too generic and misses the episode-specific referential use."
+            }
+          ]
+        },
+        "criterion_2": {
+          "score": 4,
+          "reasoning": "Step 1: Some entries are genuine formulaic units worth studying, such as \"gotta be ready,\" \"like cats and dogs,\" and \"chain of command\" in a military setting. Step 2: However, several items are not really idioms or strong opaque collocations; they are ordinary compositional phrases or truncated sentence fragments. \"the first time\" is a plain high-frequency phrase, not an idiom. \"a civil war\" is a normal noun phrase. \"the cold fusion\" is a literal technical term / named object, not an idiom. \"well you know how it\" is an incomplete fragment rather than a stable formula. \"if i may i m\" is also a broken fragment and not a valid expression as listed. Step 3: Because the list mixes a few useful formulaic items with many transparent or malformed chunks, it is only partially valid as an idiom list. The repeated episode-specific nature helps some entries, but repetition alone does not make transparent grammar into idioms. Overall, this is a weak set for idiom extraction.",
+          "invalid_expressions": [
+            {
+              "expression": "well you know how it",
+              "reason": "Truncated fragment of a sentence, not a stable idiom or formula."
+            },
+            {
+              "expression": "the cold fusion",
+              "reason": "Literal technical term / named object, not an idiomatic or formulaic expression."
+            },
+            {
+              "expression": "a civil war",
+              "reason": "Plain compositional noun phrase; not an idiom or special formula."
+            },
+            {
+              "expression": "if i may i m",
+              "reason": "Malformed/truncated fragment, not a usable expression."
+            },
+            {
+              "expression": "the first time",
+              "reason": "Very common transparent phrase, not an idiom or opaque collocation."
+            }
+          ]
+        },
+        "overall_score": 6.0,
+        "summary": "The Russian translations are mostly correct and usable, with only minor contextual awkwardness in a couple of entries. The bigger problem is the source list quality: several items are plain phrases or truncated fragments rather than genuine idioms or formulaic units.",
+        "improvement_suggestions": [
+          "Add a validation step that filters out truncated subtitle fragments and requires a complete clause or a recognized multiword formula before labeling an item as an idiom.",
+          "Use a whitelist/blacklist heuristic: keep opaque or conventionalized expressions, but exclude transparent noun phrases like \"a civil war\" and generic time phrases like \"the first time\" unless there is clear idiomatic evidence."
+        ],
+        "tokens_used": {
+          "prompt": 1965,
+          "completion": 1021,
+          "total": 2986
+        }
+      },
+      "judge_report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/fallout_s2e3/idiomatic_judge_report.json"
+    }
+  ],
+  "mean_overall_score": 5.17
+}

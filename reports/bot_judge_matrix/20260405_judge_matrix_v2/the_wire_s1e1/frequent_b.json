@@ -1,0 +1,176 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/The Wire/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.762264",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "The Wire",
+  "season": 1,
+  "episode": 1,
+  "word_count": 27,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/The Wire/Season 1/the_wire_s1_e1.srt",
+  "criterion_1": {
+    "score": 5,
+    "reasoning": "Most entries are translated into plausible Russian equivalents, and many are contextually correct for The Wire (e.g. jail→тюрьма, courthouse→здание суда, defendant→подсудимый, jury→присяжные, stairwell→лестничная клетка, promised→обещал, expecting→ждать). However, several translations are wrong or too context-insensitive. 'terrace' is rendered as 'жилой комплекс', but in the episode it refers to a housing project/tower complex, so this is only partially acceptable and too generic. 'bust' in the line 'bust my balls' means 'доставать/донимать', which is acceptable, but the word also appears in other senses in the episode and the translation does not capture the broader contextual flexibility. 'homicide' is translated as 'убойный отдел', which fits the police unit sense, though it is not the direct lexical meaning. 'shooter' is mistranslated as 'свидетель-очевидец'; in context it means the person who shot someone, i.e. 'стрелявший/убийца', so this is wrong. 'booth' as 'будка охраны' is acceptable in context, but 'lobby' as 'вестибюль' is fine. 'seated' is translated as 'сидите', which is an imperative rather than the adjective/passive 'be seated', but still close. 'hooked' as 'подключённые' is only correct in the computer sense from the subtitle example, though the Russian is awkward and incomplete without 'up'. 'mope' is not 'жалкий тип' in standard English; in context it refers to a loser/slacker or pathetic person, so this is close but not precise. 'ops' as 'оперативная работа' is too generic for 'Deputy Ops' (a rank/office, not just operations work). 'uptown' as 'в верхней части города' is literal but not idiomatic; in the episode it means 'back uptown' = back to the nicer/upper-class part of town. Overall, the list is mixed: many correct, but several important contextual mismatches reduce quality.",
+    "issues": [
+      {
+        "word": "shooter",
+        "translation": "свидетель-очевидец",
+        "issue": "Wrong meaning in context: here it means the person who shot someone, not a witness."
+      },
+      {
+        "word": "hooked",
+        "translation": "подключённые",
+        "issue": "Awkward and incomplete translation; in context it should mean 'подключены/подсоединены', and the phrase is specifically 'hooked up'."
+      },
+      {
+        "word": "mope",
+        "translation": "жалкий тип",
+        "issue": "Too colloquial and not a precise lexical equivalent; context suggests 'неудачник/тряпка/жалкий тип', but the translation is not stable or dictionary-like."
+      },
+      {
+        "word": "ops",
+        "translation": "оперативная работа",
+        "issue": "Too generic and not the right sense for 'Deputy Ops'; it refers to an operations officer/department, not just 'operational work'."
+      },
+      {
+        "word": "uptown",
+        "translation": "в верхней части города",
+        "issue": "Literal but not idiomatic; in context it means the uptown area/neighborhood, not a geographic 'upper part of the city'."
+      },
+      {
+        "word": "seated",
+        "translation": "сидите",
+        "issue": "Imperative form rather than a direct translation of 'be seated'; acceptable but not fully accurate."
+      },
+      {
+        "word": "terrace",
+        "translation": "жилой комплекс",
+        "issue": "Too generic; in context it refers to a housing project/tower complex, not just any residential complex."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 7,
+    "reasoning": "Most source items are genuine English vocabulary words. However, the list includes at least one clear non-vocabulary item: 'dee' is a character name/nickname from the series, not a general English vocabulary word. The rest are ordinary English words or established institutional terms used in the episode. Because only one obvious non-English-vocabulary entity slipped through, the score is reduced but not severely.",
+    "violations": [
+      "dee"
+    ]
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "Several items are correctly tagged at B1/B2, but the list contains many words that are much easier than the assigned band or are not suitable as standalone vocabulary targets. A number of entries are A1/A2-level words such as jail, terrace (in the sense of a building feature or simple noun), booth, lobby, seated, knowing, employed, beating, promised, hooked, expecting, and manpower. Some B2 labels are defensible because the episode-specific sense is more specialized (homicide, defendant, courthouse, courtroom, jury, ops), but many others are clearly over-leveled. There is also a non-vocabulary proper name ('dee'), which is not a CEFR vocabulary item at all. Overall, the band calibration is weak because the list mixes very basic words with a few mid-level or specialized terms.",
+    "not_c_level": [
+      {
+        "word": "jail",
+        "estimated_level": "A2",
+        "reason": "Common basic word; too easy for B1."
+      },
+      {
+        "word": "terrace",
+        "estimated_level": "A2",
+        "reason": "As a general noun it is basic; the episode-specific housing-project sense does not make it B2 vocabulary."
+      },
+      {
+        "word": "bust",
+        "estimated_level": "B1",
+        "reason": "Can be B1 in colloquial phrasal/idiomatic use, but the item is borderline and not strongly B2."
+      },
+      {
+        "word": "dee",
+        "estimated_level": "A1",
+        "reason": "Proper name/nickname, not a vocabulary item."
+      },
+      {
+        "word": "booth",
+        "estimated_level": "A2",
+        "reason": "Common concrete noun; too easy for B2."
+      },
+      {
+        "word": "lobby",
+        "estimated_level": "A2",
+        "reason": "Basic everyday noun; not B2."
+      },
+      {
+        "word": "seated",
+        "estimated_level": "A2",
+        "reason": "Common form of 'sit'; too easy for B2."
+      },
+      {
+        "word": "knowing",
+        "estimated_level": "A2",
+        "reason": "Gerund/participle of a very basic verb; not B2."
+      },
+      {
+        "word": "employed",
+        "estimated_level": "B1",
+        "reason": "Common but slightly more formal than A2; still not B2."
+      },
+      {
+        "word": "beating",
+        "estimated_level": "A2",
+        "reason": "Basic verb/noun form; too easy for B2."
+      },
+      {
+        "word": "ease",
+        "estimated_level": "B1",
+        "reason": "Common word; the phrasal use 'ease up' is B1 at most, not B2."
+      },
+      {
+        "word": "stairwell",
+        "estimated_level": "B1",
+        "reason": "Useful but not especially advanced; more B1 than B2."
+      },
+      {
+        "word": "dope",
+        "estimated_level": "B1",
+        "reason": "Colloquial drug slang; not a strong B2 item."
+      },
+      {
+        "word": "rip",
+        "estimated_level": "A2",
+        "reason": "Basic verb with many common senses; too easy for B2."
+      },
+      {
+        "word": "promised",
+        "estimated_level": "A2",
+        "reason": "Past tense of a very common verb; not B2."
+      },
+      {
+        "word": "hooked",
+        "estimated_level": "B1",
+        "reason": "Common participle in phrasal use; not B2."
+      },
+      {
+        "word": "mope",
+        "estimated_level": "B1",
+        "reason": "Less common than basic verbs, but still not B2-level vocabulary."
+      },
+      {
+        "word": "uptown",
+        "estimated_level": "A2",
+        "reason": "Common directional/location word; not B2."
+      },
+      {
+        "word": "expecting",
+        "estimated_level": "A2",
+        "reason": "Basic verb form; too easy for B2."
+      },
+      {
+        "word": "manpower",
+        "estimated_level": "B1",
+        "reason": "Common business/workforce term, but not B2."
+      }
+    ]
+  },
+  "overall_score": 5.3,
+  "summary": "The translations are mixed: many core legal and police terms are correct, but a few important items are mistranslated or too generic, especially 'shooter' and some episode-specific senses. The source list also includes a proper name ('dee'), and many words are over-leveled for the assigned B1/B2 bands.",
+  "tokens_used": {
+    "prompt": 3317,
+    "completion": 2056,
+    "total": 5373
+  }
+}

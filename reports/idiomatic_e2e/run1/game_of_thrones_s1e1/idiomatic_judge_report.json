@@ -1,0 +1,76 @@
+{
+  "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/game_of_thrones_s1e1",
+  "judged_at": "2026-04-01T23:01:42.382916",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "idiomatic_expressions",
+  "series": "Game of Thrones",
+  "season": 1,
+  "episode": 1,
+  "expression_count": 14,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Game of Thrones/Season 1/game_of_thrones_s1_e1.srt",
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Step 1: Most translations are present and in natural Russian: \"winter is coming\" → \"зима близко\", \"the seven kingdoms\" → \"семь королевств\", \"the rightful king\" → \"законный король\", \"the hand of the king\" → \"рука короля\", \"right royal prick\" → \"настоящий королевский мудак\", \"back to the wall\" → \"назад к стене\", \"gods be good\" → \"да будут боги добры\", and \"the first men\" → \"первые люди\". Step 2: Several entries are contextually correct in this episode, especially the political titles and fixed phrases around Robert, Ned, and the Night's Watch. Step 3: A few glosses are slightly awkward or overly literal, but still understandable for learners. For example, \"back to the wall\" is rendered literally as \"назад к стене\"; in context it is a directional phrase, not an idiom, so the gloss is acceptable but not idiomatic Russian. Step 4: The main weakness is that some source strings are not really idiomatic units, but that affects criterion 2 more than translation quality. Step 5: No major mistranslations are present, and no translation is missing or left in English.",
+    "issues": [
+      {
+        "expression": "back to the wall",
+        "translation": "назад к стене",
+        "issue": "Literal and somewhat awkward in Russian; acceptable in context, but not a natural idiomatic gloss."
+      },
+      {
+        "expression": "thank you in dothraki",
+        "translation": "спасибо на дотракийском",
+        "issue": "Overly generic meta-gloss rather than a real translation of the phrase as used in dialogue; it describes the language instead of the expression."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "Step 1: Some entries are genuine formulaic or episode-specific repeated units worth studying, such as \"winter is coming\", \"the rightful king\", \"the hand of the king\", \"the night's watch\", and \"gods be good\". Step 2: However, many items are not idioms in the usual sense; they are transparent title fragments or compositional noun phrases. Examples include \"the seven kingdoms\", \"king's landing\", \"of house targaryen\", \"the first men\", and \"king of the andals and\". Step 3: Several are just proper names or title formulas from the lore, which may be useful for comprehension but are not idiomatic expressions. Step 4: \"i don't fight in tournaments\" is a plain sentence, not a formulaic unit. Step 5: Overall, the list mixes a few strong recurring formulas with many false positives from named entities and compositional title strings, so it is only partially valid as an idiom list.",
+    "invalid_expressions": [
+      {
+        "expression": "king s landing",
+        "reason": "Proper noun/place name, not an idiom or formulaic expression."
+      },
+      {
+        "expression": "the seven kingdoms",
+        "reason": "Transparent title phrase; lore-specific but not idiomatic."
+      },
+      {
+        "expression": "king of the andals and",
+        "reason": "Fragment of a longer title, not a standalone idiom."
+      },
+      {
+        "expression": "of house targaryen",
+        "reason": "Compositional house-name phrase, not an idiom."
+      },
+      {
+        "expression": "back to the wall",
+        "reason": "Ordinary directional phrase here, not a fixed idiom in this context."
+      },
+      {
+        "expression": "i don t fight in tournaments",
+        "reason": "Plain sentence, not a formulaic expression."
+      },
+      {
+        "expression": "thank you in dothraki",
+        "reason": "Meta-description of language use, not an idiom."
+      },
+      {
+        "expression": "the first men",
+        "reason": "Lore term/proper noun, not an idiom."
+      }
+    ]
+  },
+  "overall_score": 6.0,
+  "summary": "The translations are mostly accurate and usable for learners, with only minor awkwardness in a few glosses. The bigger problem is selection quality: the list contains many proper names and transparent title fragments that are not genuine idioms or formulaic expressions.",
+  "improvement_suggestions": [
+    "Add a filtering step that excludes proper nouns, title fragments, and compositional noun phrases unless they function as repeated discourse formulas.",
+    "Require each candidate to be validated against a definition of idiomaticity or formulaicity, not just frequency in the episode transcript."
+  ],
+  "tokens_used": {
+    "prompt": 2342,
+    "completion": 1037,
+    "total": 3379
+  }
+}

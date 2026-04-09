@@ -1,0 +1,117 @@
+{
+  "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/euphoria_s1e4",
+  "judged_at": "2026-04-01T23:02:12.701585",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "idiomatic_expressions",
+  "series": "Euphoria S1 E4",
+  "season": 1,
+  "episode": 4,
+  "expression_count": 22,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Euphoria/Season 1/euphoria_s1_e4.srt",
+  "criterion_1": {
+    "score": 4,
+    "reasoning": "Step 1: Several translations are present and broadly correct in context, e.g. \"oh my god\" → \"о боже мой\", \"i swear to god\" → \"клянусь богом\", \"ruin my life\" → \"разрушить мою жизнь\", \"is everything okay\" → \"все в порядке?\", and \"the quiet room\" → \"тихая комната\". Step 2: However, a number of glosses are too generic or slightly off for the actual episode usage. For example, \"whatever the fuck\" is not just \"что угодно\"; in context it is an emphatic, rude \"что бы ни / что угодно, черт возьми\". \"having the best time\" is better rendered as \"мне очень хорошо / я отлично провожу время\"; the provided gloss is acceptable but a bit flat. \"that big of a deal\" and \"it is a big deal\" are okay but lose the contrastive emphasis. Step 3: Some entries are incomplete or awkwardly matched to the subtitle form, such as \"s just going straight to voicemail\" which is missing the initial \"It\" and should be a full natural Russian sentence. Step 4: \"dressed like a hooker\" is semantically correct but stylistically blunt; still acceptable for subtitles. Step 5: Overall, most translations are usable, but there are enough generic or slightly mismatched glosses that the set is not fully reliable for learners.",
+    "issues": [
+      {
+        "expression": "whatever the fuck",
+        "translation": "что угодно",
+        "issue": "Too generic; misses the rude/emphatic force and the 'whatever it is' sense in context."
+      },
+      {
+        "expression": "having the best time",
+        "translation": "отлично проводим время",
+        "issue": "Acceptable but slightly unnatural as a fixed gloss; context is first-person 'I'm having the best time' / 'We having the best time'."
+      },
+      {
+        "expression": "that big of a deal",
+        "translation": "это так важно",
+        "issue": "Reasonable, but loses the idiomatic emphasis on degree ('that big')."
+      },
+      {
+        "expression": "it is a big deal",
+        "translation": "это важно",
+        "issue": "Correct but somewhat flattened; context contrasts with 'it's really not'."
+      },
+      {
+        "expression": "s just going straight to voicemail",
+        "translation": "просто идет прямиком на голосовую почту",
+        "issue": "Awkward and incomplete; should preserve the full sentence and sound natural in Russian."
+      },
+      {
+        "expression": "way you re full of shit",
+        "translation": "ты полон чепухи",
+        "issue": "This entry is not matched in the subtitles and the gloss is too mild for 'full of shit' (usually 'врёшь' / 'несёшь чушь')."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 3,
+    "reasoning": "Step 1: A few items are genuine formulaic or idiomatic units worth studying, such as 'oh my god', 'i swear to god', 'no fucking way', 'i'm sorry', and 'is everything okay'. Step 2: But many entries are transparent compositional chunks rather than idioms or strong collocations. Examples include 'ruin my life', 'a hundred percent', 'it is a big deal', 'this wasn’t', 'i’m gonna', and 'am i supposed to know'—these are common sentence fragments or grammar patterns, not idioms. Step 3: Some are phrasal/lexical chunks that may be useful for subtitles but are not idioms in the strict sense, such as 'going straight to voicemail', 'dressed like a hooker', 'the quiet room', and 'ride the carousel'. Step 4: The list therefore contains a mix of true discourse formulas and many false positives, so it is not a strong idiom inventory.",
+    "invalid_expressions": [
+      {
+        "expression": "whatever the fuck",
+        "reason": "More of an emphatic phrase than a stable idiom; still formulaic, but not a strong opaque idiom."
+      },
+      {
+        "expression": "having the best time",
+        "reason": "Transparent compositional phrase, not idiomatic."
+      },
+      {
+        "expression": "that big of a deal",
+        "reason": "Common degree construction, not an idiom."
+      },
+      {
+        "expression": "ruin my life",
+        "reason": "Literal compositional phrase; not idiomatic."
+      },
+      {
+        "expression": "it is a big deal",
+        "reason": "Plain evaluative statement, not an idiom."
+      },
+      {
+        "expression": "this wasn t",
+        "reason": "Incomplete grammar fragment, not a formulaic expression."
+      },
+      {
+        "expression": "a hundred percent",
+        "reason": "Ordinary quantifier/intensifier, not an idiom."
+      },
+      {
+        "expression": "i m gonna",
+        "reason": "Reduced future auxiliary, a speech form rather than an idiom."
+      },
+      {
+        "expression": "s just going straight to voicemail",
+        "reason": "Transparent descriptive phrase; useful subtitle chunk but not idiomatic."
+      },
+      {
+        "expression": "ride the carousel",
+        "reason": "Literal phrase in context; not a fixed idiom."
+      },
+      {
+        "expression": "lot of shit",
+        "reason": "Very common colloquial noun phrase, but not a distinct idiom."
+      },
+      {
+        "expression": "the quiet room",
+        "reason": "Literal institutional term, not an idiom."
+      },
+      {
+        "expression": "am i supposed to know",
+        "reason": "Common question frame, not an idiom."
+      }
+    ]
+  },
+  "overall_score": 3.5,
+  "summary": "The translation set is partially usable, with several correct subtitle-friendly Russian glosses, but some entries are too generic, awkward, or incomplete. As an idiom list, it is weak: many items are ordinary grammar chunks or transparent phrases rather than genuine idiomatic/formulaic units.",
+  "improvement_suggestions": [
+    "Filter candidates with a stricter idiom/formula test: keep only expressions that are opaque, strongly conventionalized, or clearly discourse-formulaic, and exclude plain grammar frames and literal phrases.",
+    "Require context-sensitive Russian glosses that preserve register and force, especially for profanity and emphasis (e.g. 'whatever the fuck', 'no fucking way').",
+    "Normalize subtitle fragments before evaluation so entries include missing auxiliaries/articles and can be translated as full natural Russian utterances."
+  ],
+  "tokens_used": {
+    "prompt": 2566,
+    "completion": 1483,
+    "total": 4049
+  }
+}

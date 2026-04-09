@@ -1,0 +1,88 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.750737",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 24,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most pairs are translated correctly and with appropriate Russian equivalents: nephew→племянник, sword→меч, fought→сражался, wolf→волк, maiden→дева, funeral→похороны, blunder→ошибка, patience→терпение, absence→отсутствие, godly→благочестивый, believed→верили, finest→лучший, richer→богаче, spear→копьё. A few entries are weaker or context-sensitive: smelled→учуял is plausible if the sense is 'smelled/scented out' rather than literal 'smelled'; bow→лук; кланяться is acceptable because the English word is ambiguous; staying→остаться is a tense mismatch because the gerund/participle is rendered as an infinitive; lying→лживость is not the best match if the episode uses the verb/adjective sense rather than the noun 'deceit'; landing→Гавань is a proper contextual translation for King's Landing, but it is a place-name rendering rather than a direct vocabulary equivalent. The main clear problem is timer→(empty), which is missing entirely. Overall the translations are mostly correct, with a few sense/format issues and one missing item.",
+    "issues": [
+      {
+        "word": "timer",
+        "translation": "(empty)",
+        "issue": "Missing/empty translation."
+      },
+      {
+        "word": "staying",
+        "translation": "остаться",
+        "issue": "Tense/aspect mismatch: the English form is a gerund/participle, while the Russian translation is an infinitive; context may require 'оставаясь' or 'оставаясь/пребывая'."
+      },
+      {
+        "word": "lying",
+        "translation": "лживость",
+        "issue": "Potential wrong sense: 'lying' in context is more likely the verb/adjective sense ('лгать', 'лживый', 'лёжа') than the noun 'лживость'."
+      },
+      {
+        "word": "landing",
+        "translation": "Гавань",
+        "issue": "Contextualized place-name translation rather than a direct vocabulary equivalent; acceptable if referring to King's Landing, but not a general lexical translation."
+      },
+      {
+        "word": "smelled",
+        "translation": "учуял",
+        "issue": "Context-dependent choice; correct only if the meaning is 'sensed/smelled out', not literal 'smelled'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 6,
+    "reasoning": "Most source items are genuine English vocabulary words, but the list contains several entries that are not ordinary vocabulary items and should have been filtered out. 'pod' is explicitly annotated as the character name Podrick, and 'landing' is used as a proper place-name in the series context (King's Landing). 'pie' is also annotated as a name in the series, though it is a real English word as well; in this dataset it appears to be functioning as a character name rather than a vocabulary target. These non-vocabulary or proper-name-like items reduce the quality of the source list.",
+    "violations": [
+      "pod",
+      "landing",
+      "pie"
+    ]
+  },
+  "criterion_3": {
+    "score": 7,
+    "reasoning": "Most B1/B2 tags are reasonable: nephew, pie, dull, sword, wolf, maiden, funeral, blunder, patience, absence, bow, godly, believed, finest, lying, richer, spear are all broadly within B1/B2 territory depending on sense. However, a few items are miscalibrated or questionable. 'beating' is often A2/B1 in the sense of 'defeating' or 'hitting', so tagging it B2 is somewhat high. 'staying' is usually B1, not clearly B2. 'landing' as a place-name is not a vocabulary level item at all, so it should not be in a CEFR vocabulary list. 'timer' is also not a B1/B2 vocabulary target here because it is empty and, as a standalone word, is more A2/B1 technical everyday vocabulary than a clear B2 item. Overall the list is mostly in range, but a few entries are misleveled or not suitable vocabulary targets.",
+    "not_c_level": [
+      {
+        "word": "beating",
+        "estimated_level": "B1",
+        "reason": "The common meanings 'defeating' or 'hitting' are generally B1-level, so marking it B2 is somewhat too high."
+      },
+      {
+        "word": "staying",
+        "estimated_level": "B1",
+        "reason": "This is a common gerund/participle form of a basic verb and is usually not B2-level."
+      },
+      {
+        "word": "landing",
+        "estimated_level": "A2",
+        "reason": "In this dataset it functions as a proper noun/place-name ('King's Landing'), not a CEFR vocabulary item."
+      },
+      {
+        "word": "timer",
+        "estimated_level": "A2",
+        "reason": "As a standalone everyday noun it is not B2-level; additionally the translation is missing, so it is not a well-justified B2 vocabulary entry."
+      }
+    ]
+  },
+  "overall_score": 7.0,
+  "summary": "The translation quality is generally good, with most English words rendered into appropriate Russian equivalents. The main weaknesses are one missing translation, a few context/sense mismatches, and some source-list issues where proper names or non-vocabulary items slipped into the list.",
+  "tokens_used": {
+    "prompt": 1583,
+    "completion": 1237,
+    "total": 2820
+  }
+}

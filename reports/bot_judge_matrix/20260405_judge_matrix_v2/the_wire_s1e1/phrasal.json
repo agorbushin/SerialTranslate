@@ -1,0 +1,180 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/The Wire/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.762246",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "The Wire",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 393,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/The Wire/Season 1/the_wire_s1_e1.srt",
+  "criterion_1": {
+    "score": 2,
+    "reasoning": "Step 1: A small number of entries are genuinely correct and context-appropriate, such as 'come on' → 'давай', 'hold up' → 'подождать', 'what about' → 'что насчет', 'get out' → 'выйти', and 'hands up' → 'руки вверх'. Step 2: However, the list is dominated by incomplete, overly literal, or context-mismatched glosses. Many translations are too generic for the episode usage, e.g. 'it up' → 'это', 'him out' → 'его', 's up' → 'вверх', 'up in' → 'внутри', 's in' → 'входить', 'm on' → 'находиться на', which do not capture the actual idiomatic meaning in context. Step 3: Several entries are clearly wrong or awkward Russian, including transliterations or unnatural calques such as 'gerard on' → 'геррард на', 'barlow on' → 'барлоу на', 'deterrent on' → 'сдерживающий фактор о', 'business out in' → 'дела внутрь', and 'off on' → 'отключить' for a phrase that is not used that way here. Step 4: Some translations are semantically plausible in isolation but not complete enough for learner use, because they omit the particle meaning or the idiomatic force, for example 'fucked up' → 'облажался' is acceptable, but many neighboring entries are just fragments of larger constructions rather than usable glosses. Overall, only a minority of the list is correct and complete, so the score is very low.",
+    "issues": [
+      {
+        "phrasal_verb": "s up",
+        "translation": "вверх",
+        "issue": "Incomplete fragment; in context it is part of 'What's up?' and should not be glossed as a standalone directional adverb."
+      },
+      {
+        "phrasal_verb": "it up",
+        "translation": "это",
+        "issue": "Wrong and overly generic; the phrase is a fragment of 'make it up' / 'keep it up', not simply 'это'."
+      },
+      {
+        "phrasal_verb": "him out",
+        "translation": "его",
+        "issue": "Too generic; the particle meaning is lost and the gloss does not reflect the idiomatic use in context."
+      },
+      {
+        "phrasal_verb": "up in",
+        "translation": "внутри",
+        "issue": "Wrong sense; in the episode it means 'up in the towers' / 'up in court', not 'inside'."
+      },
+      {
+        "phrasal_verb": "s in",
+        "translation": "входить",
+        "issue": "Fragmentary and not a usable translation; it is not a complete phrasal meaning."
+      },
+      {
+        "phrasal_verb": "m on",
+        "translation": "находиться на",
+        "issue": "Overly literal and incomplete; this is not a stable phrasal meaning in the episode context."
+      },
+      {
+        "phrasal_verb": "gerard on",
+        "translation": "геррард на",
+        "issue": "Transliteration/calque rather than a real Russian gloss; not meaningful as a learner translation."
+      },
+      {
+        "phrasal_verb": "barlow on",
+        "translation": "барлоу на",
+        "issue": "Transliteration/calque rather than a real Russian gloss; not meaningful as a learner translation."
+      },
+      {
+        "phrasal_verb": "deterrent on",
+        "translation": "сдерживающий фактор о",
+        "issue": "Awkward and ungrammatical Russian; the phrase is not translated naturally."
+      },
+      {
+        "phrasal_verb": "business out in",
+        "translation": "дела внутрь",
+        "issue": "Wrong direction and wrong meaning; the episode context is 'lay our business out in front of a judge'."
+      },
+      {
+        "phrasal_verb": "off on",
+        "translation": "отключить",
+        "issue": "Wrong sense; in context it is part of 'drop this off on Nathan', not 'turn off'."
+      },
+      {
+        "phrasal_verb": "s about",
+        "translation": "это о",
+        "issue": "Too generic and fragmentary; it is not a clean learner gloss for the actual usage."
+      },
+      {
+        "phrasal_verb": "you in",
+        "translation": "ты в",
+        "issue": "Fragmentary and unnatural as a dictionary gloss; it is only accidental adjacency."
+      },
+      {
+        "phrasal_verb": "man in",
+        "translation": "включить человека",
+        "issue": "Incorrect meaning; this is not a phrasal verb and the Russian gloss is nonsensical."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 1,
+    "reasoning": "Step 1: A handful of entries are genuine phrasal verbs or established verb-particle/verb-preposition idioms, such as 'come on', 'hold up', 'get out', 'come back', 'go back', 'figure out', 'work out', 'pick up', 'put out', 'sit down', and 'look for'. Step 2: But the majority of the list is not a real phrasal idiom; it is mostly tokenizer fragments or accidental word adjacency extracted from subtitles, such as 'you in', 'man in', 's up', 'it up', 'm on', 's in', 't about', 're on', 'day in', 'court in', and many similar items. Step 3: Many entries are just noun + preposition combinations or ordinary grammar, not lexicalized phrasal units, for example 'questions about', 'services in', 'guard on', 'name on', 'price for', 'glass with', 'room with', 'business out in', and 'address on'. Step 4: Because the list is overwhelmingly polluted by non-phrasal fragments, the set fails the textbook standard for phrasal verbs/idioms. Only a minority are valid, so the score must be very low.",
+    "invalid_phrasals": [
+      {
+        "phrase": "s up",
+        "reason": "Not a real phrasal verb; it is a clipped fragment from 'What's up?'."
+      },
+      {
+        "phrase": "it up",
+        "reason": "Tokenizer fragment, not a standalone idiom."
+      },
+      {
+        "phrase": "you in",
+        "reason": "Ordinary adjacency, not a lexical phrasal idiom."
+      },
+      {
+        "phrase": "have on",
+        "reason": "Can be idiomatic in some contexts, but here the entry is extracted as a fragment and is not reliably a phrasal-verb item by itself."
+      },
+      {
+        "phrase": "up in",
+        "reason": "Preposition phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "s down",
+        "reason": "Fragmentary and not a valid source phrase."
+      },
+      {
+        "phrase": "s in",
+        "reason": "Fragmentary and not a valid source phrase."
+      },
+      {
+        "phrase": "it for",
+        "reason": "Accidental adjacency, not a phrasal idiom."
+      },
+      {
+        "phrase": "man in",
+        "reason": "Noun phrase with preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "t about",
+        "reason": "Fragmentary extraction, not a real idiom."
+      },
+      {
+        "phrase": "m on",
+        "reason": "Fragmentary extraction, not a real idiom."
+      },
+      {
+        "phrase": "business out in",
+        "reason": "Not a lexical phrasal unit; it is part of a larger clause."
+      },
+      {
+        "phrase": "day in",
+        "reason": "Ordinary prepositional phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "guard on",
+        "reason": "Noun + preposition, not a phrasal idiom."
+      },
+      {
+        "phrase": "services in",
+        "reason": "Noun phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "court in",
+        "reason": "Noun + preposition, not a phrasal idiom."
+      },
+      {
+        "phrase": "questions about",
+        "reason": "Ordinary prepositional phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "name on",
+        "reason": "Noun + preposition, not a phrasal idiom."
+      },
+      {
+        "phrase": "price for",
+        "reason": "Ordinary prepositional phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "glass with",
+        "reason": "Noun + preposition, not a phrasal idiom."
+      }
+    ]
+  },
+  "overall_score": 1.5,
+  "summary": "The list contains a few real phrasal verbs with decent translations, but most entries are fragmentary subtitle extractions rather than valid phrasal idioms. Translation quality is also weak overall because many glosses are literal, incomplete, or unnatural in Russian.",
+  "tokens_used": {
+    "prompt": 19864,
+    "completion": 2089,
+    "total": 21953
+  }
+}

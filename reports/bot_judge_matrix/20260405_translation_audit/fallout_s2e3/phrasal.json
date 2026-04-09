@@ -1,0 +1,96 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.753606",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Fallout S2 E3",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 46,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 1,
+    "reasoning": "Step 1: The subtitle matching section shows no actual episode lines for any listed phrasal verb, so there is no contextual evidence that the provided Russian glosses are correct for this episode. Step 2: Because the task requires episode-specific contextual correctness, every entry is effectively unsupported; many glosses are also overly generic or mismatched to the stored example usage. Step 3: A few translations are broadly acceptable as dictionary glosses (e.g. \"верить в\", \"шпионить за\", \"искать\"), but the list contains many weak or unnatural renderings such as \"отправляться\" for \"go off\", \"принимайся за дело\" for \"get on\", \"выкинуть\" for \"shit out\", and \"попробовать\" for \"turn with\". Step 4: Since most entries are either unverified by context or semantically off, the overall completeness and correctness are very low.",
+    "issues": [
+      {
+        "phrasal_verb": "go off",
+        "translation": "отправляться",
+        "issue": "Wrong sense: this gloss does not match the common phrasal meaning in context and is not supported by any episode line."
+      },
+      {
+        "phrasal_verb": "get on",
+        "translation": "принимайся за дело",
+        "issue": "Overly specific and likely wrong; the stored example suggests 'continue/get on with it', not 'start working'."
+      },
+      {
+        "phrasal_verb": "hold on",
+        "translation": "держись",
+        "issue": "Too generic; in many subtitle contexts this means 'wait' or 'hold on to', and no episode context is provided."
+      },
+      {
+        "phrasal_verb": "shit out",
+        "translation": "выкинуть",
+        "issue": "Incorrect gloss for the idiomatic use in the example; the phrase is not about physically throwing something out."
+      },
+      {
+        "phrasal_verb": "turn with",
+        "translation": "попробовать",
+        "issue": "Wrong meaning; 'turn with' is not translated by 'try' and the example does not support this gloss."
+      },
+      {
+        "phrasal_verb": "way out",
+        "translation": "выход",
+        "issue": "Too noun-like and context-dependent; as a phrasal/idiomatic item it usually needs a fuller sense such as 'way out here' or 'get out'."
+      },
+      {
+        "phrasal_verb": "going up",
+        "translation": "противостоять",
+        "issue": "This is a rough paraphrase and not a direct translation of the phrasal construction; the example suggests 'go up against'."
+      },
+      {
+        "phrasal_verb": "be on",
+        "translation": "быть на",
+        "issue": "Overly literal and not idiomatic as a learner gloss; the example context does not justify this as a stable translation."
+      },
+      {
+        "phrasal_verb": "right back",
+        "translation": "прямо обратно",
+        "issue": "Awkward and not a natural Russian gloss for the adverbial phrase; context is missing."
+      },
+      {
+        "phrasal_verb": "looked up",
+        "translation": "посмотрел вверх",
+        "issue": "This is only one possible literal sense; without context it may be wrong if the intended meaning is 'looked up to' or 'searched'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 8,
+    "reasoning": "Step 1: Most source strings are genuine phrasal verbs or established verb-preposition/particle idioms: come on, what about, believe in, spy on, take out, know about, go off, get on, get in, get back, keep up, hold on, hold up, do with, wrong with, listen up, carry around, all in, way out, talking about, made for, sympathize with, go in for, end with, stand around, do about, going up, goes for, be on, think about, care about, cut off, looking for, fight for, suck on, walk in, open up, right back, looked up, bet on, walk over, going on. Step 2: A few entries are not really phrasal idioms but still acceptable as verb-preposition combinations or fixed expressions in learner materials. Step 3: The main problem is a small set of borderline or non-idiomatic items that look like accidental fragments or incomplete constructions rather than textbook phrasal verbs. Overall, the list is mostly valid.",
+    "invalid_phrasals": [
+      {
+        "phrase": "turn with",
+        "reason": "Not a standard phrasal verb or established idiom in this form; it looks like an incomplete or accidental fragment."
+      },
+      {
+        "phrase": "shit out",
+        "reason": "As written, this is not a standard textbook phrasal verb entry; it is slangy and highly context-specific rather than a stable learner phrasal."
+      },
+      {
+        "phrase": "right back",
+        "reason": "This is usually an adverbial phrase, not a verb-particle idiom by itself."
+      },
+      {
+        "phrase": "looked up",
+        "reason": "This is a simple verb plus particle form, but as a standalone entry it is ambiguous and not necessarily a fixed idiom without a complement."
+      }
+    ]
+  },
+  "overall_score": 4.5,
+  "summary": "The list contains many real phrasal verbs, but the translation layer is weak because no episode subtitles are actually matched and several Russian glosses are inaccurate or too generic. The source list is mostly legitimate, though a few entries are borderline or not true phrasal idioms in the strict textbook sense.",
+  "tokens_used": {
+    "prompt": 2345,
+    "completion": 1294,
+    "total": 3639
+  }
+}

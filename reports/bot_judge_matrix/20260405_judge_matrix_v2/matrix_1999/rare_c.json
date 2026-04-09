@@ -1,0 +1,42 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-05T22:56:06.752800",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_c",
+  "translation_csvs": [
+    "tier_4_rare_c_translations.csv"
+  ],
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "word_count": 1,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "The pair provided is complete: the English word 'able' has a Russian translation and it is not empty, not a dash, and not left untranslated. Semantically, 'способный' is a correct Russian equivalent for the core meaning of 'able' ('capable', 'having the ability to'). Because no subtitle example is available, there is no contextual evidence that a more specific sense was required in this episode. The only minor caveat is that 'able' can sometimes be rendered more naturally as 'мочь/в состоянии/способный' depending on syntax, but 'способный' is still a valid translation.",
+    "issues": []
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "The source word 'able' is a genuine English vocabulary word and not a name, place, invented term, or foreign word. No non-English entities appear in the source list.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 1,
+    "reasoning": "This entry does not fit an advanced rare-vocabulary list. 'Able' is a very common, elementary English adjective typically learned at A2/B1 level, not a C1/C2 item. Since the task is to evaluate advanced-band vocabulary, this is a clear mismatch even though the translation itself is correct.",
+    "not_c_level": [
+      {
+        "word": "able",
+        "estimated_level": "A2",
+        "reason": "Very common basic adjective meaning 'capable'; not advanced vocabulary and not appropriate for a C-band rare-word list."
+      }
+    ]
+  },
+  "overall_score": 6.3,
+  "summary": "The translation itself is correct and complete: 'able' → 'способный' is a valid Russian equivalent. However, the source item is too basic for an advanced rare-vocabulary list, so the main issue is list quality rather than translation accuracy.",
+  "tokens_used": {
+    "prompt": 934,
+    "completion": 436,
+    "total": 1370
+  }
+}

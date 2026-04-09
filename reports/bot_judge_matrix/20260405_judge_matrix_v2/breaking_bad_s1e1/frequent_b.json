@@ -1,0 +1,109 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Breaking Bad/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.766005",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Breaking Bad",
+  "season": 1,
+  "episode": 1,
+  "word_count": 15,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Breaking Bad/Season 1/breaking_bad_s1_e1.srt",
+  "criterion_1": {
+    "score": 7,
+    "reasoning": "Most translations are correct and contextually appropriate: bacon→бекон, flask→колба, meth→метамфетамин, molecule→молекула, supposed→предположительно, snitch→стукач, whiff→запах, skater→скейтер, punk→сопляк. However, several items are off in this episode context. 'turning' in 'turning myself in' means 'сдаваясь/сдаться', not 'исполнение'. 'tick' in 'stone-fine tick-tick' refers to meth, so 'метамфетамин' is acceptable only as a contextual gloss, but it is not a direct translation of the word itself and is too interpretive. 'sage' here means the adjective 'sage' as a color ('sage green'), so 'шалфейный' is acceptable but slightly awkward; 'wipe' in 'wipe downs' should be 'протирка/обтирание' or 'протирочные работы', and 'протирка' is somewhat generic but usable. The main clear errors are 'boiling'→'кипятильный', which is wrong in 'boiling flask' and should be 'кипящий' or 'кипячения', and 'supposed' is slightly too adverbial/hedged for the adjective use in 'really supposed to be'.",
+    "issues": [
+      {
+        "word": "turning",
+        "translation": "исполнение",
+        "issue": "Wrong sense in context; here it means 'surrendering/turning myself in', not 'performance/execution'."
+      },
+      {
+        "word": "wipe",
+        "translation": "протирка",
+        "issue": "Too generic; in 'wipe downs' it should refer to wiping/cleaning down surfaces, not just the noun 'wiping'."
+      },
+      {
+        "word": "boiling",
+        "translation": "кипятильный",
+        "issue": "Incorrect meaning; in 'boiling flask' it means 'boiling' (as in heating to boil), not 'for boiling water'/'boiler-related'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 9,
+    "reasoning": "The source list is overwhelmingly made of real English vocabulary items. Most entries are ordinary words used in the episode. There are no obvious character names or place names in the list. The only borderline item is 'meth', which is slang/abbreviation for methamphetamine but still a real English lexical item in this context, so it does not count as a violation.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "Several rows are miscalibrated for the stated CEFR band. Some [B1] items are actually very easy A1/A2 words, such as 'bacon' and 'lately'. Some [B2] items are also too easy or too specialized for B2, especially 'flask', 'meth', 'molecule', 'snitch', 'whiff', 'skater', and 'punk' depending on sense; 'boiling' as used here is also more of a general adjective than a B2 target. 'sage' as a color adjective and 'supposed' are plausible B1/B2 items, but the list overall mixes very easy vocabulary with slang/specialized chemistry terms, so the banding is not well balanced.",
+    "not_c_level": [
+      {
+        "word": "bacon",
+        "estimated_level": "A1",
+        "reason": "Very basic food vocabulary, not B1."
+      },
+      {
+        "word": "lately",
+        "estimated_level": "A2",
+        "reason": "Common everyday adverb, usually below B1."
+      },
+      {
+        "word": "tick",
+        "estimated_level": "C1",
+        "reason": "In this episode it is slang for meth; this is not standard B1/B2 vocabulary and is highly context-specific."
+      },
+      {
+        "word": "flask",
+        "estimated_level": "A2",
+        "reason": "Basic object word, though used in a chemistry context; still not strongly B2."
+      },
+      {
+        "word": "meth",
+        "estimated_level": "A2",
+        "reason": "Slang abbreviation, not a standard B2 vocabulary item."
+      },
+      {
+        "word": "molecule",
+        "estimated_level": "A2",
+        "reason": "Common science term, generally easier than B2."
+      },
+      {
+        "word": "snitch",
+        "estimated_level": "B1",
+        "reason": "Could fit B1 colloquial vocabulary, but not clearly B2; the list labels it B2."
+      },
+      {
+        "word": "whiff",
+        "estimated_level": "B1",
+        "reason": "Common enough colloquial noun/verb, but typically not B2."
+      },
+      {
+        "word": "boiling",
+        "estimated_level": "A2",
+        "reason": "Basic adjective/participle, not B2."
+      },
+      {
+        "word": "skater",
+        "estimated_level": "A2",
+        "reason": "Simple noun derived from 'skate'; too easy for B2."
+      },
+      {
+        "word": "punk",
+        "estimated_level": "B1",
+        "reason": "Colloquial insult, but not especially B2-level."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The translations are mostly usable, with several correct chemistry and slang renderings, but there are a few clear context errors, especially 'turning' and 'boiling'. The source list also mixes very easy words with slang and specialized terms, so the CEFR banding is not well calibrated.",
+  "tokens_used": {
+    "prompt": 2635,
+    "completion": 1300,
+    "total": 3935
+  }
+}

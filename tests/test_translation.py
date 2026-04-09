@@ -2,6 +2,9 @@
 """
 Comprehensive tests for translation functionality.
 
+Production path for the bot is ``translate_tier_translations.run``; these tests
+still target ``translate_words`` for historical coverage until migrated.
+
 Tests cover:
 1. Translation functions (translate_words_with_context, translate_tier_file, translate_episode)
 2. Translation quality (validation, retry logic, parallel processing)

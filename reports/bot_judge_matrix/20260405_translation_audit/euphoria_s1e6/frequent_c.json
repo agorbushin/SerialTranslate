@@ -1,0 +1,103 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.754878",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Euphoria S1 E6",
+  "season": 1,
+  "episode": 1,
+  "word_count": 10,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most pairs are translated into natural Russian words with the correct general meaning: 'rebirth' → 'возрождение', 'tequila' → 'текила', 'burden' → 'обуза', 'dyin' → 'умираю', 'bitty' → 'крошечный', and 'fascination' → 'одержимость' are all plausible. The main concern is that several items are context-sensitive slang or clipped forms, and without subtitle examples it is hard to verify the exact sense. 'raped' → 'изнасилованная' is grammatically feminine and may be wrong if the source form is used as a past participle/adjective in a different syntactic role; 'blockin' → 'перекрывая' may be too specific or awkward for a clipped colloquial form; 'woo' → 'ликовать' may miss the common interjectional/cheering sense; and 'blacked' → 'отключился' is plausible but could also reflect a different slang meaning depending on context. Overall, the translations are mostly complete and not empty, but a few are potentially imprecise.",
+    "issues": [
+      {
+        "word": "raped",
+        "translation": "изнасилованная",
+        "issue": "Potentially wrong grammatical form and possibly too narrow without context; the Russian adjective is feminine and may not match the source usage."
+      },
+      {
+        "word": "blockin",
+        "translation": "перекрывая",
+        "issue": "Clipped colloquial form; translation may be too specific or awkward without the exact sentence context."
+      },
+      {
+        "word": "woo",
+        "translation": "ликовать",
+        "issue": "Possible sense mismatch; 'woo' often functions as an exclamation/cheer rather than the verb 'to rejoice'."
+      },
+      {
+        "word": "blacked",
+        "translation": "отключился",
+        "issue": "Plausible but context-dependent slang; may not capture the exact intended meaning."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items appear to be genuine English vocabulary forms or colloquial clipped forms used in English. None are obvious names, place names, foreign-language insertions, or invented terms that should have been filtered out.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 3,
+    "reasoning": "The list contains several basic or intermediate words that do not fit a C1/C2 vocabulary target. While some items are advanced or slangy, many are common everyday words or forms that most learners would know well before C-level. The list therefore does not consistently meet the intended difficulty band.",
+    "not_c_level": [
+      {
+        "word": "tequila",
+        "estimated_level": "B1",
+        "reason": "A common loanword and drink name; not advanced vocabulary."
+      },
+      {
+        "word": "burden",
+        "estimated_level": "B1",
+        "reason": "Fairly common everyday vocabulary, usually learned at intermediate level."
+      },
+      {
+        "word": "dyin",
+        "estimated_level": "A2",
+        "reason": "Just a colloquial spelling of 'dying'; the underlying word is basic."
+      },
+      {
+        "word": "bitty",
+        "estimated_level": "B2",
+        "reason": "Informal but still not strongly C-level; relatively accessible to intermediate learners."
+      },
+      {
+        "word": "rebirth",
+        "estimated_level": "B2",
+        "reason": "Somewhat abstract, but still a fairly common word rather than distinctly advanced."
+      },
+      {
+        "word": "fascination",
+        "estimated_level": "B2",
+        "reason": "Common academic/general vocabulary, not clearly C1/C2."
+      },
+      {
+        "word": "woo",
+        "estimated_level": "B1",
+        "reason": "Short, common interjection/verb; not advanced vocabulary."
+      },
+      {
+        "word": "blacked",
+        "estimated_level": "B2",
+        "reason": "A colloquial past form/slang usage rather than advanced lexical vocabulary."
+      },
+      {
+        "word": "blockin",
+        "estimated_level": "B1",
+        "reason": "Clipped colloquial form of a basic verb; not C-level."
+      }
+    ]
+  },
+  "overall_score": 7.0,
+  "summary": "The translations are mostly usable and the source list contains no obvious non-English intrusions. However, several entries are not clearly C-level vocabulary, and a few translations are context-sensitive or slightly imprecise, so the list is only partially suitable for an advanced vocabulary set.",
+  "tokens_used": {
+    "prompt": 1189,
+    "completion": 1056,
+    "total": 2245
+  }
+}

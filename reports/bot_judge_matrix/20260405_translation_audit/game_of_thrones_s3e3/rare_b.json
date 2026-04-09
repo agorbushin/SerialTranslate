@@ -1,0 +1,173 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.750905",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_b",
+  "translation_csvs": [
+    "tier_4_rare_b_translations.csv"
+  ],
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 31,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "Most pairs are valid Russian translations of the English headwords, and many are semantically acceptable in isolation: opportunity/возможность, thought/мысль, patient/терпеливый, council/совет, event/событие, finance/финансы, whether/ли, require/требовать, training/обучение, choice/выбор, such/такой, power/власть, few/несколько, opinion/мнение, written/написанный, service/служба, basic/основной, period/срок, loan/заём, privacy/уединение, land/земля. However, several entries are wrong or too context-dependent: control→распоряжаться is only one possible verb and not a direct noun translation; front→в присутствии is a phrase, not a lexical equivalent of the word itself; release→освобождение is a noun while the English item may require a verb or different sense; profile→незаметность is not a normal translation of 'profile'; either→тоже is incorrect; rule→править is only the verb sense and misses the noun sense; interest→с процентами is not a translation of the word itself; step→походка is a wrong sense; deal→расправляться is a specific verb and not the general noun/verb 'deal'. Some items are also overly generic or mismatched to likely episode usage, but the list is mostly complete and non-empty.",
+    "issues": [
+      {
+        "word": "control",
+        "translation": "распоряжаться",
+        "issue": "Only partially matches one verbal sense; not a direct or complete translation of the headword in all contexts."
+      },
+      {
+        "word": "front",
+        "translation": "в присутствии",
+        "issue": "Phrase-level rendering rather than a direct lexical translation; likely wrong sense for the headword."
+      },
+      {
+        "word": "release",
+        "translation": "освобождение",
+        "issue": "Noun translation only; may miss the intended verb sense or specific contextual meaning."
+      },
+      {
+        "word": "profile",
+        "translation": "незаметность",
+        "issue": "Incorrect meaning; 'profile' does not normally mean 'stealth/inconspicuousness'."
+      },
+      {
+        "word": "either",
+        "translation": "тоже",
+        "issue": "Wrong meaning; 'either' is not generally translated as 'тоже'."
+      },
+      {
+        "word": "rule",
+        "translation": "править",
+        "issue": "Only the verb sense is given; if the episode uses the noun 'rule', this is the wrong sense."
+      },
+      {
+        "word": "interest",
+        "translation": "с процентами",
+        "issue": "Not a direct translation of the word; this is a phrase and may reflect a specific financial context only."
+      },
+      {
+        "word": "step",
+        "translation": "походка",
+        "issue": "Wrong sense; 'step' usually means 'шаг' in the basic vocabulary sense."
+      },
+      {
+        "word": "deal",
+        "translation": "расправляться",
+        "issue": "Wrong or overly specific sense; 'deal' usually means 'сделка', 'иметь дело', or 'разбираться' depending on context."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words. There are no obvious character names, place names, foreign-language insertions, or invented fantasy terms in the source list. The list is lexically clean from a source-language filtering perspective.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list mixes some reasonable B1/B2 items with many very common A1/A2 words and a few more specialized or abstract items. For a B-learner list, words like thought, patient, event, few, such, basic, step, land, and choice are too elementary; finance, payment, loan, interest, privacy, and profile are more specialized and may be above or outside the intended episode-level B1/B2 target depending on usage. Overall, the calibration is weak because a substantial portion of the list is not B-band appropriate.",
+    "not_c_level": [
+      {
+        "word": "thought",
+        "estimated_level": "A2",
+        "reason": "Very common everyday vocabulary; too basic for a B1/B2 target list."
+      },
+      {
+        "word": "patient",
+        "estimated_level": "A2",
+        "reason": "Common adjective/basic vocabulary; not a strong B-band item."
+      },
+      {
+        "word": "event",
+        "estimated_level": "A2",
+        "reason": "High-frequency general word, usually below B1/B2."
+      },
+      {
+        "word": "choice",
+        "estimated_level": "A2",
+        "reason": "Common everyday word; typically too basic for this list."
+      },
+      {
+        "word": "such",
+        "estimated_level": "A2",
+        "reason": "Function-like common word; not a good B-band vocabulary target."
+      },
+      {
+        "word": "few",
+        "estimated_level": "A1/A2",
+        "reason": "Very basic quantifier, below B1/B2."
+      },
+      {
+        "word": "written",
+        "estimated_level": "A2",
+        "reason": "Common past participle/adjective; too basic for a B-band list."
+      },
+      {
+        "word": "either",
+        "estimated_level": "A2",
+        "reason": "Common function word; not appropriate as a B-level vocabulary item."
+      },
+      {
+        "word": "basic",
+        "estimated_level": "A2",
+        "reason": "Very common adjective; below the intended band."
+      },
+      {
+        "word": "period",
+        "estimated_level": "A2",
+        "reason": "Common word with broad everyday use; not especially B-band."
+      },
+      {
+        "word": "step",
+        "estimated_level": "A1/A2",
+        "reason": "Very basic everyday noun; too elementary."
+      },
+      {
+        "word": "land",
+        "estimated_level": "A1/A2",
+        "reason": "Basic vocabulary; not suitable for a B1/B2 list."
+      },
+      {
+        "word": "finance",
+        "estimated_level": "B2",
+        "reason": "Acceptable as B2, but it is more specialized than many other items and may be too domain-specific for a general episode vocabulary list."
+      },
+      {
+        "word": "payment",
+        "estimated_level": "B1",
+        "reason": "Borderline but acceptable; still relatively common and not strongly episode-specific."
+      },
+      {
+        "word": "loan",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1/B2 item, though somewhat domain-specific."
+      },
+      {
+        "word": "interest",
+        "estimated_level": "B2",
+        "reason": "Acceptable if financial sense is intended, but the list's translation suggests a specialized financial usage rather than general vocabulary."
+      },
+      {
+        "word": "privacy",
+        "estimated_level": "B2",
+        "reason": "Acceptable B2 item, but more abstract and less frequent than core B1 vocabulary."
+      },
+      {
+        "word": "profile",
+        "estimated_level": "B2",
+        "reason": "Can be B2, but the translation is wrong and the word is less common than core B-band items."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The list is mostly composed of real English words with many acceptable Russian equivalents, but several translations are clearly wrong or too sense-specific. The biggest weakness is vocabulary calibration: many entries are too basic for a B1/B2 list, while a few are more specialized or awkwardly translated.",
+  "tokens_used": {
+    "prompt": 1521,
+    "completion": 1639,
+    "total": 3160
+  }
+}

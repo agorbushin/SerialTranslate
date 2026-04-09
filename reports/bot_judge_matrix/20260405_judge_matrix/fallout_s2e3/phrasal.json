@@ -1,0 +1,84 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:55:11.809949",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Fallout S2 E3",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 46,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 1,
+    "reasoning": "Step 1: The subtitle matching section shows no matched lines for any listed phrasal verb, so there is no episode-specific context to verify usage against. Step 2: Because the task requires checking contextual correctness in this episode, the absence of matches means the translations cannot be confirmed as episode-accurate. Step 3: Most Russian glosses are present and not empty, but several are overly generic or potentially wrong-sense for the listed phrasals (for example, 'go off' → 'отправляться' is not the usual meaning of 'go off', 'turn with' → 'попробовать' is not a normal gloss, and 'shit out' → 'выкинуть' is not a good learner gloss). Step 4: Since the list is large and the episode evidence is missing, the output is mostly unverified rather than clearly correct, so the score must be very low.",
+    "issues": [
+      {
+        "phrasal_verb": "go off",
+        "translation": "отправляться",
+        "issue": "Wrong or at least highly unlikely sense; 'go off' usually means explode, leave, happen, or go bad, not 'отправляться'."
+      },
+      {
+        "phrasal_verb": "turn with",
+        "translation": "попробовать",
+        "issue": "Translation does not match a standard meaning of the phrase and is not a reliable learner gloss."
+      },
+      {
+        "phrasal_verb": "shit out",
+        "translation": "выкинуть",
+        "issue": "Overly loose and not a good direct gloss; the phrase is slang and usually means to expel/produce or 'shit out' in a figurative sense, not simply 'выкинуть'."
+      },
+      {
+        "phrasal_verb": "way back",
+        "translation": "давно",
+        "issue": "This is more of an adverbial phrase than a clear phrasal verb; the gloss is acceptable as a time expression but not a precise phrasal-verb translation."
+      },
+      {
+        "phrasal_verb": "get on",
+        "translation": "принимайся за дело",
+        "issue": "Too narrow and context-dependent; 'get on' commonly means continue, progress, or get along, so this gloss is not generally correct."
+      },
+      {
+        "phrasal_verb": "hold up",
+        "translation": "подождать",
+        "issue": "Acceptable in some contexts, but the gloss is incomplete because 'hold up' can also mean delay, support, or rob."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 7,
+    "reasoning": "Step 1: Most entries are genuine English phrasal verbs or established verb-preposition idioms: 'come on', 'spy on', 'take out', 'get back', 'keep up', 'hold on', 'cut off', 'looking for', 'fight for', 'walk over', and similar items are valid. Step 2: A few entries are not really phrasal verbs in the textbook sense but are still acceptable multiword idioms or prepositional constructions, such as 'what about', 'know about', 'care about', 'think about', and 'talking about'. Step 3: Some items are weak or questionable as lexical phrasal entries because they look like ordinary grammar, incomplete fragments, or nonstandard combinations. Step 4: Because the majority are valid, but several are borderline or invalid, the score should be above average but not perfect.",
+    "invalid_phrasals": [
+      {
+        "phrase": "way back",
+        "reason": "Primarily an adverbial/time expression, not a phrasal verb or verb-particle idiom."
+      },
+      {
+        "phrase": "turn with",
+        "reason": "Not a standard phrasal verb or established idiom in this form."
+      },
+      {
+        "phrase": "right back",
+        "reason": "Usually an adverbial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "looked up",
+        "reason": "This is just the past tense of 'look up'; valid as a verb-particle construction, but the listed form is not itself a phrasal-verb lemma."
+      },
+      {
+        "phrase": "going on",
+        "reason": "Can be a valid phrasal/idiomatic form, but in many cases it is simply the progressive of 'go on' or an adjective-like construction; borderline as a standalone entry."
+      },
+      {
+        "phrase": "be on",
+        "reason": "Very broad copular/prepositional construction; not a clear textbook phrasal verb."
+      }
+    ]
+  },
+  "overall_score": 4.0,
+  "summary": "Most English entries are real phrasal verbs or acceptable verb-preposition idioms, but a few are borderline or not true phrasal-verb lemmas. The Russian translations are mostly present, yet episode-specific correctness cannot be verified because no subtitle matches were found, and several glosses are weak or likely wrong-sense.",
+  "tokens_used": {
+    "prompt": 2345,
+    "completion": 1125,
+    "total": 3470
+  }
+}

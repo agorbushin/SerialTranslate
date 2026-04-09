@@ -1,0 +1,71 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-05T22:56:06.752395",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "word_count": 5,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most pairs are translated into plausible Russian equivalents. 'scaffold' → 'строительные леса' is correct in the common sense of construction scaffolding, though without subtitle context it is impossible to confirm whether a more specific technical sense was intended. 'emp' → 'электромагнитный импульс' is a correct expansion of the acronym/term. 'mainframe' → 'центральный компьютер' is semantically acceptable, though a more standard Russian rendering would often be 'мэйнфрейм' or 'большая ЭВМ' depending on context. 'deja' → 'дежавю' is problematic because the source form is incomplete/fragmentary: if the intended word is 'déjà vu', the Russian translation is fine, but as written 'deja' alone is not a complete English word. 'jujitsu' → 'боевое искусство' is too generic; it loses the specific meaning of the martial art 'дзюдзюцу/джиу-джитсу'.",
+    "issues": [
+      {
+        "word": "deja",
+        "translation": "дежавю",
+        "issue": "Source form is incomplete/fragmentary; the translation may match the intended phrase 'déjà vu', but as a standalone source word it is not a precise one-to-one translation."
+      },
+      {
+        "word": "jujitsu",
+        "translation": "боевое искусство",
+        "issue": "Translation is too generic; it should preserve the specific martial art meaning rather than just 'martial art'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "Several source items are not ordinary English vocabulary words and should likely have been filtered out. 'emp' is an acronym/technical abbreviation rather than a standard vocabulary item. 'mainframe' is a technical term but still English vocabulary. 'deja' is not a complete English word; it is a foreign-language fragment from French. 'jujitsu' is a borrowed term and may be acceptable as an English loanword, though it is not core vocabulary. 'scaffold' is a genuine English word. Overall, the list contains multiple items that are not ideal for a clean English vocabulary list.",
+    "violations": [
+      "emp",
+      "deja"
+    ]
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is not well aligned with a C1/C2 vocabulary target. 'scaffold' is a fairly common word, typically around B2, not advanced. 'emp' is an acronym/technical abbreviation rather than a CEFR vocabulary item. 'mainframe' is specialized technical vocabulary and can be considered C1/C2 in a computing context. 'deja' is not a valid standalone English vocabulary item. 'jujitsu' is a loanword and relatively specialized, but it is not especially advanced English vocabulary in the CEFR sense. Therefore, most entries fail the C-level requirement.",
+    "not_c_level": [
+      {
+        "word": "scaffold",
+        "estimated_level": "B2",
+        "reason": "Common enough in general English and not clearly advanced C1/C2 vocabulary."
+      },
+      {
+        "word": "emp",
+        "estimated_level": "B2",
+        "reason": "An acronym/technical abbreviation rather than a C-level vocabulary word."
+      },
+      {
+        "word": "deja",
+        "estimated_level": "A1/A2",
+        "reason": "Not a valid standalone English vocabulary item; appears to be a fragment of a French phrase."
+      },
+      {
+        "word": "jujitsu",
+        "estimated_level": "B2",
+        "reason": "A specialized loanword, but not strongly C1/C2-level advanced vocabulary."
+      }
+    ]
+  },
+  "overall_score": 4.7,
+  "summary": "The translations are partly correct, but one is too generic and one source item appears incomplete or non-lexical. The source list also contains items that are not ideal English vocabulary entries and is weakly aligned with a C-level learning goal.",
+  "tokens_used": {
+    "prompt": 1081,
+    "completion": 913,
+    "total": 1994
+  }
+}

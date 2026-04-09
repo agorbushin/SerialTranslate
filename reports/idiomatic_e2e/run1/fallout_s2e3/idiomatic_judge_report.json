@@ -1,0 +1,64 @@
+{
+  "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run1/fallout_s2e3",
+  "judged_at": "2026-04-01T23:02:34.930112",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "idiomatic_expressions",
+  "series": "Fallout S2 E3",
+  "season": 2,
+  "episode": 3,
+  "expression_count": 8,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Fallout/Season 2/fallout_s2_e3.srt",
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Step 1: Most translation pairs are present and not missing. All listed items have Russian glosses, and none are left in English or marked N/A. Step 2: Several glosses are contextually correct in this episode: \"gotta be ready\" → \"нужно быть готовым\" fits the imperative readiness context; \"chain of command\" → \"цепочка командования\" is acceptable in military hierarchy context; \"like cats and dogs\" → \"как кошки с собаками\" matches the conflict description; \"a civil war\" → \"гражданская война\" is correct; \"the first time\" → \"в первый раз\" is fine. Step 3: A few entries are slightly awkward or overly literal but still understandable. \"well you know how it\" → \"ну, вы знаете, как это\" is incomplete as a standalone gloss because the English source is truncated and the Russian is also a fragment; it is usable but not ideal. \"the cold fusion\" → \"холодный синтез\" is technically correct as a term, but in the episode it refers to a named relic/object, so the definite article and noun phrase feel a bit generic; still acceptable. Step 4: The main weakness is that some glosses are too generic for the exact usage, especially the truncated discourse formula and the named-object reference, but there are no major wrong-sense translations. Overall the set is mostly correct with minor contextual/format issues.",
+    "issues": [
+      {
+        "expression": "well you know how it",
+        "translation": "ну, вы знаете, как это",
+        "issue": "Source is a truncated discourse formula, and the Russian gloss is also fragmentary; it is acceptable but incomplete and somewhat generic."
+      },
+      {
+        "expression": "the cold fusion",
+        "translation": "холодный синтез",
+        "issue": "Technically correct, but in context it refers to a specific named relic/object, so the gloss is a bit too generic and misses the episode-specific referential use."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "Step 1: Some entries are genuine formulaic units worth studying, such as \"gotta be ready,\" \"like cats and dogs,\" and \"chain of command\" in a military setting. Step 2: However, several items are not really idioms or strong opaque collocations; they are ordinary compositional phrases or truncated sentence fragments. \"the first time\" is a plain high-frequency phrase, not an idiom. \"a civil war\" is a normal noun phrase. \"the cold fusion\" is a literal technical term / named object, not an idiom. \"well you know how it\" is an incomplete fragment rather than a stable formula. \"if i may i m\" is also a broken fragment and not a valid expression as listed. Step 3: Because the list mixes a few useful formulaic items with many transparent or malformed chunks, it is only partially valid as an idiom list. The repeated episode-specific nature helps some entries, but repetition alone does not make transparent grammar into idioms. Overall, this is a weak set for idiom extraction.",
+    "invalid_expressions": [
+      {
+        "expression": "well you know how it",
+        "reason": "Truncated fragment of a sentence, not a stable idiom or formula."
+      },
+      {
+        "expression": "the cold fusion",
+        "reason": "Literal technical term / named object, not an idiomatic or formulaic expression."
+      },
+      {
+        "expression": "a civil war",
+        "reason": "Plain compositional noun phrase; not an idiom or special formula."
+      },
+      {
+        "expression": "if i may i m",
+        "reason": "Malformed/truncated fragment, not a usable expression."
+      },
+      {
+        "expression": "the first time",
+        "reason": "Very common transparent phrase, not an idiom or opaque collocation."
+      }
+    ]
+  },
+  "overall_score": 6.0,
+  "summary": "The Russian translations are mostly correct and usable, with only minor contextual awkwardness in a couple of entries. The bigger problem is the source list quality: several items are plain phrases or truncated fragments rather than genuine idioms or formulaic units.",
+  "improvement_suggestions": [
+    "Add a validation step that filters out truncated subtitle fragments and requires a complete clause or a recognized multiword formula before labeling an item as an idiom.",
+    "Use a whitelist/blacklist heuristic: keep opaque or conventionalized expressions, but exclude transparent noun phrases like \"a civil war\" and generic time phrases like \"the first time\" unless there is clear idiomatic evidence."
+  ],
+  "tokens_used": {
+    "prompt": 1965,
+    "completion": 1021,
+    "total": 2986
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+  "judged_at": "2026-04-05T22:55:11.810595",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Euphoria S1 E6",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 9,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 4,
+    "reasoning": "Step 1: Check whether each Russian gloss is present and usable. All listed entries have a Russian translation, so there are no empty/N/A/missing items.\nStep 2: Check contextual correctness for this episode. Several glosses are broadly acceptable as learner translations: \"run away\" → \"убежать\", \"come on\" → \"давай\", \"blacked out\" → \"потерять сознание\", \"whine about\" → \"ныть о\", and \"fuck off\" → \"отвали\". However, some are too narrow or slightly off in sense: \"hooked up with\" and \"hooked up\" are usually \"переспал с/переспал\", which is acceptable only when the context is clearly sexual; without a matching subtitle line here, the episode-specific usage cannot be verified. \"fuck up\" → \"провалиться\" is not the best match for the common phrasal meaning; it more often means \"облажаться/испортить/запороть\", while \"get the fuck up\" in the stored example is actually an imperative meaning \"вставай\" and not the phrasal verb \"fuck up\" at all. \"ran into\" → \"встретил\" is acceptable, though it is somewhat generic and misses the nuance of accidental encounter.\nStep 3: Because the subtitle examples did not match any lines, the evaluation must rely on the stored examples, and one stored example for \"fuck up\" appears mismatched to the source phrase. Overall, most translations are serviceable, but there are enough sense/usage issues to keep the score in the mid range.",
+    "issues": [
+      {
+        "phrasal_verb": "fuck up",
+        "translation": "провалиться",
+        "issue": "Wrong sense for the stored example; \"get the fuck up\" means \"вставай\", while \"fuck up\" usually means \"облажаться/испортить/запороть\"."
+      },
+      {
+        "phrasal_verb": "hooked up with",
+        "translation": "переспал с",
+        "issue": "Potentially too narrow; this is only correct if the episode context is explicitly sexual. Without a matching subtitle line, the exact sense cannot be confirmed."
+      },
+      {
+        "phrasal_verb": "hooked up",
+        "translation": "переспал",
+        "issue": "Potentially too narrow and context-dependent; \"hooked up\" can mean more than sex in some contexts, so the gloss may over-specify the meaning."
+      },
+      {
+        "phrasal_verb": "ran into",
+        "translation": "встретил",
+        "issue": "Acceptable but somewhat generic; it misses the nuance of accidental or unexpected encounter."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 9,
+    "reasoning": "Step 1: Check whether each English source string is a genuine phrasal verb or established verb-particle/verb-preposition idiom. All listed items are real English expressions used as phrasal verbs or fixed verb-particle combinations: \"run away\", \"come on\", \"blacked out\", \"hooked up with\", \"fuck up\", \"whine about\", \"fuck off\", \"hooked up\", and \"ran into\".\nStep 2: Check for accidental adjacency or non-idiomatic garbage. None of the entries look like tokenizer noise or accidental word adjacency. Even the profanity-based items are established idiomatic verbs.\nStep 3: The only minor caveat is that \"hooked up\" is somewhat underspecified without an object or context, but it is still a valid phrasal-type expression. Therefore, nearly all entries are valid, and the list is strong overall.",
+    "invalid_phrasals": []
+  },
+  "overall_score": 6.5,
+  "summary": "The source list is made up of genuine phrasal verbs and idiomatic verb-particle expressions, so criterion 2 is very strong. Criterion 1 is weaker because some glosses are too generic or context-sensitive, and one stored example for \"fuck up\" appears mismatched to the actual phrasal meaning.",
+  "tokens_used": {
+    "prompt": 1026,
+    "completion": 918,
+    "total": 1944
+  }
+}

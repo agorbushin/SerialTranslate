@@ -13,9 +13,10 @@ import time
 import uuid
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Collection, Dict, List, Optional, Tuple
+from typing import Any, Collection, Dict, List, Literal, Optional, Tuple
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.helpers import escape_markdown
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -25,31 +26,11 @@ from telegram.ext import (
     ContextTypes,
 )
 
-# Telegram bot token (from archive codebase)
-TELEGRAM_BOT_TOKEN = os.environ.get(
-    "TELEGRAM_BOT_TOKEN",
-    "8525395469:AAG5uDLN0kmUYyZAMvfVI_0LrIO4RnCcR54",
-)
-def _openai_key_from_archive() -> str:
-    """Fallback: load OpenAI API key from Archieve/Code archive/telegram_bot.py when env is not set."""
-    try:
-        archive_dir = Path(__file__).resolve().parent / "Archieve" / "Code archive"
-        if archive_dir.exists():
-            import importlib.util
-            spec = importlib.util.spec_from_file_location("archive_telegram_bot", archive_dir / "telegram_bot.py")
-            if spec and spec.loader:
-                mod = importlib.util.module_from_spec(spec)
-                spec.loader.exec_module(mod)
-                key = getattr(mod, "OPENAI_API_KEY", None)
-                if key and isinstance(key, str) and key.strip():
-                    return key.strip()
-    except Exception:
-        pass
-    return ""
+from env_config import get_openai_api_key, get_opensubtitles_api_key, resolve_openai_api_key
 
-
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY") or _openai_key_from_archive() or ""
-OPENSUBTITLES_API_KEY = os.environ.get("OPENSUBTITLES_API_KEY", "8FcGUu17mWuXoaqMxKQisSvjXhvjZdct")
+TELEGRAM_BOT_TOKEN = (os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip()
+OPENAI_API_KEY = get_openai_api_key()
+OPENSUBTITLES_API_KEY = get_opensubtitles_api_key()
 
 # Build/start time set when main() runs (see main())
 BOT_BUILD_DATETIME = ""
@@ -64,7 +45,24 @@ TIER_4_RARE_C_TRANSLATIONS_CSV = "tier_4_rare_c_translations.csv"
 TIER_4_RARE_B_TRANSLATIONS_CSV = "tier_4_rare_b_translations.csv"
 PHRASAL_VERBS_CSV = "phrasal_verbs.csv"
 PHRASAL_VERBS_PREVIEW_LIMIT = 15
+IDIOMATIC_EXPRESSIONS_CSV = "idiomatic_expressions.csv"
+IDIOMS_PREVIEW_LIMIT = 15
+# When False, /idioms and the Idioms button show a placeholder instead of extraction / CSV.
+IDIOMS_FEATURE_ENABLED = False
+
+_IDIOMS_WIP_MESSAGE = (
+    "🚧 *Idioms — work in progress*\n\n"
+    "We're polishing this feature so lists are clearer and more reliable.\n\n"
+    "✨ *Still available:* word tiers, rare lists, and phrasal verbs — same as before.\n\n"
+    "_Thanks for your patience._"
+)
 LATENCY_METRICS_BASE = BASE_DIR / "latency_metrics"
+OPENAI_HTTP_TIMEOUT_SEC = 45.0
+
+
+def _md1(text: str) -> str:
+    """Escape for Telegram legacy Markdown when embedding user/model-derived titles."""
+    return escape_markdown((text or "").strip(), version=1)
 
 
 def _ms_since(started: float) -> int:
@@ -134,8 +132,9 @@ def keyboard_loaded(
     context: ContextTypes.DEFAULT_TYPE,
     *,
     extra_phrasal_count: Optional[int] = None,
+    extra_idiom_count: Optional[int] = None,
 ) -> InlineKeyboardMarkup:
-    """After a title is loaded: frequent/rare lists, phrasal, optional full-phrasal row, next series."""
+    """After a title is loaded: word lists, phrasal, idioms, optional full-list rows, next series."""
     _ = context
     rows: List[List[InlineKeyboardButton]] = [
         [
@@ -146,7 +145,10 @@ def keyboard_loaded(
             InlineKeyboardButton("📉 Rare C", callback_data="rare_c_series"),
             InlineKeyboardButton("📉 Rare B", callback_data="rare_b_series"),
         ],
-        [InlineKeyboardButton("🔤 Phrasal verbs", callback_data="phrasal_verbs")],
+        [
+            InlineKeyboardButton("🔤 Phrasal verbs", callback_data="phrasal_verbs"),
+            InlineKeyboardButton("💬 Idioms", callback_data="idiomatic_expressions"),
+        ],
     ]
     if (
         extra_phrasal_count is not None
@@ -160,8 +162,34 @@ def keyboard_loaded(
                 )
             ]
         )
+    if extra_idiom_count is not None and extra_idiom_count > IDIOMS_PREVIEW_LIMIT:
+        rows.append(
+            [
+                InlineKeyboardButton(
+                    f"📋 All idioms ({extra_idiom_count})",
+                    callback_data="idiomatic_expressions_all",
+                )
+            ]
+        )
     rows.append([InlineKeyboardButton("📺 Next series", callback_data="next_series")])
     return InlineKeyboardMarkup(rows)
+
+
+def _csv_data_row_count(csv_path: Path) -> int:
+    """Number of data rows (excluding header)."""
+    if not csv_path.is_file():
+        return 0
+    try:
+        with open(csv_path, encoding="utf-8") as f:
+            return max(0, sum(1 for _ in f) - 1)
+    except OSError:
+        return 0
+
+
+def _extra_preview_count(csv_path: Path, preview_limit: int) -> Optional[int]:
+    """If file has more than preview_limit rows, return total count for 'show all' button."""
+    n = _csv_data_row_count(csv_path)
+    return n if n > preview_limit else None
 
 
 def _parse_series_input(text: str) -> Tuple[str, int, int]:
@@ -279,7 +307,8 @@ async def _normalize_with_chatgpt(user_input: str) -> Optional[Tuple[str, int, i
     Ask ChatGPT to normalize user input into (series_name, season, episode).
     Returns None if API key missing, request fails, or result is UNKNOWN.
     """
-    if not OPENAI_API_KEY or not user_input.strip():
+    api_key = resolve_openai_api_key()
+    if not api_key or not user_input.strip():
         return None
     prompt = f"""The user wants frequent hard words from a TV series (with Russian glosses). They entered: "{user_input}"
 
@@ -297,7 +326,7 @@ If the input is too vague or not a series name, set series_name to "UNKNOWN". Re
 
     def _normalize_sync() -> Optional[Tuple[str, int, int]]:
         from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        client = OpenAI(api_key=api_key, timeout=OPENAI_HTTP_TIMEOUT_SEC)
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -328,6 +357,55 @@ If the input is too vague or not a series name, set series_name to "UNKNOWN". Re
     except Exception as e:
         print(f"ChatGPT normalization failed: {e}")
         return None
+
+
+async def _correct_series_title_typos(series_name: str) -> str:
+    """
+    Fix obvious typos in a parsed TV series title using a small chat model.
+    Returns the original string if the API key is missing, the title is empty/Unknown, or on failure.
+    """
+    name = (series_name or "").strip()
+    api_key = resolve_openai_api_key()
+    if not api_key or not name or name.upper() == "UNKNOWN":
+        return name
+    model = (os.environ.get("OPENAI_SERIES_SPELLCHECK_MODEL") or "").strip() or "gpt-4o-mini"
+    prompt = f"""The following string is a TV series title (season/episode was already removed). Fix only clear spelling mistakes or obvious typos to the usual IMDb-style official title. Do not substitute a different show. If the title is already correct or you are uncertain, return it unchanged.
+
+Title: "{name}"
+
+Return ONLY a JSON object with exactly this key: "series_name". No markdown."""
+
+    def _spellfix_sync() -> str:
+        from openai import OpenAI
+
+        client = OpenAI(api_key=api_key, timeout=OPENAI_HTTP_TIMEOUT_SEC)
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": 'You fix TV series title spelling only. Reply with a single JSON object {"series_name": "..."}.',
+                },
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.1,
+            max_tokens=60,
+        )
+        content = (response.choices[0].message.content or "").strip()
+        if content.startswith("```"):
+            content = re.sub(r"^```\w*\n?", "", content)
+            content = re.sub(r"\n?```\s*$", "", content)
+        data = json.loads(content)
+        sn = (data.get("series_name") or "").strip()
+        if not sn:
+            return name
+        return sn
+
+    try:
+        return await asyncio.to_thread(_spellfix_sync)
+    except Exception as e:
+        print(f"ChatGPT title spellfix failed: {e}")
+        return name
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -477,12 +555,13 @@ def _do_analyze(
 
     analyze_metrics: Dict[str, int] = {}
     handoff: Dict[str, Any] = {}
+    oa_key = resolve_openai_api_key() or None
     episode_dir = run_pipeline(
         subtitle_path=subtitle_path,
         base_dir=BASE_DIR,
         tierlist_base_dir=TIERLIST_BASE,
         max_english_freq=20_000_000,
-        openai_api_key=OPENAI_API_KEY or None,
+        openai_api_key=oa_key,
         metrics_out=analyze_metrics,
         handoff_out=handoff,
         skip_if_outputs_fresh=True,
@@ -514,12 +593,13 @@ def _do_analyze_movie(
 
     analyze_metrics: Dict[str, int] = {}
     handoff: Dict[str, Any] = {}
+    oa_key = resolve_openai_api_key() or None
     episode_dir = run_pipeline(
         subtitle_path=subtitle_path,
         base_dir=BASE_DIR,
         tierlist_base_dir=TIERLIST_BASE,
         max_english_freq=20_000_000,
-        openai_api_key=OPENAI_API_KEY or None,
+        openai_api_key=oa_key,
         is_movie=True,
         series_name=movie_name,
         year=year if year > 0 else None,
@@ -550,10 +630,11 @@ def _do_translate(
 
     metrics: Dict[str, Any] = {}
     tiers = FREQUENT_TRANSLATION_TIER_IDS if tier_ids is None else tier_ids
+    oa_key = resolve_openai_api_key() or None
     ok, err = run_translate(
         episode_dir=episode_dir,
         subtitle_path=subtitle_path,
-        api_key=OPENAI_API_KEY or None,
+        api_key=oa_key,
         translations_base=TRANSLATIONS_BASE,
         subtitle_base=SUBTITLE_BASE,
         metrics_out=metrics,
@@ -597,7 +678,7 @@ async def _handle_message_movie(
     movie_name, year = _parse_movie_input(raw)
     latency["phase_timings_ms"]["parse_input"] = _ms_since(phase_started)
     latency["identity"] = {"movie_name": movie_name, "year": year}
-    label = f"*{movie_name}*" + (f" ({year})" if year else "")
+    label = f"*{_md1(movie_name)}*" + (f" ({year})" if year else "")
     status_msg = await update.message.reply_text(
         f"🎬 Processing request for: {label}\n\n"
         "⏳ Looking for a saved word list or translations…",
@@ -695,7 +776,7 @@ async def _handle_message_movie(
             if not ok or not out_dir:
                 reason = (trans_err or "Translation failed.").strip()
                 await status_msg.edit_text(
-                    f"❌ **Translation failed.**\n\n{reason}",
+                    f"❌ **Translation failed.**\n\n{_md1(reason)}",
                     parse_mode="Markdown",
                     reply_markup=keyboard_discovery(context),
                 )
@@ -804,7 +885,7 @@ async def _handle_message_movie(
         if not ok or not out_dir:
             reason = (trans_err or "Translation failed.").strip()
             await status_msg.edit_text(
-                f"❌ **Translation failed.**\n\n{reason}",
+                f"❌ **Translation failed.**\n\n{_md1(reason)}",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
             )
@@ -845,7 +926,7 @@ async def _handle_message_movie(
         latency["error"] = "request_timeout"
     except Exception as e:
         await status_msg.edit_text(
-            f"❌ **Error:** {str(e)[:150]}",
+            f"❌ **Error:** {_md1(str(e)[:150])}",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
         )
@@ -899,7 +980,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         "episode": episode,
     }
     status_msg = await update.message.reply_text(
-        f"🔍 Processing request for: *{raw}*\n\n"
+        f"🔍 Processing request for: *{_md1(raw)}*\n\n"
         "⏳ Looking for a saved word list or translations…",
         parse_mode="Markdown",
         reply_markup=keyboard_discovery(context),
@@ -908,7 +989,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # If simple parse likely failed (e.g. "ep 2 season 2" left in series name), ask ChatGPT
     if _simple_parse_likely_failed(raw, series_name, season, episode):
         await status_msg.edit_text(
-            f"🔍 Processing request for: *{raw}*\n\n"
+            f"🔍 Processing request for: *{_md1(raw)}*\n\n"
             "⏳ Normalizing with ChatGPT…",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -924,11 +1005,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 "episode": episode,
             }
             await status_msg.edit_text(
-                f"🔍 Processing: *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
+                f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
                 "⏳ Looking for a saved word list or translations…",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
             )
+    else:
+        await status_msg.edit_text(
+            f"🔍 Processing request for: *{_md1(raw)}*\n\n"
+            "⏳ Checking series title…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        phase_started = time.perf_counter()
+        series_name = await _correct_series_title_typos(series_name)
+        latency["phase_timings_ms"]["spellfix_title"] = _ms_since(phase_started)
+        latency["identity"] = {
+            "series_name": series_name,
+            "season": season,
+            "episode": episode,
+        }
+        await status_msg.edit_text(
+            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
+            "⏳ Looking for a saved word list or translations…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
 
     loop = asyncio.get_running_loop()
     timeout = 600.0
@@ -949,7 +1051,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if translations_dir is not None:
             latency["branch"] = "cache_hit_translations"
             await status_msg.edit_text(
-                f"🔍 Processing: *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n"
+                f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
                 f"✅ Found existing translations.\n\n"
                 f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
                 parse_mode="Markdown",
@@ -974,7 +1076,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if episode_dir is not None:
             latency["branch"] = "tier_exists_translate_only"
             await status_msg.edit_text(
-                f"🔍 Processing: *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n"
+                f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
                 f"✅ Found existing hard words list.\n\n"
                 "⏳ Translating words…",
                 parse_mode="Markdown",
@@ -983,7 +1085,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             if subtitle_path is None:
                 # Try to get subtitle path from episode_info and download if missing
                 await status_msg.edit_text(
-                    f"🔍 Processing: *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n"
+                    f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
                     "⏳ Subtitle file missing, downloading…",
                     parse_mode="Markdown",
                     reply_markup=keyboard_discovery(context),
@@ -999,7 +1101,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
                 if not subtitle_path:
                     await status_msg.edit_text(
-                        f"❌ **Subtitle download failed** for *{series_name}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
+                        f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
                         "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
                         parse_mode="Markdown",
                         reply_markup=keyboard_discovery(context),
@@ -1020,7 +1122,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             if not ok or not out_dir:
                 reason = (trans_err or "Translation failed.").strip()
                 await status_msg.edit_text(
-                    f"❌ **Translation failed.**\n\n{reason}\n\n💡 Use /next or **Next series** to try another title.",
+                    f"❌ **Translation failed.**\n\n{_md1(reason)}\n\n💡 Use /next or **Next series** to try another title.",
                     parse_mode="Markdown",
                     reply_markup=keyboard_discovery(context),
                 )
@@ -1029,7 +1131,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 return
             rel = out_dir.relative_to(BASE_DIR)
             await status_msg.edit_text(
-                f"✅ *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
+                f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
                 f"📁 C-level words translated and saved to: `{rel}/`",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
@@ -1052,7 +1154,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Case C: nothing exists — download, analyze, translate
         latency["branch"] = "full_pipeline"
         await status_msg.edit_text(
-            f"🔍 Processing: *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
+            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
             "⏳ Downloading subtitle…",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -1068,7 +1170,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
         if not subtitle_path:
             await status_msg.edit_text(
-                f"❌ **Subtitle download failed** for *{series_name}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
+                f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
                 "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
@@ -1078,7 +1180,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             return
 
         await status_msg.edit_text(
-            f"🔍 Processing: *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n"
+            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
             f"✅ Subtitle downloaded.\n\n"
             "⏳ Building the hard-word list from the subtitle…",
             parse_mode="Markdown",
@@ -1103,7 +1205,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             return
 
         await status_msg.edit_text(
-            f"🔍 Processing: *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n"
+            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
             f"✅ C-level list ready.\n\n"
             "⏳ Translating words…",
             parse_mode="Markdown",
@@ -1124,7 +1226,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if not ok or not out_dir:
             reason = (trans_err or "Translation failed.").strip()
             await status_msg.edit_text(
-                f"❌ **Translation failed.**\n\n{reason}",
+                f"❌ **Translation failed.**\n\n{_md1(reason)}",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
             )
@@ -1134,7 +1236,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
         rel = out_dir.relative_to(BASE_DIR)
         await status_msg.edit_text(
-            f"✅ *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
+            f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
             f"📁 C-level words translated and saved to: `{rel}/`",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -1163,7 +1265,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         latency["error"] = "request_timeout"
     except Exception as e:
         await status_msg.edit_text(
-            f"❌ **Error:** {str(e)[:150]}",
+            f"❌ **Error:** {_md1(str(e)[:150])}",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
         )
@@ -1225,9 +1327,9 @@ def _format_b_level_list(
 ) -> str:
     """Format a single B-level list; truncates with '… and N more'."""
     if is_movie:
-        title = f"🎬 *{series_name}*" + (f" ({year})" if year else "")
+        title = f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
     else:
-        title = f"📺 *{series_name}*{_tv_episode_suffix(series_name, season, episode)}"
+        title = f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
     merged: List[Tuple[str, str]] = []
     seen = set()
     for w, t in [*b1, *b2]:
@@ -1241,7 +1343,7 @@ def _format_b_level_list(
     if not merged:
         return header + "_No words._"
     show = merged[:max_lines_per_band]
-    lines = [f"{i}. *{w}* → {t}" for i, (w, t) in enumerate(show, 1)]
+    lines = [f"{i}. *{_md1(w)}* → {_md1(t)}" for i, (w, t) in enumerate(show, 1)]
     body = "\n".join(lines)
     if n > max_lines_per_band:
         body += f"\n\n… and {n - max_lines_per_band} more."
@@ -1261,13 +1363,13 @@ def _format_word_list(
     """Format header + numbered word list. If pairs > max_lines, show first max_lines and '... and N more'."""
     n = len(pairs)
     if is_movie:
-        header = f"🎬 *{series_name}*" + (f" ({year})" if year else "") + f"\n\n📊 *C-level words: {n}*\n\n"
+        header = f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "") + f"\n\n📊 *C-level words: {n}*\n\n"
     else:
-        header = f"📺 *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n\n📊 *C-level words: {n}*\n\n"
+        header = f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n📊 *C-level words: {n}*\n\n"
     if not pairs:
         return header + "_No words._"
     show = pairs[:max_lines]
-    lines = [f"{i}. *{w}* → {t}" for i, (w, t) in enumerate(show, 1)]
+    lines = [f"{i}. *{_md1(w)}* → {_md1(t)}" for i, (w, t) in enumerate(show, 1)]
     body = "\n".join(lines)
     if n > max_lines:
         body += f"\n\n… and {n - max_lines} more words."
@@ -1288,12 +1390,12 @@ def _format_rare_in_series_full_list(
     n = len(pairs)
     label = "Rare in series (C1–C2)" if band == "c" else "Rare in series (B1–B2)"
     if is_movie:
-        header = f"📋 *{label}* — *{series_name}*" + (f" ({year})" if year else "") + f"\n\n📊 *{n} words*\n\n"
+        header = f"📋 *{label}* — *{_md1(series_name)}*" + (f" ({year})" if year else "") + f"\n\n📊 *{n} words*\n\n"
     else:
-        header = f"📋 *{label}* — *{series_name}*{_tv_episode_suffix(series_name, season, episode)}\n\n📊 *{n} words*\n\n"
+        header = f"📋 *{label}* — *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n📊 *{n} words*\n\n"
     if not pairs:
         return header + "_No words._"
-    lines = [f"{i}. *{w}* → {t}" for i, (w, t) in enumerate(pairs, 1)]
+    lines = [f"{i}. *{_md1(w)}* → {_md1(t)}" for i, (w, t) in enumerate(pairs, 1)]
     return header + "\n".join(lines)
 
 
@@ -1367,7 +1469,7 @@ async def _send_translations_list(
     kb = keyboard_loaded(context)
     rel = f"`{translations_dir.relative_to(BASE_DIR)}/`"
     if not pairs:
-        header = f"🎬 *{series_name}*" + (f" ({year})" if year else "") if is_movie else f"📺 *{series_name}*{_tv_episode_suffix(series_name, season, episode)}"
+        header = f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "") if is_movie else f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
         body = f"{header}\n\n📁 Saved to: {rel}{latency_suffix}\n\n_No words in CSV._"
         if query:
             await query.edit_message_text(body, parse_mode="Markdown", reply_markup=kb)
@@ -1467,19 +1569,51 @@ def _subtitle_path_for_loaded_title(
     return p if p.is_file() else None
 
 
-async def send_rare_c_series_full_list(
+async def _send_rare_series_full_list(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
     *,
     query=None,
+    band: Literal["c", "b"],
 ) -> None:
-    """Send full rare-in-series (C1–C2) list from tier_4_rare_c_translations.csv. /full"""
+    """Send full rare-in-series list (C1–C2 or B) from tier_4_rare_*_translations.csv."""
+    from translate_tier_translations import (
+        TIER_4_RARE_B_CSV,
+        TIER_4_RARE_C_CSV,
+        TIER_ID_TIER_4B,
+        TIER_ID_TIER_4C,
+        load_tier_words,
+    )
+
+    if band == "c":
+        translations_csv = TIER_4_RARE_C_TRANSLATIONS_CSV
+        tier_words_csv = TIER_4_RARE_C_CSV
+        tier_id = TIER_ID_TIER_4C
+        not_loaded_hint = "Send a title first, then use /full or tap **Rare C**."
+        missing_episode_hint = "Send the episode title again, then tap **Rare C**."
+        empty_tier_msg = (
+            "_No rare-in-series (C1–C2) words in this episode’s tier list._ "
+            "Re-run analysis if you expect `tier_4_rare_c_words.csv` to be non-empty."
+        )
+        progress = "⏳ Translating rare-in-series (C1–C2) list…"
+        timeout_band = "(C)"
+        retry_button = "**Rare C**"
+        format_band: Literal["c", "b"] = "c"
+    else:
+        translations_csv = TIER_4_RARE_B_TRANSLATIONS_CSV
+        tier_words_csv = TIER_4_RARE_B_CSV
+        tier_id = TIER_ID_TIER_4B
+        not_loaded_hint = "Send a title first, then tap **Rare B**."
+        missing_episode_hint = "Send the episode title again, then tap **Rare B**."
+        empty_tier_msg = "_No rare-in-series (B) words in this episode’s tier list._"
+        progress = "⏳ Translating rare-in-series (B) list…"
+        timeout_band = "(B)"
+        retry_button = "**Rare B**"
+        format_band = "b"
+
     last_dir = context.user_data.get("last_translations_dir")
     if not last_dir:
-        msg = (
-            "❌ No episode or movie loaded yet.\n\n"
-            "Send a title first, then use /full or tap **Rare C**."
-        )
+        msg = f"❌ No episode or movie loaded yet.\n\n{not_loaded_hint}"
         kb = keyboard_discovery(context)
         if query:
             await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb)
@@ -1500,19 +1634,13 @@ async def send_rare_c_series_full_list(
     series_name, season, episode, is_movie, year = _get_translations_header(
         translations_dir, context
     )
-    pairs = _load_translation_pairs_csv(translations_dir / TIER_4_RARE_C_TRANSLATIONS_CSV)
+    pairs = _load_translation_pairs_csv(translations_dir / translations_csv)
     if not pairs:
-        from translate_tier_translations import (
-            TIER_4_RARE_C_CSV,
-            TIER_ID_TIER_4C,
-            load_tier_words,
-        )
-
         episode_dir_str = context.user_data.get("last_episode_dir")
         header = (
-            f"🎬 *{series_name}*" + (f" ({year})" if year else "")
+            f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
             if is_movie
-            else f"📺 *{series_name}*{_tv_episode_suffix(series_name, season, episode)}"
+            else f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
         )
         kb_loaded = keyboard_loaded(context)
 
@@ -1520,7 +1648,7 @@ async def send_rare_c_series_full_list(
             msg = (
                 f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n"
                 "_Could not locate the tier list folder to translate rare words._ "
-                "Send the episode title again, then tap **Rare C**."
+                f"{missing_episode_hint}"
             )
             if query:
                 await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
@@ -1529,19 +1657,14 @@ async def send_rare_c_series_full_list(
             return
 
         episode_dir = Path(episode_dir_str).resolve()
-        if not load_tier_words(episode_dir, TIER_4_RARE_C_CSV):
-            msg = (
-                f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n"
-                "_No rare-in-series (C1–C2) words in this episode’s tier list._ "
-                "Re-run analysis if you expect `tier_4_rare_c_words.csv` to be non-empty."
-            )
+        if not load_tier_words(episode_dir, tier_words_csv):
+            msg = f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n{empty_tier_msg}"
             if query:
                 await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
             else:
                 await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
             return
 
-        progress = "⏳ Translating rare-in-series (C1–C2) list…"
         if query:
             await query.edit_message_text(
                 progress, parse_mode="Markdown", reply_markup=kb_loaded
@@ -1556,20 +1679,21 @@ async def send_rare_c_series_full_list(
         )
         loop = asyncio.get_running_loop()
         timeout = 600.0
+        tid = tier_id
         try:
             ok, _out_dir, trans_err, _metrics = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
                     lambda ed=episode_dir, p=sp: _do_translate(
-                        ed, p, tier_ids=frozenset({TIER_ID_TIER_4C})
+                        ed, p, tier_ids=frozenset({tid})
                     ),
                 ),
                 timeout=timeout,
             )
         except asyncio.TimeoutError:
             msg = (
-                f"{header}\n\n❌ **Timed out** translating the rare-in-series (C) list.\n\n"
-                "Try **Rare C** again."
+                f"{header}\n\n❌ **Timed out** translating the rare-in-series {timeout_band} list.\n\n"
+                f"Try {retry_button} again."
             )
             if query:
                 await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
@@ -1579,16 +1703,14 @@ async def send_rare_c_series_full_list(
 
         if not ok:
             reason = (trans_err or "Translation failed.").strip()
-            msg = f"{header}\n\n❌ **Rare list translation failed.**\n\n{reason}"
+            msg = f"{header}\n\n❌ **Rare list translation failed.**\n\n{_md1(reason)}"
             if query:
                 await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
             else:
                 await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
             return
 
-        pairs = _load_translation_pairs_csv(
-            translations_dir / TIER_4_RARE_C_TRANSLATIONS_CSV
-        )
+        pairs = _load_translation_pairs_csv(translations_dir / translations_csv)
         if not pairs:
             msg = (
                 f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n"
@@ -1601,7 +1723,7 @@ async def send_rare_c_series_full_list(
             return
 
     full_text = _format_rare_in_series_full_list(
-        series_name, season, episode, pairs, is_movie=is_movie, year=year, band="c"
+        series_name, season, episode, pairs, is_movie=is_movie, year=year, band=format_band
     )
     chunks = _split_message_chunks(full_text)
     kb = keyboard_loaded(context)
@@ -1616,6 +1738,16 @@ async def send_rare_c_series_full_list(
                 part, parse_mode="Markdown",
                 reply_markup=kb if i == len(chunks) - 1 else None,
             )
+
+
+async def send_rare_c_series_full_list(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    *,
+    query=None,
+) -> None:
+    """Send full rare-in-series (C1–C2) list from tier_4_rare_c_translations.csv. /full"""
+    await _send_rare_series_full_list(update, context, query=query, band="c")
 
 
 async def send_rare_b_series_full_list(
@@ -1625,147 +1757,7 @@ async def send_rare_b_series_full_list(
     query=None,
 ) -> None:
     """Send full rare-in-series (B-level) list from tier_4_rare_b_translations.csv."""
-    last_dir = context.user_data.get("last_translations_dir")
-    if not last_dir:
-        msg = (
-            "❌ No episode or movie loaded yet.\n\n"
-            "Send a title first, then tap **Rare B**."
-        )
-        kb = keyboard_discovery(context)
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb)
-        return
-
-    translations_dir = Path(last_dir).resolve()
-    if not translations_dir.exists():
-        msg = f"❌ Translations folder not found: `{_rel_path(last_dir)}/`"
-        kb = keyboard_discovery(context)
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb)
-        return
-
-    series_name, season, episode, is_movie, year = _get_translations_header(
-        translations_dir, context
-    )
-    pairs = _load_translation_pairs_csv(translations_dir / TIER_4_RARE_B_TRANSLATIONS_CSV)
-    if not pairs:
-        from translate_tier_translations import (
-            TIER_4_RARE_B_CSV,
-            TIER_ID_TIER_4B,
-            load_tier_words,
-        )
-
-        episode_dir_str = context.user_data.get("last_episode_dir")
-        header = (
-            f"🎬 *{series_name}*" + (f" ({year})" if year else "")
-            if is_movie
-            else f"📺 *{series_name}*{_tv_episode_suffix(series_name, season, episode)}"
-        )
-        kb_loaded = keyboard_loaded(context)
-
-        if not episode_dir_str:
-            msg = (
-                f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n"
-                "_Could not locate the tier list folder to translate rare words._ "
-                "Send the episode title again, then tap **Rare B**."
-            )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            return
-
-        episode_dir = Path(episode_dir_str).resolve()
-        if not load_tier_words(episode_dir, TIER_4_RARE_B_CSV):
-            msg = (
-                f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n"
-                "_No rare-in-series (B) words in this episode’s tier list._"
-            )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            return
-
-        progress = "⏳ Translating rare-in-series (B) list…"
-        if query:
-            await query.edit_message_text(
-                progress, parse_mode="Markdown", reply_markup=kb_loaded
-            )
-        else:
-            await update.message.reply_text(
-                progress, parse_mode="Markdown", reply_markup=kb_loaded
-            )
-
-        sp = _subtitle_path_for_loaded_title(
-            series_name, season, episode, is_movie=is_movie, year=year
-        )
-        loop = asyncio.get_running_loop()
-        timeout = 600.0
-        try:
-            ok, _out_dir, trans_err, _metrics = await asyncio.wait_for(
-                loop.run_in_executor(
-                    None,
-                    lambda ed=episode_dir, p=sp: _do_translate(
-                        ed, p, tier_ids=frozenset({TIER_ID_TIER_4B})
-                    ),
-                ),
-                timeout=timeout,
-            )
-        except asyncio.TimeoutError:
-            msg = (
-                f"{header}\n\n❌ **Timed out** translating the rare-in-series (B) list.\n\n"
-                "Try **Rare B** again."
-            )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            return
-
-        if not ok:
-            reason = (trans_err or "Translation failed.").strip()
-            msg = f"{header}\n\n❌ **Rare list translation failed.**\n\n{reason}"
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            return
-
-        pairs = _load_translation_pairs_csv(
-            translations_dir / TIER_4_RARE_B_TRANSLATIONS_CSV
-        )
-        if not pairs:
-            msg = (
-                f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n"
-                "_Rare list translation produced no usable rows._"
-            )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            return
-
-    full_text = _format_rare_in_series_full_list(
-        series_name, season, episode, pairs, is_movie=is_movie, year=year, band="b"
-    )
-    chunks = _split_message_chunks(full_text)
-    kb = keyboard_loaded(context)
-
-    if query:
-        await query.edit_message_text(chunks[0], parse_mode="Markdown", reply_markup=kb)
-        for part in chunks[1:]:
-            await query.message.reply_text(part, parse_mode="Markdown")
-    else:
-        for i, part in enumerate(chunks):
-            await update.message.reply_text(
-                part, parse_mode="Markdown",
-                reply_markup=kb if i == len(chunks) - 1 else None,
-            )
+    await _send_rare_series_full_list(update, context, query=query, band="b")
 
 
 # Backwards compatibility for tests and /full
@@ -1820,9 +1812,9 @@ async def send_b_level_words(
             "to generate the B-level translation file._"
         )
         title = (
-            f"🎬 *{series_name}*" + (f" ({year})" if year else "")
+            f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
             if is_movie
-            else f"📺 *{series_name}*{_tv_episode_suffix(series_name, season, episode)}"
+            else f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
         )
         msg = f"📗 *B-level words* — {title}\n\n_No B-level translations in this folder yet._{hint}"
         if query:
@@ -1917,24 +1909,66 @@ def _run_extract_phrasal_verbs(
     )
 
 
-def _load_phrasal_rows(translations_dir: Path) -> List[Tuple[str, str, str, str]]:
-    """Rows: phrasal_verb, frequency, translation, example (supports legacy 'verb' column)."""
+def _run_extract_idiomatic_expressions(
+    subtitle_path: Path,
+    translations_dir: Path,
+    series_name: str,
+    api_key: str,
+    season: int,
+    episode: int,
+) -> bool:
+    from idiomatic_expressions import extract_idioms_from_episode
+
+    s = season if season > 0 else 1
+    e = episode if episode > 0 else 1
+    return extract_idioms_from_episode(
+        subtitle_path,
+        translations_dir,
+        series_name,
+        api_key,
+        season_number=s,
+        episode_number=e,
+    )
+
+
+def _load_phrasal_rows(translations_dir: Path) -> List[Tuple[str, str, str, str, str]]:
+    """Rows for display: pv, freq, translation, example, optional score note (legacy CSVs supported)."""
     path = translations_dir / PHRASAL_VERBS_CSV
-    rows: List[Tuple[str, str, str, str]] = []
+    rows: List[Tuple[str, str, str, str, str]] = []
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
             pv = (row.get("phrasal_verb") or row.get("verb") or "").strip()
             if not pv:
                 continue
-            rows.append(
-                (
-                    pv,
-                    (row.get("frequency") or "").strip(),
-                    (row.get("translation") or "").strip(),
-                    (row.get("example") or "").strip(),
-                )
-            )
+            freq = (row.get("frequency") or "").strip()
+            tr = (row.get("translation") or "").strip()
+            ex = (row.get("example") or "").strip()
+            idi = (row.get("idiomaticity_score") or "").strip()
+            lit = (row.get("literality_score") or "").strip()
+            if idi or lit:
+                note = f"id{idi}/lit{lit}" if idi and lit else (idi or lit)
+            else:
+                note = (row.get("phrasality_score") or "").strip()
+            rows.append((pv, freq, tr, ex, note))
+    return rows
+
+
+def _load_idiom_rows(translations_dir: Path) -> List[Tuple[str, str, str, str, str]]:
+    """Rows: expression, freq, translation, example, idiomacy_rating (or legacy idiomaticity_score)."""
+    path = translations_dir / IDIOMATIC_EXPRESSIONS_CSV
+    rows: List[Tuple[str, str, str, str, str]] = []
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            expr = (row.get("expression") or "").strip()
+            if not expr:
+                continue
+            freq = (row.get("frequency") or "").strip()
+            tr = (row.get("translation") or "").strip()
+            ex = (row.get("example") or "").strip()
+            rating = (row.get("idiomacy_rating") or row.get("idiomaticity_score") or "").strip()
+            rows.append((expr, freq, tr, ex, rating))
     return rows
 
 
@@ -1942,7 +1976,7 @@ def _format_phrasal_list(
     series_name: str,
     season: int,
     episode: int,
-    rows: List[Tuple[str, str, str, str]],
+    rows: List[Tuple[str, str, str, str, str]],
     *,
     is_movie: bool = False,
     year: int = 0,
@@ -1952,12 +1986,12 @@ def _format_phrasal_list(
     shown = len(rows)
     if is_movie:
         title = (
-            f"🔤 *Phrasal verbs* — 🎬 *{series_name}*"
+            f"🔤 *Phrasal verbs* — 🎬 *{_md1(series_name)}*"
             + (f" ({year})" if year else "")
         )
     else:
         title = (
-            f"🔤 *Phrasal verbs* — 📺 *{series_name}*"
+            f"🔤 *Phrasal verbs* — 📺 *{_md1(series_name)}*"
             f"{_tv_episode_suffix(series_name, season, episode)}"
         )
     if not rows:
@@ -1973,7 +2007,8 @@ def _format_phrasal_list(
 
     header = f"{title}\n\n{stats}"
     lines: List[str] = []
-    for i, (pv, _freq, tr, ex) in enumerate(rows, 1):
+    for i, row in enumerate(rows, 1):
+        pv, _freq, tr, ex = row[0], row[1], row[2], row[3]
         disp = tr if tr else "N/A"
         line = f"{i}. *{pv}* → {disp}"
         if ex and ex not in ("N/A", ""):
@@ -1981,6 +2016,89 @@ def _format_phrasal_list(
             line += f"\n   _{short}_"
         lines.append(line)
     return header + "\n".join(lines)
+
+
+def _format_idiom_list(
+    series_name: str,
+    season: int,
+    episode: int,
+    rows: List[Tuple[str, str, str, str, str]],
+    *,
+    is_movie: bool = False,
+    year: int = 0,
+    full_total: Optional[int] = None,
+) -> str:
+    """Format repeated idioms list (preview or full)."""
+    shown = len(rows)
+    if is_movie:
+        title = (
+            f"💬 *Idioms* — 🎬 *{_md1(series_name)}*"
+            + (f" ({year})" if year else "")
+        )
+    else:
+        title = (
+            f"💬 *Idioms* — 📺 *{_md1(series_name)}*"
+            f"{_tv_episode_suffix(series_name, season, episode)}"
+        )
+    if not rows:
+        return f"{title}\n\n_No idioms._"
+
+    if full_total is not None and full_total > shown:
+        stats = (
+            f"📊 *Top {shown} of {full_total}* idioms"
+            f" — _Use the 📋 All idioms button for the rest._\n\n"
+        )
+    else:
+        stats = f"📊 *{shown}* idioms\n\n"
+
+    header = f"{title}\n\n{stats}"
+    lines: List[str] = []
+    for i, row in enumerate(rows, 1):
+        expr, _freq, tr, ex, rating = row[0], row[1], row[2], row[3], row[4]
+        disp = tr if tr else "N/A"
+        line = f"{i}. *{expr}* → {disp}"
+        if rating:
+            line += f" _(idiomacy {rating}/10)_"
+        if ex and ex not in ("N/A", ""):
+            short = ex[:180] + ("…" if len(ex) > 180 else "")
+            line += f"\n   _{short}_"
+        lines.append(line)
+    return header + "\n".join(lines)
+
+
+def _keyboard_with_list_extras(
+    context: ContextTypes.DEFAULT_TYPE,
+    translations_dir: Path,
+    *,
+    phrasal_all_count: Optional[int] = None,
+    hide_phrasal_all_button: bool = False,
+    idiom_all_count: Optional[int] = None,
+    hide_idiom_all_button: bool = False,
+) -> InlineKeyboardMarkup:
+    """Build loaded keyboard; optional overrides for 'show all' rows (e.g. after preview)."""
+    if hide_phrasal_all_button:
+        pc: Optional[int] = None
+    elif phrasal_all_count is not None:
+        pc = (
+            phrasal_all_count
+            if phrasal_all_count > PHRASAL_VERBS_PREVIEW_LIMIT
+            else None
+        )
+    else:
+        pc = _extra_preview_count(
+            translations_dir / PHRASAL_VERBS_CSV, PHRASAL_VERBS_PREVIEW_LIMIT
+        )
+
+    if hide_idiom_all_button:
+        ic: Optional[int] = None
+    elif idiom_all_count is not None:
+        ic = idiom_all_count if idiom_all_count > IDIOMS_PREVIEW_LIMIT else None
+    else:
+        ic = _extra_preview_count(
+            translations_dir / IDIOMATIC_EXPRESSIONS_CSV, IDIOMS_PREVIEW_LIMIT
+        )
+
+    return keyboard_loaded(context, extra_phrasal_count=pc, extra_idiom_count=ic)
 
 
 async def send_phrasal_verbs(
@@ -1993,7 +2111,6 @@ async def send_phrasal_verbs(
     """Load or generate phrasal_verbs.csv; send top N preview unless ``show_all``."""
     last_dir = context.user_data.get("last_translations_dir")
     kb_empty = keyboard_discovery(context)
-    kb_after = keyboard_loaded(context)
 
     if not last_dir:
         msg = (
@@ -2015,6 +2132,8 @@ async def send_phrasal_verbs(
             await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
         return
 
+    kb_after = _keyboard_with_list_extras(context, translations_dir)
+
     series_name, season, episode, is_movie, year = _get_translations_header(
         translations_dir, context
     )
@@ -2026,7 +2145,7 @@ async def send_phrasal_verbs(
         if not OPENAI_API_KEY.strip():
             msg = (
                 "❌ *OPENAI_API_KEY* is not set.\n\n"
-                "Set it to extract and translate phrasal verbs."
+                "Set it to extract and translate phrasal verbs and idioms."
             )
             if query:
                 await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_after)
@@ -2089,7 +2208,9 @@ async def send_phrasal_verbs(
             is_movie=is_movie,
             year=year,
         )
-        kb = keyboard_loaded(context)
+        kb = _keyboard_with_list_extras(
+            context, translations_dir, hide_phrasal_all_button=True
+        )
     else:
         display_rows = rows[:PHRASAL_VERBS_PREVIEW_LIMIT]
         full_text = _format_phrasal_list(
@@ -2101,7 +2222,193 @@ async def send_phrasal_verbs(
             year=year,
             full_total=total_n,
         )
-        kb = keyboard_loaded(context, extra_phrasal_count=total_n)
+        kb = _keyboard_with_list_extras(
+            context, translations_dir, phrasal_all_count=total_n
+        )
+
+    chunks = _split_message_chunks(full_text)
+
+    if query:
+        await query.edit_message_text(chunks[0], parse_mode="Markdown", reply_markup=kb)
+        for part in chunks[1:]:
+            await query.message.reply_text(part, parse_mode="Markdown")
+    else:
+        if status_message is not None:
+            await status_message.edit_text(chunks[0], parse_mode="Markdown", reply_markup=kb)
+            for part in chunks[1:]:
+                await update.message.reply_text(part, parse_mode="Markdown")
+        else:
+            for i, part in enumerate(chunks):
+                await update.message.reply_text(
+                    part,
+                    parse_mode="Markdown",
+                    reply_markup=kb if i == len(chunks) - 1 else None,
+                )
+
+
+async def _send_idioms_disabled_placeholder(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    *,
+    query=None,
+) -> None:
+    """Telegram Markdown message when idioms are temporarily unavailable."""
+    last_dir = context.user_data.get("last_translations_dir")
+    kb_empty = keyboard_discovery(context)
+    kb: InlineKeyboardMarkup
+    if last_dir:
+        td = Path(last_dir).resolve()
+        if td.is_dir():
+            kb = _keyboard_with_list_extras(
+                context, td, hide_idiom_all_button=True
+            )
+        else:
+            kb = kb_empty
+    else:
+        kb = kb_empty
+    if query:
+        await query.edit_message_text(
+            _IDIOMS_WIP_MESSAGE, parse_mode="Markdown", reply_markup=kb
+        )
+    else:
+        await update.message.reply_text(
+            _IDIOMS_WIP_MESSAGE, parse_mode="Markdown", reply_markup=kb
+        )
+
+
+async def send_idiomatic_expressions(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    *,
+    query=None,
+    show_all: bool = False,
+) -> None:
+    """Load or generate idiomatic_expressions.csv; send top N preview unless ``show_all``."""
+    if not IDIOMS_FEATURE_ENABLED:
+        await _send_idioms_disabled_placeholder(update, context, query=query)
+        return
+
+    last_dir = context.user_data.get("last_translations_dir")
+    kb_empty = keyboard_discovery(context)
+
+    if not last_dir:
+        msg = (
+            "❌ No episode or movie loaded yet.\n\n"
+            "Send a title first, then tap **Idioms** or use /idioms."
+        )
+        if query:
+            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
+        else:
+            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
+        return
+
+    translations_dir = Path(last_dir).resolve()
+    if not translations_dir.exists():
+        msg = f"❌ Translations folder not found: `{_rel_path(last_dir)}/`"
+        if query:
+            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
+        else:
+            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
+        return
+
+    kb_after = _keyboard_with_list_extras(context, translations_dir)
+
+    series_name, season, episode, is_movie, year = _get_translations_header(
+        translations_dir, context
+    )
+    csv_path = translations_dir / IDIOMATIC_EXPRESSIONS_CSV
+    loop = asyncio.get_running_loop()
+    status_message = None
+
+    if not csv_path.exists():
+        if not OPENAI_API_KEY.strip():
+            msg = (
+                "❌ *OPENAI_API_KEY* is not set.\n\n"
+                "Set it to extract and translate idioms."
+            )
+            if query:
+                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_after)
+            else:
+                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_after)
+            return
+
+        subtitle_path = _resolve_subtitle_for_phrasal(translations_dir, context)
+        if not subtitle_path:
+            msg = (
+                "❌ Could not find the subtitle file for this title.\n\n"
+                "Ensure subtitles exist under `Subtitle/` for this episode or movie."
+            )
+            if query:
+                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_after)
+            else:
+                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_after)
+            return
+
+        sn = _series_name_for_phrasal(translations_dir, context)
+        loading = "💬 *Idioms*\n\n⏳ Extracting repeated expressions and translating…"
+        if query:
+            await query.edit_message_text(
+                loading, parse_mode="Markdown", reply_markup=kb_after
+            )
+        else:
+            status_message = await update.message.reply_text(
+                loading, parse_mode="Markdown", reply_markup=kb_after
+            )
+
+        ok = await loop.run_in_executor(
+            None,
+            lambda: _run_extract_idiomatic_expressions(
+                subtitle_path,
+                translations_dir,
+                sn,
+                OPENAI_API_KEY.strip(),
+                season,
+                episode,
+            ),
+        )
+        if not ok:
+            err = (
+                "❌ Could not build an idiom list (no repeated matches or read error).\n\n"
+                f"📁 `{_rel_path(str(translations_dir))}/`"
+            )
+            if query:
+                await query.edit_message_text(err, parse_mode="Markdown", reply_markup=kb_after)
+            else:
+                if status_message is not None:
+                    await status_message.edit_text(
+                        err, parse_mode="Markdown", reply_markup=kb_after
+                    )
+            return
+
+    rows = _load_idiom_rows(translations_dir)
+    total_n = len(rows)
+    if show_all or total_n <= IDIOMS_PREVIEW_LIMIT:
+        display_rows = rows
+        full_text = _format_idiom_list(
+            series_name,
+            season,
+            episode,
+            display_rows,
+            is_movie=is_movie,
+            year=year,
+        )
+        kb = _keyboard_with_list_extras(
+            context, translations_dir, hide_idiom_all_button=True
+        )
+    else:
+        display_rows = rows[:IDIOMS_PREVIEW_LIMIT]
+        full_text = _format_idiom_list(
+            series_name,
+            season,
+            episode,
+            display_rows,
+            is_movie=is_movie,
+            year=year,
+            full_total=total_n,
+        )
+        kb = _keyboard_with_list_extras(
+            context, translations_dir, idiom_all_count=total_n
+        )
 
     chunks = _split_message_chunks(full_text)
 
@@ -2125,6 +2432,7 @@ async def send_phrasal_verbs(
 
 # Registered in main() as /phrasal; keep name so main() stays unchanged.
 send_phrasal_placeholder = send_phrasal_verbs
+send_idioms_placeholder = send_idiomatic_expressions
 
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -2154,6 +2462,10 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await send_phrasal_verbs(wrapped, context, query=query)
     elif data == "phrasal_verbs_all":
         await send_phrasal_verbs(wrapped, context, query=query, show_all=True)
+    elif data == "idiomatic_expressions":
+        await send_idiomatic_expressions(wrapped, context, query=query)
+    elif data == "idiomatic_expressions_all":
+        await send_idiomatic_expressions(wrapped, context, query=query, show_all=True)
     elif data == "next_series":
         await next_series(wrapped, context)
     elif data == "next_movie":
@@ -2177,7 +2489,7 @@ async def handle_document_placeholder(update: Update, context: ContextTypes.DEFA
 def main() -> None:
     global BOT_BUILD_DATETIME
     if not TELEGRAM_BOT_TOKEN:
-        print("Set TELEGRAM_BOT_TOKEN or add token in code.")
+        print("Set TELEGRAM_BOT_TOKEN in the environment.")
         return
     BOT_BUILD_DATETIME = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"Bot build (start) time: {BOT_BUILD_DATETIME}", flush=True)
@@ -2188,6 +2500,7 @@ def main() -> None:
     app.add_handler(CommandHandler("movie", next_movie))
     app.add_handler(CommandHandler("full", send_full_list))
     app.add_handler(CommandHandler("phrasal", send_phrasal_placeholder))
+    app.add_handler(CommandHandler("idioms", send_idioms_placeholder))
     app.add_handler(CallbackQueryHandler(button_callback))
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document_placeholder))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

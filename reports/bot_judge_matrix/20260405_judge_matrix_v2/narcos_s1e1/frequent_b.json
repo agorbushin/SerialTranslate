@@ -1,0 +1,129 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Narcos/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.766059",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Narcos",
+  "season": 1,
+  "episode": 1,
+  "word_count": 23,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Narcos/Season 1/narcos_s1_e1.srt",
+  "criterion_1": {
+    "score": 9,
+    "reasoning": "Most pairs are translated correctly and match the episode context: jail→тюрьма, handwriting→почерк, spare→запасной, jungle→джунгли, cocaine→кокаин, coke→кокаин, smuggling→контрабанда, paste→кокаиновая паста, arrested→арестованный, pitcher→кувшин, emerald→изумруд, swallow→проглотить, productive→продуктивный, packing→собирать вещи, marijuana→марихуана, gasoline→бензин, transporting→перевозка, renegotiate→пересмотреть условия, bail→залог, businessmen→бизнесмены. The main issue is blond→блондинка, which is gender-specific and does not match the English word in general; in the subtitle it refers to a blond woman, so the translation is contextually acceptable but lexically not ideal as a general equivalent. Another minor issue is plumbing→сантехническое дело, which is understandable but slightly awkward; in the subtitle it means a plumbing business, so a more natural translation would be 'сантехника' or 'сантехнический бизнес'. Overall, the list is highly accurate with only minor contextual/lexical imperfections.",
+    "issues": [
+      {
+        "word": "blond",
+        "translation": "блондинка",
+        "issue": "Gender-specific Russian form; acceptable in the subtitle context (a blond woman) but not a neutral translation of the English adjective/noun."
+      },
+      {
+        "word": "plumbing",
+        "translation": "сантехническое дело",
+        "issue": "Understandable but slightly unnatural; context suggests 'plumbing business' rather than the abstract phrase 'santyekhnicheskoe delo'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 9,
+    "reasoning": "Nearly all source items are genuine English vocabulary words. The list does not contain obvious character names, place names, or foreign-language intrusions. The only borderline item is coke, which is real English slang for cocaine and therefore valid. No clear non-English entities slipped through.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list is heavily skewed toward lower-level vocabulary despite being labeled B1/B2. Several B1 items are actually A1/A2-level words (jail, spare, jungle), and many B2 items are also basic everyday or transparent words (cocaine, coke, arrested, pitcher, emerald, blond, swallow, productive, packing, gasoline, bail, businessmen). A few items are appropriately B2 or at least plausible at B2 in this crime/drug context (smuggling, transporting, renegotiate, plumbing, marijuana, kilos, paste). Overall, the banding is too easy for many entries, so the calibration is weak.",
+    "not_c_level": [
+      {
+        "word": "jail",
+        "estimated_level": "A2",
+        "reason": "Common basic vocabulary, not really B1."
+      },
+      {
+        "word": "handwriting",
+        "estimated_level": "A2",
+        "reason": "Everyday school vocabulary, below B1."
+      },
+      {
+        "word": "spare",
+        "estimated_level": "A2",
+        "reason": "Basic adjective with common everyday use."
+      },
+      {
+        "word": "jungle",
+        "estimated_level": "A2",
+        "reason": "Common concrete noun, below B1."
+      },
+      {
+        "word": "cocaine",
+        "estimated_level": "A2",
+        "reason": "Common internationally known drug term, not B2-level in difficulty."
+      },
+      {
+        "word": "coke",
+        "estimated_level": "A2",
+        "reason": "Very common slang term in this context; not B2."
+      },
+      {
+        "word": "arrested",
+        "estimated_level": "A2",
+        "reason": "Basic past participle/verb form, too easy for B2."
+      },
+      {
+        "word": "pitcher",
+        "estimated_level": "A2",
+        "reason": "Common household noun, not B2."
+      },
+      {
+        "word": "emerald",
+        "estimated_level": "A2",
+        "reason": "Common noun for a gemstone, below B2."
+      },
+      {
+        "word": "blond",
+        "estimated_level": "A2",
+        "reason": "Basic descriptive adjective/noun, not B2."
+      },
+      {
+        "word": "swallow",
+        "estimated_level": "A2",
+        "reason": "Common verb with basic meaning."
+      },
+      {
+        "word": "productive",
+        "estimated_level": "B1",
+        "reason": "Could fit B1, but not strongly B2; the word is fairly common and transparent."
+      },
+      {
+        "word": "packing",
+        "estimated_level": "A2",
+        "reason": "Basic verb/noun form, too easy for B2."
+      },
+      {
+        "word": "gasoline",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun, below B2."
+      },
+      {
+        "word": "bail",
+        "estimated_level": "B1",
+        "reason": "Legal term that can fit B1, but not especially B2."
+      },
+      {
+        "word": "businessmen",
+        "estimated_level": "A2",
+        "reason": "Basic plural noun, too easy for B2."
+      }
+    ]
+  },
+  "overall_score": 7.3,
+  "summary": "The translations are mostly correct and contextually appropriate, with only minor issues such as the gendered choice for blond and a slightly awkward rendering of plumbing. The main weakness is vocabulary calibration: many items labeled B1/B2 are actually much easier than that, so the list is not well matched to the stated CEFR bands.",
+  "tokens_used": {
+    "prompt": 3032,
+    "completion": 1322,
+    "total": 4354
+  }
+}

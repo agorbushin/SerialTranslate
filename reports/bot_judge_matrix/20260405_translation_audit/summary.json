@@ -1,0 +1,442 @@
+{
+  "run_label": "20260405_translation_audit",
+  "manifest": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/manifests/default_10.json",
+  "model": "gpt-5.4-mini",
+  "max_workers": 36,
+  "parallel_judge_tasks": 36,
+  "finished_at": "2026-04-06T02:54:11.329775",
+  "episodes": [
+    {
+      "key": "matrix_1999",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+      "subtitle_used": null,
+      "started_at": "2026-04-06T02:53:53.741705",
+      "episode_index": 0,
+      "status": "ok",
+      "parts": {
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "rare_c": {
+          "overall_score": 6.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/matrix_1999/rare_c.json"
+        },
+        "phrasal": {
+          "overall_score": 3.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/matrix_1999/phrasal.json"
+        },
+        "frequent_c": {
+          "overall_score": 5.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/matrix_1999/frequent_c.json"
+        },
+        "frequent_b": {
+          "overall_score": 7.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/matrix_1999/frequent_b.json"
+        },
+        "rare_b": {
+          "overall_score": 5.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/matrix_1999/rare_b.json"
+        }
+      },
+      "skip_count": 1,
+      "error_count": 0,
+      "completed_at": "2026-04-06T02:54:11.329698"
+    },
+    {
+      "key": "game_of_thrones_s3e3",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+      "subtitle_used": null,
+      "started_at": "2026-04-06T02:53:53.742770",
+      "episode_index": 1,
+      "status": "ok",
+      "parts": {
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "phrasal": {
+          "overall_score": 5.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/game_of_thrones_s3e3/phrasal.json"
+        },
+        "rare_c": {
+          "overall_score": 6.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/game_of_thrones_s3e3/rare_c.json"
+        },
+        "frequent_c": {
+          "overall_score": 4.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/game_of_thrones_s3e3/frequent_c.json"
+        },
+        "frequent_b": {
+          "overall_score": 7.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/game_of_thrones_s3e3/frequent_b.json"
+        },
+        "rare_b": {
+          "overall_score": 6.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/game_of_thrones_s3e3/rare_b.json"
+        }
+      },
+      "skip_count": 1,
+      "error_count": 0,
+      "completed_at": "2026-04-06T02:54:11.329735"
+    },
+    {
+      "key": "euphoria_s2e2",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+      "subtitle_used": null,
+      "started_at": "2026-04-06T02:53:53.743709",
+      "episode_index": 2,
+      "status": "ok",
+      "parts": {
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "rare_c": {
+          "overall_score": 6.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/euphoria_s2e2/rare_c.json"
+        },
+        "frequent_c": {
+          "overall_score": 3.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/euphoria_s2e2/frequent_c.json"
+        },
+        "frequent_b": {
+          "overall_score": 7.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/euphoria_s2e2/frequent_b.json"
+        },
+        "rare_b": {
+          "overall_score": 6.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/euphoria_s2e2/rare_b.json"
+        },
+        "phrasal": {
+          "overall_score": 3.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/euphoria_s2e2/phrasal.json"
+        }
+      },
+      "skip_count": 1,
+      "error_count": 0,
+      "completed_at": "2026-04-06T02:54:11.329739"
+    },
+    {
+      "key": "fallout_s2e3",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+      "subtitle_used": null,
+      "started_at": "2026-04-06T02:53:53.745012",
+      "episode_index": 3,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": 8.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/fallout_s2e3/frequent_c.json"
+        },
+        "rare_b": {
+          "overall_score": 7.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/fallout_s2e3/rare_b.json"
+        },
+        "phrasal": {
+          "overall_score": 4.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/fallout_s2e3/phrasal.json"
+        },
+        "frequent_b": {
+          "overall_score": 6.3,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/fallout_s2e3/frequent_b.json"
+        }
+      },
+      "skip_count": 2,
+      "error_count": 0,
+      "completed_at": "2026-04-06T02:54:11.329748"
+    },
+    {
+      "key": "euphoria_s1e6",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+      "subtitle_used": null,
+      "started_at": "2026-04-06T02:53:53.745513",
+      "episode_index": 4,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "phrasal": {
+          "overall_score": 6.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/euphoria_s1e6/phrasal.json"
+        },
+        "frequent_c": {
+          "overall_score": 7.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/euphoria_s1e6/frequent_c.json"
+        },
+        "idioms": {
+          "overall_score": 2.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/euphoria_s1e6/idioms.json"
+        },
+        "frequent_b": {
+          "overall_score": 5.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/euphoria_s1e6/frequent_b.json"
+        }
+      },
+      "skip_count": 2,
+      "error_count": 0,
+      "completed_at": "2026-04-06T02:54:11.329751"
+    },
+    {
+      "key": "the_wire_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/The Wire/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/The Wire/Season 1/the_wire_s1_e1.srt",
+      "started_at": "2026-04-06T02:53:53.746111",
+      "episode_index": 5,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": 5.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/the_wire_s1e1/frequent_c.json"
+        },
+        "frequent_b": {
+          "overall_score": 4.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/the_wire_s1e1/frequent_b.json"
+        },
+        "phrasal": {
+          "overall_score": 2.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/the_wire_s1e1/phrasal.json"
+        }
+      },
+      "skip_count": 3,
+      "error_count": 0,
+      "completed_at": "2026-04-06T02:54:11.329754"
+    },
+    {
+      "key": "breaking_bad_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Breaking Bad/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Breaking Bad/Season 1/breaking_bad_s1_e1.srt",
+      "started_at": "2026-04-06T02:53:53.746450",
+      "episode_index": 6,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": null,
+          "error": "OpenAI API call failed: Error code: 400 - {'error': {'message': \"We could not parse the JSON body of your request. (HINT: This likely means you ",
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/breaking_bad_s1e1/frequent_c.json"
+        },
+        "frequent_b": {
+          "overall_score": 7.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/breaking_bad_s1e1/frequent_b.json"
+        },
+        "phrasal": {
+          "overall_score": 3.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/breaking_bad_s1e1/phrasal.json"
+        }
+      },
+      "skip_count": 3,
+      "error_count": 1,
+      "completed_at": "2026-04-06T02:54:11.329758"
+    },
+    {
+      "key": "black_mirror_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Black Mirror/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Black Mirror/Season 1/black_mirror_s1_e1.srt",
+      "started_at": "2026-04-06T02:53:53.747061",
+      "episode_index": 7,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": 5.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/black_mirror_s1e1/frequent_c.json"
+        },
+        "frequent_b": {
+          "overall_score": 7.3,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/black_mirror_s1e1/frequent_b.json"
+        },
+        "phrasal": {
+          "overall_score": 2.5,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/black_mirror_s1e1/phrasal.json"
+        }
+      },
+      "skip_count": 3,
+      "error_count": 0,
+      "completed_at": "2026-04-06T02:54:11.329761"
+    },
+    {
+      "key": "narcos_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Narcos/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Narcos/Season 1/narcos_s1_e1.srt",
+      "started_at": "2026-04-06T02:53:53.747742",
+      "episode_index": 8,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "phrasal": {
+          "skipped": true,
+          "skipped_reason": "missing phrasal_verbs.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_b": {
+          "overall_score": 7.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/narcos_s1e1/frequent_b.json"
+        },
+        "frequent_c": {
+          "overall_score": 4.3,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/narcos_s1e1/frequent_c.json"
+        }
+      },
+      "skip_count": 4,
+      "error_count": 0,
+      "completed_at": "2026-04-06T02:54:11.329764"
+    },
+    {
+      "key": "sherlock_s1e1",
+      "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Sherlock/Season 1/1",
+      "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Sherlock/Season 1/sherlock_s1_e1.srt",
+      "started_at": "2026-04-06T02:53:53.748558",
+      "episode_index": 9,
+      "status": "ok",
+      "parts": {
+        "rare_c": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_c_translations.csv"
+        },
+        "rare_b": {
+          "skipped": true,
+          "skipped_reason": "missing tier_4_rare_b_translations.csv"
+        },
+        "phrasal": {
+          "skipped": true,
+          "skipped_reason": "missing phrasal_verbs.csv"
+        },
+        "idioms": {
+          "skipped": true,
+          "skipped_reason": "missing idiomatic_expressions.csv"
+        },
+        "frequent_c": {
+          "overall_score": 6.0,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/sherlock_s1e1/frequent_c.json"
+        },
+        "frequent_b": {
+          "overall_score": 7.7,
+          "error": null,
+          "report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/bot_judge_matrix/20260405_translation_audit/sherlock_s1e1/frequent_b.json"
+        }
+      },
+      "skip_count": 4,
+      "error_count": 0,
+      "completed_at": "2026-04-06T02:54:11.329767"
+    }
+  ],
+  "episodes_ok": 10,
+  "episodes_failed": 0,
+  "mean_overall_score_by_part": {
+    "frequent_c": 5.57,
+    "frequent_b": 6.67,
+    "rare_c": 6.23,
+    "rare_b": 6.53,
+    "phrasal": 3.88,
+    "idioms": 2.0
+  },
+  "skipped_count_by_part": {
+    "frequent_c": 0,
+    "frequent_b": 0,
+    "rare_c": 7,
+    "rare_b": 6,
+    "phrasal": 2,
+    "idioms": 9
+  },
+  "judge_error_count_by_part": {
+    "frequent_c": 1,
+    "frequent_b": 0,
+    "rare_c": 0,
+    "rare_b": 0,
+    "phrasal": 0,
+    "idioms": 0
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Black Mirror/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.766559",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Black Mirror",
+  "season": 1,
+  "episode": 1,
+  "word_count": 14,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Black Mirror/Season 1/black_mirror_s1_e1.srt",
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most English words are translated correctly and in the right episode-specific sense. The strongest matches are deadline→\"крайний срок\", precisely→\"точно\", intercourse→\"половой акт\", uploaded→\"загруженный\", humiliation→\"унижение\", whoever→\"кто бы ни\", destroyed→\"уничтожен\", and advised→\"предупреждены\" in the broadcast-warning sense. A few items are slightly off or too generic: performer→\"исполнитель\" is acceptable but less natural than \"исполнитель/артист\" in this context; timeline→\"лента новостей\" is contextually plausible but not the direct meaning of \"timeline\" and is somewhat interpretive; bizarre→\"нелепый\" is close but \"странный/чудовищный\" would fit the ransom-demand context better; ransom→\"требование выкупа\" is awkward because the word itself means \"выкуп\" or \"требование выкупа\" only by extension; advising→\"советующий\" is not the best fit for the ongoing action in dialogue and should be more like \"советующий/рекомендующий\" or, in context, \"предостерегающий\". Overall the translations are mostly complete and context-aware, with only minor semantic/naturalness issues.",
+    "issues": [
+      {
+        "word": "timeline",
+        "translation": "лента новостей",
+        "issue": "Contextually plausible, but not the core meaning of 'timeline'; it is an interpretive rendering rather than a direct translation."
+      },
+      {
+        "word": "bizarre",
+        "translation": "нелепый",
+        "issue": "Close in meaning, but in this ransom-demand context 'странный', 'чудовищный', or 'абсурдный' would be more precise."
+      },
+      {
+        "word": "ransom",
+        "translation": "требование выкупа",
+        "issue": "Awkward phrasing; the noun usually translates as 'выкуп', while 'ransom demand' is 'требование выкупа'."
+      },
+      {
+        "word": "advising",
+        "translation": "советующий",
+        "issue": "Grammatically possible, but slightly unnatural in this dialogue; the sense is closer to 'рекомендующий' or 'предостерегающий'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words used in the episode. There are no character names, place names, invented terms, or foreign words masquerading as vocabulary entries. Even items that look like proper nouns in the subtitles are not included in the source list itself.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is heavily skewed toward vocabulary that is below the stated B1/B2 bands. Several entries are clearly A1/A2-level or otherwise too easy for the assigned band, while only a few are solidly B2. This makes the calibration poor overall: words like 'happening', 'precisely', 'uploaded', 'destroyed', and 'advised' are not B2-level targets, and 'performer' is also more B1/A2 than B1-strong. A smaller subset such as 'deadline', 'intercourse', 'timeline', 'bizarre', 'ransom', 'humiliation', and 'whoever' are more defensible as B2.",
+    "not_c_level": [
+      {
+        "word": "happening",
+        "estimated_level": "A2",
+        "reason": "Very common everyday verb form; too basic for a B2 list."
+      },
+      {
+        "word": "precisely",
+        "estimated_level": "B1",
+        "reason": "Common adverb, but generally B1 rather than B2."
+      },
+      {
+        "word": "uploaded",
+        "estimated_level": "B1",
+        "reason": "Common digital-age verb, but not strongly B2; more B1 in modern usage."
+      },
+      {
+        "word": "performer",
+        "estimated_level": "B1",
+        "reason": "Basic vocabulary for a person who performs; not especially advanced."
+      },
+      {
+        "word": "destroyed",
+        "estimated_level": "A2",
+        "reason": "Very common past participle/adjective; too easy for B2."
+      },
+      {
+        "word": "advised",
+        "estimated_level": "B1",
+        "reason": "Common verb form; the passive warning sense is not advanced enough for B2."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The Russian translations are mostly accurate and context-sensitive, with only a few minor naturalness issues. The main weakness is vocabulary calibration: several entries tagged B2 are actually much easier, so the list is not well matched to the stated CEFR level.",
+  "tokens_used": {
+    "prompt": 2565,
+    "completion": 1110,
+    "total": 3675
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/game_of_thrones_s1e1",
+  "judged_at": "2026-04-01T23:03:36.976649",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "idiomatic_expressions",
+  "series": "Game of Thrones",
+  "season": 1,
+  "episode": 1,
+  "expression_count": 8,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Game of Thrones/Season 1/game_of_thrones_s1_e1.srt",
+  "criterion_1": {
+    "score": 4,
+    "reasoning": "Step 1: Several translations are present and broadly correct. \"winter is coming\" → \"зима близко\" matches the episode’s recurring motto and is contextually right. \"the hand of the king\" → \"рука короля\" is a standard title gloss and fits the dialogue. \"the rightful king\" → \"законный король\" is also accurate in context. \"the andals and the first men\" → \"Андалы и Первые Люди\" is correct as a proper ethnonymic phrase.\n\nStep 2: Some entries are only partially correct because the Russian gloss is too literal or awkward. \"king of the andals\" → \"король Андалов\" is understandable, but in the episode it is part of the fixed title \"King of the Andals and the first men\"; the gloss should preserve that full title-like usage rather than isolate a fragment. \"back to the wall\" → \"назад к стене\" is literal, but in the subtitle it is used as a directional command and not an idiom; the translation is not wrong linguistically, but it is not a good idiomatic gloss.\n\nStep 3: One entry is clearly wrong: \"gods be good\" → \"да будет так, надеюсь, я всегда буду служить законному королю\" is not a translation of the source at all. The source is a brief exclamation/plea, roughly \"Боги, помогите\" / \"Дай-то боги\" / \"Храни нас боги\" depending on context. The provided Russian string is a long unrelated sentence.\n\nStep 4: \"right royal prick\" → \"настоящий королевский мудак\" is semantically close and captures the insult, though \"right royal\" is an intensifier and the Russian is slightly stylized. Overall it is acceptable. The main completeness problem is that one gloss is unrelated, and a few others are overly literal or not well adapted to the episode context.",
+    "issues": [
+      {
+        "expression": "gods be good",
+        "translation": "да будет так, надеюсь, я всегда буду служить законному королю",
+        "issue": "Completely incorrect and unrelated to the source; the English is a short exclamation, not a full sentence about serving the king."
+      },
+      {
+        "expression": "back to the wall",
+        "translation": "назад к стене",
+        "issue": "Literal but not idiomatic; in context it is just a directional phrase, so this is not a good learner gloss for an expression list."
+      },
+      {
+        "expression": "king of the andals",
+        "translation": "король Андалов",
+        "issue": "Too fragmentary for the episode context; it appears inside a fixed royal title and should be glossed as part of the full formula."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 3,
+    "reasoning": "Step 1: A few entries are genuine formulaic or episode-relevant units. \"winter is coming\" is a clear recurring motto and a strong formula. \"the hand of the king\" is a fixed title. \"the rightful king\" is a meaningful political formula in this episode. \"gods be good\" is a real exclamation, though the list’s translation is wrong.\n\nStep 2: Several entries are not really idioms or opaque formulae; they are transparent compositional phrases. \"king of the andals\" is just a title fragment, not a standalone idiom. \"the andals and the first men\" is a proper-noun coordination, not an idiom. \"back to the wall\" here is a literal directional phrase, not the idiom \"with one's back to the wall\" or a special formula.\n\nStep 3: \"right royal prick\" is a colloquial insult and somewhat formulaic, but it is not a stable idiom worth prioritizing as a learner unit compared with more established expressions. Overall, the list mixes a few strong formulae with multiple transparent or fragmentary strings, so it is mostly false positives as an idiom list.",
+    "invalid_expressions": [
+      {
+        "expression": "king of the andals",
+        "reason": "Not an idiom; it is only a fragment of a longer title and is fully compositional."
+      },
+      {
+        "expression": "the andals and the first men",
+        "reason": "A proper-noun coordination, not an idiomatic or formulaic expression in the usual sense."
+      },
+      {
+        "expression": "back to the wall",
+        "reason": "In the shown context it is literal direction, not the idiom 'with one's back to the wall' or a fixed formula."
+      },
+      {
+        "expression": "the hand of the king",
+        "reason": "A title, not an idiom; useful as terminology, but not an idiomatic expression."
+      },
+      {
+        "expression": "the rightful king",
+        "reason": "A transparent political phrase rather than a distinct idiom or opaque collocation."
+      }
+    ]
+  },
+  "overall_score": 3.5,
+  "summary": "The translation set contains a few good episode-specific formulas, but one gloss is badly wrong and several others are too literal or fragmentary. As an idiom list, it also overincludes transparent titles and compositional phrases that are not true idiomatic units.",
+  "improvement_suggestions": [
+    "Filter out transparent title fragments and proper-noun coordinations unless they function as fixed episode formulas.",
+    "Require each Russian gloss to be a direct, context-matched translation of the exact subtitle line, not a paraphrase or unrelated sentence.",
+    "Add an idiom-vs-title-vs-literal-phrase classifier before translation evaluation to reduce false positives."
+  ],
+  "tokens_used": {
+    "prompt": 2078,
+    "completion": 1257,
+    "total": 3335
+  }
+}

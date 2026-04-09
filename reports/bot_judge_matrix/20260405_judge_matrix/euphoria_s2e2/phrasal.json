@@ -1,0 +1,173 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-05T22:55:11.810046",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 70,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 1,
+    "reasoning": "Most entries are not supported by any subtitle match in the provided episode context, so there is no evidence that the stored Russian glosses are correct for this episode. A few glosses are broadly acceptable as dictionary meanings (for example, 'fuck up' → 'испортить', 'get out' → 'выйти', 'find out' → 'узнать'), but the task asks for episode-specific contextual correctness, and that cannot be verified here. Several translations are also clearly too generic, mismatched, or awkward for the listed source forms: some are participles/adjectives rather than natural learner glosses, some are overly literal, and some source items are not even shown in context. Because the list is long and almost entirely unverified against episode usage, the overall completeness and contextual accuracy are very poor.",
+    "issues": [
+      {
+        "phrasal_verb": "brought out",
+        "translation": "выявил",
+        "issue": "Wrong form and likely wrong sense for the stored example; the episode-style usage would normally be 'bring out the worst/best in someone' = 'выявлять/проявлять', not a past-tense standalone gloss."
+      },
+      {
+        "phrasal_verb": "looking for",
+        "translation": "ищущий",
+        "issue": "This is a participial adjective, not a natural Russian gloss for the phrasal construction; better would be 'искать' or 'в поисках' depending on context."
+      },
+      {
+        "phrasal_verb": "come on",
+        "translation": "давай",
+        "issue": "Too narrow and context-dependent; 'come on' can mean 'давай', but also 'ну же', 'перестань', 'да ладно'."
+      },
+      {
+        "phrasal_verb": "shit out",
+        "translation": "выпустить",
+        "issue": "Overly generic and likely incorrect for the vulgar idiomatic use in the example; the phrase is not simply 'выпустить'."
+      },
+      {
+        "phrasal_verb": "up for",
+        "translation": "готов к",
+        "issue": "Acceptable in some contexts, but too narrow; 'up for' often means 'готов/согласен на', and the stored example does not verify this episode usage."
+      },
+      {
+        "phrasal_verb": "work out",
+        "translation": "заниматься",
+        "issue": "Too generic and incomplete; 'work out' can mean 'тренироваться', 'получаться', 'разобраться', depending on context."
+      },
+      {
+        "phrasal_verb": "come up",
+        "translation": "появиться",
+        "issue": "Too narrow; in the example it means 'подойти/подойти и заговорить', not just 'appear'."
+      },
+      {
+        "phrasal_verb": "get on",
+        "translation": "ладить",
+        "issue": "This gloss is only one sense of 'get on'; the stored example suggests transport ('get on that train'), so 'сесть на' would be more accurate there."
+      },
+      {
+        "phrasal_verb": "come with",
+        "translation": "приходить с",
+        "issue": "Awkward and not the idiomatic learner gloss; in many contexts it means 'идти с кем-то', 'пойти вместе', or 'сопровождать'."
+      },
+      {
+        "phrasal_verb": "checked out",
+        "translation": "проверил",
+        "issue": "Wrong tense/sense for the example; 'checked out' here means 'отключился/выпал из разговора', not 'проверил'."
+      },
+      {
+        "phrasal_verb": "out for",
+        "translation": "в поисках",
+        "issue": "The stored example does not support this gloss, and 'out for' is highly context-sensitive; the provided translation is too generic."
+      },
+      {
+        "phrasal_verb": "going on",
+        "translation": "что происходит",
+        "issue": "This is a phrase-level gloss rather than a direct translation of the verb-particle construction; acceptable as an idiomatic rendering, but not precise as a phrasal-verb gloss."
+      },
+      {
+        "phrasal_verb": "going on with",
+        "translation": "продолжать с",
+        "issue": "Incorrect sense; 'what's going on with X' means 'что происходит с X', not 'продолжать с'."
+      },
+      {
+        "phrasal_verb": "pissed off",
+        "translation": "раздосадован",
+        "issue": "Too mild and not idiomatic for the vulgar intensity of 'pissed off'; better would be 'злой', 'взбешённый', 'разозлённый'."
+      },
+      {
+        "phrasal_verb": "fucking with",
+        "translation": "ебаться с",
+        "issue": "Wrong sense; in the example it means 'подкалывать/издеваться/морочить', not sexual intercourse."
+      },
+      {
+        "phrasal_verb": "plays on",
+        "translation": "играет на",
+        "issue": "Too literal and not supported by the example; the phrase in context is likely just 'plays on' as a video continuing, not a stable phrasal idiom with this gloss."
+      },
+      {
+        "phrasal_verb": "fuck out",
+        "translation": "выебать",
+        "issue": "Incorrect for the common expletive phrase 'get the fuck out'; the gloss does not match the actual idiomatic meaning 'убирайся/пошёл вон'."
+      },
+      {
+        "phrasal_verb": "do for",
+        "translation": "подходить для",
+        "issue": "Wrong sense; 'do for five minutes' means 'занять/хватить на пять минут' or 'подойти на пять минут', not 'подходить для'."
+      },
+      {
+        "phrasal_verb": "got on",
+        "translation": "соседствовал",
+        "issue": "Incorrect Russian and wrong sense; 'got on the train' means 'сел на поезд/вошёл в поезд', not 'соседствовал'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 7,
+    "reasoning": "Most source strings are genuine phrasal verbs, verb-preposition combinations, or established idioms: 'fuck up', 'get in', 'get out', 'find out', 'figure out', 'move on', 'let go', 'count on', 'backed down', and similar items are valid. However, the list also contains several forms that are not clean textbook phrasal verbs but rather participial fragments, progressive forms, or accidental subtitle chunks ('looking for', 'going on', 'hangin out', 'been up', 'it off', 'goin on'), and a few are malformed or non-idiomatic as standalone entries. So the set is mostly valid, but not fully clean.",
+    "invalid_phrasals": [
+      {
+        "phrase": "looking for",
+        "reason": "This is a verb + preposition search construction, but as a standalone source string it is a progressive/participial fragment rather than a canonical phrasal verb entry."
+      },
+      {
+        "phrase": "goin on",
+        "reason": "Nonstandard spelling of 'going on'; it is a subtitle fragment, not a clean dictionary form."
+      },
+      {
+        "phrase": "hangin out",
+        "reason": "Nonstandard spelling and a progressive fragment; better treated as a colloquial surface form of 'hang out', not a separate lexical entry."
+      },
+      {
+        "phrase": "hangin out with",
+        "reason": "Nonstandard spelling and fragmentary form; not a canonical phrasal-verb headword."
+      },
+      {
+        "phrase": "it off",
+        "reason": "Not a valid phrasal verb by itself; it is an incomplete fragment from a larger expression ('wash it off', 'fuck it off', etc.)."
+      },
+      {
+        "phrase": "getting off",
+        "reason": "Gerund/participle form rather than the base phrasal verb; valid surface form, but not a clean headword entry."
+      },
+      {
+        "phrase": "going on",
+        "reason": "Can be a valid phrasal/idiomatic construction, but here it is also a very common progressive form and subtitle fragment; borderline as a lexical phrasal entry."
+      },
+      {
+        "phrase": "going on with",
+        "reason": "Fragmentary construction rather than a stable phrasal verb headword; it is part of the question 'what's going on with...'."
+      },
+      {
+        "phrase": "been up",
+        "reason": "Auxiliary + adjective/participle-like fragment, not a phrasal verb idiom."
+      },
+      {
+        "phrase": "been up for",
+        "reason": "Fragmentary perfect form; not a canonical phrasal-verb entry."
+      },
+      {
+        "phrase": "fucking with",
+        "reason": "Colloquial verb + preposition construction, but as written it is a progressive fragment; still idiomatic, yet not a clean headword."
+      },
+      {
+        "phrase": "plays on",
+        "reason": "This is often just a literal verb phrase ('plays on the computer') rather than a fixed phrasal idiom."
+      }
+    ]
+  },
+  "overall_score": 4.0,
+  "summary": "The list contains many real English phrasal verbs, but the Russian glosses are largely unverified against the episode context and several are too generic, wrong-sense, or awkward. The source list is mostly legitimate, though it includes a noticeable number of fragmentary or non-canonical forms.",
+  "tokens_used": {
+    "prompt": 3252,
+    "completion": 2191,
+    "total": 5443
+  }
+}

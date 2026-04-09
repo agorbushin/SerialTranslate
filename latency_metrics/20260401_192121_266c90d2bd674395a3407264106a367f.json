@@ -1,0 +1,24 @@
+{
+  "request_id": "266c90d2bd674395a3407264106a367f",
+  "mode": "series",
+  "raw_input": "fallout s2e3",
+  "started_at": "2026-04-01T19:21:20.600294",
+  "finished_at": "2026-04-01T19:21:21.775878",
+  "status": "in_progress",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Fallout",
+    "season": 2,
+    "episode": 3
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 190
+  },
+  "timings_ms": {
+    "total_e2e_ms": 1175
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": null
+}

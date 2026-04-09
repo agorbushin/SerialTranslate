@@ -1,0 +1,26 @@
+{
+  "request_id": "f5d94ab5fb8640f691cd5c3ccc4bbc8c",
+  "mode": "series",
+  "raw_input": "AB",
+  "started_at": "2026-04-01T22:42:37.469323",
+  "finished_at": "2026-04-01T22:42:39.667411",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "AB",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "spellfix_title": 1720,
+    "find_existing": 49,
+    "download_subtitle": 425
+  },
+  "timings_ms": {
+    "total_e2e_ms": 2198
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

@@ -1,0 +1,47 @@
+{
+  "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/fallout_s2e3",
+  "judged_at": "2026-04-01T23:04:19.485101",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "idiomatic_expressions",
+  "series": "Fallout S2 E3",
+  "season": 2,
+  "episode": 3,
+  "expression_count": 6,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Fallout/Season 2/fallout_s2_e3.srt",
+  "criterion_1": {
+    "score": 9,
+    "reasoning": "Step 1: Check whether each Russian gloss is present and usable. All six entries have non-empty Russian translations, and none are left in English or marked as missing. Step 2: Check contextual fit in this episode. \"нужно быть готовым\" matches the imperative \"Gotta be ready.\"; \"как кошки с собаками\" fits the repeated conflict comparison; \"иерархия командования\" is a good rendering of \"chain of command\" in a military context; \"плохой парень\" is acceptable for the moral framing in \"the bad guy\"; \"ну, вы знаете, как это\" matches the discourse formula \"Well you know how it is around here\"; and \"до войны\" correctly renders the temporal phrase \"before the war.\" Step 3: Note minor nuance issues. \"плохой парень\" is slightly colloquial and can sound more like a literal 'bad guy' than the broader moral label 'the bad one / villain', but it is still acceptable in context. Overall the translations are complete and contextually correct.",
+    "issues": [
+      {
+        "expression": "the bad guy",
+        "translation": "плохой парень",
+        "issue": "Slightly colloquial and a bit literal; in context it means 'the villain / the bad one', though the gloss is still acceptable."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 5,
+    "reasoning": "Step 1: Identify which items are genuinely idiomatic or formulaic. \"like cats and dogs\" is a real idiom; \"chain of command\" is a fixed institutional collocation worth learning; \"the bad guy\" is a common formulaic label; \"well you know how it\" is a discourse fragment of a formula; and \"before the war\" is a recurring episode/world-building phrase but not an idiom. Step 2: Flag transparent or weakly idiomatic items. \"gotta be ready\" is just a contracted obligation statement, not an idiom. \"before the war\" is a plain temporal phrase, not a formulaic expression in the idiom sense. Step 3: Judge the list as a whole. Several entries are useful learner chunks, but at least two are clear false positives for an idiom list, so the set is only partially valid as idiomatic/formulaic material.",
+    "invalid_expressions": [
+      {
+        "expression": "gotta be ready",
+        "reason": "Transparent contracted grammar ('have got to be ready'), not an idiom or special formula."
+      },
+      {
+        "expression": "before the war",
+        "reason": "Plain compositional time phrase, not a fixed idiom or notable formulaic unit."
+      }
+    ]
+  },
+  "overall_score": 7.0,
+  "summary": "The Russian translations are generally accurate and well matched to the episode context. The main weakness is the inclusion of a few transparent phrases that do not really qualify as idioms or strong formulaic units.",
+  "improvement_suggestions": [
+    "Tighten extraction rules to exclude transparent grammatical chunks and ordinary time phrases unless they recur as episode-specific catchphrases.",
+    "Add a filter that prioritizes opaque or semi-opaque collocations and discourse formulas, and down-ranks contracted obligation patterns like 'gotta be ready'."
+  ],
+  "tokens_used": {
+    "prompt": 1872,
+    "completion": 726,
+    "total": 2598
+  }
+}

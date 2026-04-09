@@ -1,0 +1,39 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-05T22:56:06.753564",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "phrasal_count": 2,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 2,
+    "reasoning": "Step 1: Check whether each Russian translation is present. Both entries have Russian glosses, so they are not missing or left in English. Step 2: Check contextual correctness for this episode. The subtitle examples are not found in the provided episode context, so there is no direct in-episode evidence to confirm the intended sense. Step 3: Evaluate the glosses themselves. 'tumbling down' → 'падать' is very generic and only loosely matches the idea of 'tumbling down'; it does not capture the more specific sense of collapsing/falling down in a dynamic way. 'hack into' → 'взломать' is closer, but as a gloss it is incomplete because the phrasal verb means 'to gain unauthorized access to' rather than simply 'to hack/break into' in a broad sense. Because both translations are present but at least one is overly generic and the other is somewhat underspecified, the overall completeness/correctness is low.",
+    "issues": [
+      {
+        "phrasal_verb": "tumbling down",
+        "translation": "падать",
+        "issue": "Overly generic gloss; it does not fully capture the specific 'tumble/collapse downward' sense."
+      },
+      {
+        "phrasal_verb": "hack into",
+        "translation": "взломать",
+        "issue": "Partly correct but incomplete; the phrasal verb means 'to gain unauthorized access to', not just 'to hack' in a broad sense."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 9,
+    "reasoning": "Step 1: Determine whether each English source string is a real phrasal-type expression. 'hack into' is a genuine verb-preposition idiom meaning to gain unauthorized access to a system, so it clearly qualifies. Step 2: Check 'tumbling down'. This is not a classic dictionary phrasal verb in the same way as 'hack into', but it is a natural verb + particle/preposition construction used idiomatically in expressions like 'tumbling down the rabbit hole' and can function as an established multiword verbal phrase. Step 3: Since both entries are legitimate English multiword verb constructions and neither is obvious tokenizer garbage or accidental adjacency, the list is largely valid. The only slight reservation is that 'tumbling down' is less canonical as a standalone phrasal verb than 'hack into', so the score is just below perfect.",
+    "invalid_phrasals": []
+  },
+  "overall_score": 5.5,
+  "summary": "The phrasal forms are generally valid, especially 'hack into', but the Russian glosses are only partially precise and the episode context does not provide matching subtitle evidence. Overall, this is a mostly acceptable list with weak contextual support and somewhat generic translation choices.",
+  "tokens_used": {
+    "prompt": 661,
+    "completion": 622,
+    "total": 1283
+  }
+}

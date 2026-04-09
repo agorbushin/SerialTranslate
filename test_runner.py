@@ -61,24 +61,15 @@ TEST_SERIES: List[Dict[str, Any]] = [
 # ---------------------------------------------------------------------------
 
 def _get_openai_key() -> str:
-    import os
-    key = os.environ.get("OPENAI_API_KEY", "")
-    if key and key.strip():
-        return key.strip()
-    try:
-        if str(BASE_DIR) not in sys.path:
-            sys.path.insert(0, str(BASE_DIR))
-        from telegram_bot import OPENAI_API_KEY as _k  # type: ignore
-        if _k and str(_k).strip():
-            return str(_k).strip()
-    except Exception:
-        pass
-    return ""
+    from env_config import get_openai_api_key
+
+    return get_openai_api_key()
 
 
 def _get_opensubtitles_key() -> str:
-    import os
-    return os.environ.get("OPENSUBTITLES_API_KEY", "8FcGUu17mWuXoaqMxKQisSvjXhvjZdct")
+    from env_config import get_opensubtitles_api_key
+
+    return get_opensubtitles_api_key()
 
 
 # ---------------------------------------------------------------------------

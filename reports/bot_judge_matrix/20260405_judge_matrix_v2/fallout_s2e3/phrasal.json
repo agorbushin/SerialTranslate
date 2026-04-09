@@ -1,0 +1,128 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.760000",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Fallout S2 E3",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 46,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 1,
+    "reasoning": "Step 1: The subtitle matching section shows no actual episode lines for any listed phrasal verb, so there is no contextual evidence that the provided Russian glosses were verified against usage in this episode. Step 2: Because the task requires correctness in this episode, the lack of matched lines means most entries cannot be confirmed and should be treated as unsupported. Step 3: A few translations are broadly acceptable as dictionary glosses (for example, 'believe in' → 'верить в', 'spy on' → 'шпионить за', 'fight for' → 'бороться за'), but many are either too generic, potentially wrong-sense, or awkwardly literal for phrasal usage (for example, 'go off' → 'отправляться', 'get on' → 'принимайся за дело', 'way out' → 'выход', 'turn with' → 'попробовать'). Step 4: Since the list is mostly unverified and several glosses are not context-sensitive, the overall completeness/correctness is very low, though not zero because some entries are valid as general translations.",
+    "issues": [
+      {
+        "phrasal_verb": "go off",
+        "translation": "отправляться",
+        "issue": "Wrong sense for the listed example; 'go off of what they told us' means 'исходить из / опираться на', not 'отправляться'."
+      },
+      {
+        "phrasal_verb": "get on",
+        "translation": "принимайся за дело",
+        "issue": "Overly specific and likely wrong; 'get on with it' is better rendered as 'давай, продолжай' or 'приступай', not exactly 'принимайся за дело'."
+      },
+      {
+        "phrasal_verb": "hold on",
+        "translation": "держись",
+        "issue": "Too generic for the common imperative 'hold on to it'; the gloss misses the sense of 'держись за это / не отпускай'."
+      },
+      {
+        "phrasal_verb": "way out",
+        "translation": "выход",
+        "issue": "Too literal and incomplete; in the example it refers to 'way out here' meaning 'здесь, в этой глуши / в этих краях', not a physical exit."
+      },
+      {
+        "phrasal_verb": "talking about",
+        "translation": "говоря о",
+        "issue": "This is a participial phrase rather than a stable phrasal idiom; the gloss is acceptable as a translation, but the category is questionable."
+      },
+      {
+        "phrasal_verb": "made for",
+        "translation": "создано для",
+        "issue": "Too narrow and passive; in context 'made for this great nation' is closer to 'сделанные ради / предназначенные для', and the phrase is not always a phrasal idiom."
+      },
+      {
+        "phrasal_verb": "go in",
+        "translation": "увлекаться",
+        "issue": "The example 'go in for the religious stuff' is better translated as 'увлекаться / интересоваться', but the source phrase is not a standalone phrasal verb in the same way as textbook phrasals."
+      },
+      {
+        "phrasal_verb": "turn with",
+        "translation": "попробовать",
+        "issue": "Incorrect translation; 'a turn with this' is not 'попробовать' in the given sense, and the phrase itself is likely not a valid phrasal idiom."
+      },
+      {
+        "phrasal_verb": "right back",
+        "translation": "прямо обратно",
+        "issue": "Awkward and not idiomatic Russian; in context it means 'прямо в ответ / в ответ' rather than a literal 'back'."
+      },
+      {
+        "phrasal_verb": "looked up",
+        "translation": "посмотрел вверх",
+        "issue": "This is only one possible literal sense; in the example it is fine, but as a general gloss it can be misleading because 'look up at me' is a directional verb phrase, not a fixed phrasal verb."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 5,
+    "reasoning": "Step 1: Many entries are genuine phrasal verbs or established verb-preposition idioms: 'come on', 'spy on', 'take out', 'get back', 'keep up', 'hold on', 'cut off', 'looking for', 'fight for', 'bet on', 'walk over', 'going on', and similar. Step 2: However, several items are not really phrasal verbs but ordinary verb + preposition combinations or participial phrases, such as 'what about', 'know about', 'talking about', 'made for', 'sympathize with', 'think about', 'care about', and 'looking for'. Step 3: Some entries are malformed or not idiomatic lexical units, such as 'shit out', 'turn with', 'right back', and 'looked up' as listed forms, which are not textbook phrasal-verb entries in the same way as the others. Step 4: Because the list mixes valid phrasal-type idioms with many ordinary grammatical combinations and a few dubious forms, it is only moderately valid overall.",
+    "invalid_phrasals": [
+      {
+        "phrase": "what about",
+        "reason": "Ordinary prepositional phrase used to introduce a topic, not a phrasal verb."
+      },
+      {
+        "phrase": "know about",
+        "reason": "Simple verb + preposition combination, not a phrasal verb idiom."
+      },
+      {
+        "phrase": "talking about",
+        "reason": "Participial phrase, not a lexical phrasal verb."
+      },
+      {
+        "phrase": "made for",
+        "reason": "Ordinary verb + preposition construction; not a standard phrasal verb entry."
+      },
+      {
+        "phrase": "sympathize with",
+        "reason": "Verb + preposition collocation, not a phrasal verb."
+      },
+      {
+        "phrase": "think about",
+        "reason": "Ordinary verb + preposition combination, not a phrasal verb."
+      },
+      {
+        "phrase": "care about",
+        "reason": "Ordinary verb + preposition combination, not a phrasal verb."
+      },
+      {
+        "phrase": "looking for",
+        "reason": "Progressive form of a verb + preposition phrase; not a phrasal verb lemma."
+      },
+      {
+        "phrase": "shit out",
+        "reason": "Not a standard phrasal verb in this form; the phrase is likely accidental or context-specific slang rather than a textbook idiom."
+      },
+      {
+        "phrase": "turn with",
+        "reason": "Not a recognized phrasal idiom in standard English."
+      },
+      {
+        "phrase": "right back",
+        "reason": "Adverbial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "looked up",
+        "reason": "Inflected verb form rather than a listed phrasal-verb lemma; as written it is not a stable source entry."
+      }
+    ]
+  },
+  "overall_score": 3.0,
+  "summary": "The list contains a mix of real phrasal verbs and ordinary verb-preposition phrases, and the episode evidence is absent for all items. Several Russian glosses are acceptable in a general sense, but a number are too literal, too generic, or wrong for the intended usage.",
+  "tokens_used": {
+    "prompt": 2345,
+    "completion": 1687,
+    "total": 4032
+  }
+}

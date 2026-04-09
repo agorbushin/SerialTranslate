@@ -14,10 +14,30 @@ from typing import Optional, List, Dict
 import requests
 
 
-# Default API key (from docs/4_APIS.md and archive). Prefer env OPENSUBTITLES_API_KEY.
 def _default_api_key() -> str:
-    import os
-    return os.environ.get("OPENSUBTITLES_API_KEY", "8FcGUu17mWuXoaqMxKQisSvjXhvjZdct")
+    from env_config import get_opensubtitles_api_key
+
+    return get_opensubtitles_api_key()
+
+
+def _filename_has_season_episode(
+    fname: str, season_number: int, episode_number: int
+) -> bool:
+    """
+    True if filename (or path string) plausibly tags this season/episode.
+    Accepts zero-padded (s01e04) and compact (s1e4) forms, and NxM variants.
+    """
+    fn = (fname or "").lower()
+    padded = f"s{season_number:02d}e{episode_number:02d}"
+    if padded in fn:
+        return True
+    for s_fmt in (str(season_number), f"{season_number:02d}"):
+        for e_fmt in (str(episode_number), f"{episode_number:02d}"):
+            if f"{s_fmt}x{e_fmt}" in fn:
+                return True
+    # s1e4 but not s1e40 / s1e22 as "s1e2"
+    pat = rf"(?<![0-9])s0*{season_number}e0*{episode_number}(?![0-9])"
+    return re.search(pat, fn, re.IGNORECASE) is not None
 
 
 def _normalize_series_for_filename(series_name: str) -> str:
@@ -228,12 +248,16 @@ class OpenSubtitlesDownloader:
         if output_path.exists():
             return output_path
 
-        results = self.search_subtitles(
-            series_name,
-            languages,
-            season_number=season_number,
-            episode_number=episode_number,
-        )
+        try:
+            results = self.search_subtitles(
+                series_name,
+                languages,
+                season_number=season_number,
+                episode_number=episode_number,
+            )
+        except Exception as e:
+            print(f"OpenSubtitles search failed: {e}")
+            return None
         if not results:
             return None
 
@@ -253,11 +277,10 @@ class OpenSubtitlesDownloader:
         scored.sort(key=lambda x: x[0], reverse=True)
         best_score, best_match_score, best = scored[0]
 
-        # Require season/episode in filename when specified
-        pattern = f"s{season_number:02d}e{episode_number:02d}"
+        # Require season/episode in filename when specified (padded + compact s1e4, etc.)
         file_info = (best.get("attributes") or {}).get("files") or [{}]
         fname = (file_info[0] or {}).get("file_name", "").lower()
-        if pattern not in fname and f"{season_number}x{episode_number}" not in fname:
+        if not _filename_has_season_episode(fname, season_number, episode_number):
             if best_match_score < 0.5:
                 return None
 

@@ -1,0 +1,113 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.754835",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_b",
+  "translation_csvs": [
+    "tier_4_rare_b_translations.csv"
+  ],
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 31,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "Most pairs are valid Russian translations of the English headwords, but several are either too context-dependent, semantically off, or overly narrow. Clear correct matches include opportunity→возможность, thought→мысль, patient→терпеливый, council→совет, event→событие, whether→ли, require→требовать, training→обучение, choice→выбор, such→такой, power→власть, few→несколько, opinion→мнение, written→написанный, service→служба, rule→править, basic→основной, period→срок, loan→заём, privacy→уединение, land→земля. Problems include control→распоряжаться, which is only one possible sense and not the most direct translation of 'control'; front→в присутствии, which is not a normal translation of the noun/adverb 'front'; release→освобождение, which is a noun and may miss the verb sense; profile→незаметность, which is not a standard equivalent; either→тоже, which is wrong; interest→с процентами, which is not a lexical translation of the word itself; step→походка, which is only one specific sense and likely wrong in many contexts; deal→расправляться, which is a verb sense but not the usual translation of the noun/verb 'deal' without context. Finance→финансы is acceptable as a general equivalent, but some entries are too generic or mismatched for likely subtitle usage.",
+    "issues": [
+      {
+        "word": "control",
+        "translation": "распоряжаться",
+        "issue": "Only a partial/context-specific sense; 'control' is more directly 'контроль' or 'управлять' depending on usage."
+      },
+      {
+        "word": "front",
+        "translation": "в присутствии",
+        "issue": "Not a standard translation of 'front'; appears to be a contextual paraphrase rather than the word's meaning."
+      },
+      {
+        "word": "release",
+        "translation": "освобождение",
+        "issue": "Noun form only; may miss the verb sense 'release' = 'освободить/выпустить'."
+      },
+      {
+        "word": "profile",
+        "translation": "незаметность",
+        "issue": "Semantically off; 'profile' is usually 'профиль', 'образ', or 'репутация', not 'незаметность'."
+      },
+      {
+        "word": "either",
+        "translation": "тоже",
+        "issue": "Wrong meaning; 'either' is usually 'либо', 'тоже' corresponds to 'also/too'."
+      },
+      {
+        "word": "interest",
+        "translation": "с процентами",
+        "issue": "Not a direct translation of the word; this is a phrase-like gloss and misses the standalone meaning 'interest' = 'процент/интерес'."
+      },
+      {
+        "word": "step",
+        "translation": "походка",
+        "issue": "Too narrow and likely wrong in many contexts; 'step' is usually 'шаг'."
+      },
+      {
+        "word": "deal",
+        "translation": "расправляться",
+        "issue": "Possible verb sense in some contexts, but not the core translation of 'deal'; likely mismatched without supporting context."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words. There are no obvious character names, place names, foreign-language intrusions, or invented fantasy terms in the list. The list is lexically clean from a source-word filtering perspective.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list mixes some B1/B2 words with many very common A1/A2 items and a few more specialized or abstract terms. Words like opportunity, council, control, finance, whether, require, training, choice, power, release, opinion, service, privacy, and loan are reasonable B1/B2 targets. However, several entries are too basic for a B-band list, such as thought, patient, few, written, basic, land, and step, which are typically A1/A2. Some items are also borderline or contextually specialized, like finance and loan, but the main issue is that the set is not well calibrated to B1/B2 difficulty overall.",
+    "not_c_level": [
+      {
+        "word": "thought",
+        "estimated_level": "A2",
+        "reason": "Very common everyday vocabulary; usually below B1."
+      },
+      {
+        "word": "patient",
+        "estimated_level": "A2",
+        "reason": "Basic adjective in common use; not typically B1/B2."
+      },
+      {
+        "word": "few",
+        "estimated_level": "A1",
+        "reason": "High-frequency basic quantifier."
+      },
+      {
+        "word": "written",
+        "estimated_level": "A2",
+        "reason": "Common past participle/adjective form; too basic for a B-band target list."
+      },
+      {
+        "word": "basic",
+        "estimated_level": "A2",
+        "reason": "Common everyday adjective, generally below B1."
+      },
+      {
+        "word": "land",
+        "estimated_level": "A1",
+        "reason": "Very basic vocabulary item."
+      },
+      {
+        "word": "step",
+        "estimated_level": "A1",
+        "reason": "Common basic noun/verb; not a B1/B2 vocabulary target."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The translations are mostly understandable, but several entries are inaccurate, overly narrow, or not direct lexical equivalents. The source list is clean, but the vocabulary level is uneven, with many items that are too basic for a B1/B2 set.",
+  "tokens_used": {
+    "prompt": 1521,
+    "completion": 1328,
+    "total": 2849
+  }
+}

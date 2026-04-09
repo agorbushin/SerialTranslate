@@ -17,6 +17,7 @@ from download_subtitles import (
     _normalize_series_for_filename,
     _episode_filename,
     _season_folder_name,
+    _filename_has_season_episode,
 )
 
 
@@ -24,6 +25,21 @@ def test_path_helpers() -> None:
     assert _normalize_series_for_filename("Game of Thrones") == "game_of_thrones"
     assert _season_folder_name(2) == "Season 2"
     assert _episode_filename("Game of Thrones", 2, 2) == "game_of_thrones_s2_e2.srt"
+
+
+@pytest.mark.parametrize(
+    "fname,season,ep,expected",
+    [
+        ("Show.S01E04.1080p.mkv", 1, 4, True),
+        ("show.s1e4.720p.srt", 1, 4, True),
+        ("release.1x4.eng.srt", 1, 4, True),
+        ("release.01x04.eng.srt", 1, 4, True),
+        ("Show.S01E40.1080p.mkv", 1, 4, False),
+        ("Show.S02E04.1080p.mkv", 1, 4, False),
+    ],
+)
+def test_filename_has_season_episode(fname: str, season: int, ep: int, expected: bool) -> None:
+    assert _filename_has_season_episode(fname, season, ep) is expected
 
 
 def test_get_subtitle_path() -> None:

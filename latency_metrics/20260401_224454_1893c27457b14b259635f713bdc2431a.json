@@ -1,0 +1,25 @@
+{
+  "request_id": "1893c27457b14b259635f713bdc2431a",
+  "mode": "series",
+  "raw_input": "Test Series",
+  "started_at": "2026-04-01T22:44:54.960315",
+  "finished_at": "2026-04-01T22:44:54.962635",
+  "status": "success",
+  "branch": "cache_hit_translations",
+  "identity": {
+    "series_name": "Test Series",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "spellfix_title": 0,
+    "find_existing": 0
+  },
+  "timings_ms": {
+    "total_e2e_ms": 2
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": null
+}

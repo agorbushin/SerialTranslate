@@ -1,0 +1,128 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.752755",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 70,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 1,
+    "reasoning": "Most entries are not supported by any matched subtitle line, so there is no episode-specific evidence that the glosses are correct in context. A few translations are broadly acceptable as dictionary equivalents (e.g. get out → выйти, get back → вернуться, find out → узнать, figure out → разобраться, talk about → говорить о), but the task requires checking how they are used in this episode, and that context is absent. Several glosses are also too generic or semantically off for phrasal-verb usage: brought out → выявил is not a natural rendering of 'bring out' in the stored example, shit out → выпустить is wrong, looking for → ищущий is a participle rather than a usable Russian translation, checked out → проверил is incomplete for 'checked out for a second', and out for → в поисках is not the same construction. Because the list is large and many items are either missing, overly generic, or not context-verified, the overall translation quality is very low.",
+    "issues": [
+      {
+        "phrasal_verb": "brought out",
+        "translation": "выявил",
+        "issue": "Overly narrow and awkward; in the stored example 'brought out the worst in him' the natural sense is 'вызвал/проявил худшее', not 'выявил'."
+      },
+      {
+        "phrasal_verb": "shit out",
+        "translation": "выпустить",
+        "issue": "Wrong sense; in the example it is an intensifier in a sexual vulgar phrase, not 'release'."
+      },
+      {
+        "phrasal_verb": "looking for",
+        "translation": "ищущий",
+        "issue": "Participial form rather than a usable contextual gloss; should be something like 'ищут/разыскивают'."
+      },
+      {
+        "phrasal_verb": "checked out",
+        "translation": "проверил",
+        "issue": "Incomplete and context-mismatched; 'checked out for a second' means 'на секунду отключился/выпал', not 'checked'."
+      },
+      {
+        "phrasal_verb": "out for",
+        "translation": "в поисках",
+        "issue": "Wrong construction; 'out for' here is not equivalent to 'in search of'."
+      },
+      {
+        "phrasal_verb": "got on",
+        "translation": "соседствовал",
+        "issue": "Incorrect Russian meaning; 'got on the train' means 'сел/попал на поезд', not 'neighboring'."
+      },
+      {
+        "phrasal_verb": "fucking with",
+        "translation": "ебаться с",
+        "issue": "Too literal and often wrong; in the example it means 'messing with/teasing/playing with', not sexual intercourse."
+      },
+      {
+        "phrasal_verb": "fuck out",
+        "translation": "выебать",
+        "issue": "Wrong sense for the common phrase 'Get the fuck out'; the idiomatic meaning is 'убирайся/пошёл вон'."
+      },
+      {
+        "phrasal_verb": "do for",
+        "translation": "подходить для",
+        "issue": "Too generic and not a stable gloss for the construction; context-dependent and often means 'сделать для/подойти'."
+      },
+      {
+        "phrasal_verb": "going on with",
+        "translation": "продолжать с",
+        "issue": "Incorrect meaning; in 'What's going on with your sister' it means 'что происходит с', not 'continue with'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 6,
+    "reasoning": "Many entries are genuine phrasal verbs or established verb-particle/verb-preposition combinations: fuck up, get in, get out, get back, come on, go in, care about, give up, sit down, go back, find out, figure out, work out, bring out, come up, get on, move on, let go, come with, checked out, hang out, hang out with, going on, finds out, pissed off, open up, live with, fell for, thought about, cared about, think about, backed down, came over, haunted by, been up, been up for, knock on, got on, hangs up, plays on, talk about, count on, speak about, back together, back together with, go down, stickin up for, coming for, roll up, fly in. However, several items are not real phrasal idioms or are malformed/tokenizer artifacts: some are just fragments, some are ordinary grammar, and some are nonstandard spellings or clipped forms. Because a substantial minority are invalid or dubious, the score should be mid-range rather than high.",
+    "invalid_phrasals": [
+      {
+        "phrase": "it off",
+        "reason": "Fragmentary string; not a standalone phrasal verb. It is likely part of 'wash it off' or similar."
+      },
+      {
+        "phrase": "goin on",
+        "reason": "Nonstandard spelling/clipping of 'going on'; acceptable as transcript shorthand, but not a canonical phrasal entry."
+      },
+      {
+        "phrase": "hangin out",
+        "reason": "Nonstandard spelling/clipping of 'hanging out'; transcript shorthand rather than a canonical dictionary form."
+      },
+      {
+        "phrase": "hangin out with",
+        "reason": "Nonstandard spelling/clipping; same issue as above."
+      },
+      {
+        "phrase": "babysat for",
+        "reason": "Not a phrasal verb; ordinary verb plus preposition indicating who was babysat for."
+      },
+      {
+        "phrase": "going on",
+        "reason": "Can be a valid progressive construction, but in isolation it is often just ordinary grammar rather than a fixed phrasal idiom."
+      },
+      {
+        "phrase": "going on with",
+        "reason": "Not a standard phrasal verb; it is a grammatical pattern built on 'go on' plus a prepositional complement."
+      },
+      {
+        "phrase": "banging on",
+        "reason": "Often a literal progressive verb phrase rather than a lexicalized phrasal verb; borderline at best."
+      },
+      {
+        "phrase": "been up",
+        "reason": "Ordinary perfect aspect of 'be up', not a clear phrasal idiom."
+      },
+      {
+        "phrase": "been up for",
+        "reason": "Ordinary perfect aspect plus preposition; not a fixed phrasal verb entry in the same sense."
+      },
+      {
+        "phrase": "fucking with",
+        "reason": "Colloquial multiword expression, but not a standard textbook phrasal verb in this form; meaning depends heavily on context."
+      },
+      {
+        "phrase": "fuck out",
+        "reason": "Not a standard phrasal verb as listed; the common idiom is 'fuck out of' or the fixed phrase 'get the fuck out'."
+      }
+    ]
+  },
+  "overall_score": 3.5,
+  "summary": "The translation list contains many broadly plausible dictionary glosses, but the episode-specific evidence is missing and several glosses are inaccurate or too generic for the actual phrasal usage. The source list is mostly valid, but it also includes a number of malformed fragments and non-idiomatic strings, so the overall quality is mixed to poor.",
+  "tokens_used": {
+    "prompt": 3252,
+    "completion": 1646,
+    "total": 4898
+  }
+}

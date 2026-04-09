@@ -1,0 +1,63 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.757070",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Fallout S2 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 7,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most pairs are translated into plausible Russian equivalents and none are missing. 'cleric' → 'священник' is acceptable in many contexts, though it is slightly narrower/more religiously specific than the English word, which can also mean a clerical/religious official. 'relic' → 'реликвия' is correct. 'profligate' → 'распутник' captures the sense of a morally dissolute person, though it is somewhat noun-like and may miss the adjective form. 'fusion' → 'термоядерный синтез' is a correct technical rendering if the episode uses the nuclear/energy sense. 'battalion' → 'батальон' is exact. 'hoo' → 'ликующий возглас' is a reasonable functional translation for an exclamation, though it is not a direct lexical equivalent and may be too interpretive. 'abomination' → 'мерзость' is correct. Overall the list is mostly accurate, with minor issues of specificity and one highly interpretive rendering.",
+    "issues": [
+      {
+        "word": "cleric",
+        "translation": "священник",
+        "issue": "Mostly correct, but slightly narrower than the English word; 'cleric' can mean a religious official/clergyman more generally."
+      },
+      {
+        "word": "profligate",
+        "translation": "распутник",
+        "issue": "Meaning is close, but the Russian word is more naturally a noun, while the English item is often an adjective; the translation is somewhat form-shifted."
+      },
+      {
+        "word": "hoo",
+        "translation": "ликующий возглас",
+        "issue": "Very interpretive rather than lexical; it conveys the function of the exclamation but is not a direct translation of the source form."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 9,
+    "reasoning": "All source items are real English vocabulary words and none are obvious names, places, or foreign-language intrusions. 'fusion', 'battalion', 'relic', 'abomination', and 'cleric' are standard English words. 'hoo' is also an English interjection/exclamation, so it is not a non-English entity. No clear filtering violations are present.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 5,
+    "reasoning": "The list mixes advanced vocabulary with several words that are not clearly C1/C2. 'relic', 'fusion', 'battalion', and 'abomination' can fit upper-intermediate to advanced usage depending on context, but 'cleric' is often more specialized than advanced, and 'hoo' is an interjection rather than a C-level vocabulary item. 'profligate' is genuinely advanced, but the overall set is not consistently C-level. Because the task is to teach advanced vocabulary, items that are too basic or not really vocabulary targets reduce the quality of the list.",
+    "not_c_level": [
+      {
+        "word": "cleric",
+        "estimated_level": "B2",
+        "reason": "A specialized but fairly transparent religious term; many learners encounter it before C1, and it is not strongly advanced in general vocabulary terms."
+      },
+      {
+        "word": "hoo",
+        "estimated_level": "B1",
+        "reason": "An interjection/exclamation rather than advanced vocabulary; it is not a typical C1/C2 teaching item."
+      }
+    ]
+  },
+  "overall_score": 7.3,
+  "summary": "The translations are mostly correct and complete, with only minor issues of nuance and one highly interpretive rendering. The source list is clean in terms of English vocabulary, but it is not fully aligned with a strict C-level learning goal because at least a couple of items are too basic or not ideal advanced-vocabulary targets.",
+  "tokens_used": {
+    "prompt": 1131,
+    "completion": 856,
+    "total": 1987
+  }
+}

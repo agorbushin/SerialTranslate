@@ -4,7 +4,7 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "game_of_thrones_s1_e1.srt",
-  "analysis_date": "2026-03-31T20:56:57.846083",
+  "analysis_date": "2026-03-31T21:56:32.247743",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 96287961,
@@ -12,15 +12,15 @@
     "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 1,
-    "tier_2_random": 168,
+    "tier_1_hard_usable": 0,
+    "tier_2_random": 164,
     "tier_3_common": 17,
     "tier_4_rare_in_series": 4,
-    "tier_5_filtered": 144,
+    "tier_5_filtered": 146,
     "tier_b1_words": 1,
-    "tier_b2_words": 16,
+    "tier_b2_words": 15,
     "tier_4_rare_c_words": 0,
     "tier_4_rare_b_words": 10
   },
-  "excluded_names_fantasy_count": 50
+  "excluded_names_fantasy_count": 55
 }

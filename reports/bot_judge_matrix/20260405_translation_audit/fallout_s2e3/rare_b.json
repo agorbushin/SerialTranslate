@@ -1,0 +1,118 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.753193",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_b",
+  "translation_csvs": [
+    "tier_4_rare_b_translations.csv"
+  ],
+  "series": "Fallout S2 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 19,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 7,
+    "reasoning": "Most pairs are translated into valid Russian words and are broadly semantically correct: option→вариант, force→сила, opportunity→возможность, support→поддержка, thought→мысль, live→жить, control→управление, risk→рисковать, mile→миля, state→штат, version→версия are all acceptable. However, several entries are either too context-dependent or potentially wrong in the episode sense: district→избирательный округ is a specific political sense and may be too narrow if the subtitle used a different meaning; issue→вопрос is often correct but can miss meanings like 'problem' or 'matter'; act→акт is only correct for a noun and may be wrong if the subtitle used the verb 'to act'; research→исследовательский is not a noun translation and is likely wrong if the source word is the noun 'research'; figure→сообразить is a verb meaning 'to figure out', not a direct translation of the noun/verb without context; display→предъявить is a legal/official verb and may be too specific; effect→следствие is only one possible sense and may be wrong if the intended meaning was 'effect' as 'impact'. Overall the list is mostly usable, but several items show sense mismatch or part-of-speech mismatch.",
+    "issues": [
+      {
+        "word": "district",
+        "translation": "избирательный округ",
+        "issue": "Too specific; may be the wrong sense if the episode uses 'district' in a general geographic or administrative meaning."
+      },
+      {
+        "word": "issue",
+        "translation": "вопрос",
+        "issue": "Potentially too narrow; 'issue' can mean 'problem', 'matter', or 'topic' depending on context."
+      },
+      {
+        "word": "act",
+        "translation": "акт",
+        "issue": "May be wrong part of speech/sense; if the subtitle uses the verb 'act', 'акт' is incorrect."
+      },
+      {
+        "word": "research",
+        "translation": "исследовательский",
+        "issue": "Likely wrong part of speech; this is an adjective ('research-related'), not the noun 'research'."
+      },
+      {
+        "word": "figure",
+        "translation": "сообразить",
+        "issue": "Verb phrase meaning 'to figure out'; not a direct equivalent for all uses of 'figure'."
+      },
+      {
+        "word": "display",
+        "translation": "предъявить",
+        "issue": "Too specific and formal; may not match common meanings like 'show' or 'display'."
+      },
+      {
+        "word": "effect",
+        "translation": "следствие",
+        "issue": "Possible sense mismatch; 'effect' often means 'effect/impact/result', while 'следствие' is more specifically 'consequence'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words. None are obvious character names, place names, foreign-language insertions, or invented sci-fi terms. The list is clean from a source-vocabulary filtering perspective.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list mixes some reasonable B1/B2 items with several very basic A1/A2 words and a few more specialized or less suitable items. Words like option, system, force, opportunity, issue, support, thought, live, control, risk, state, version, and effect are broadly B1/B2-appropriate. But several entries are too basic for a B-band list, and some are awkwardly chosen because they are common or overly specialized rather than useful mid-level vocabulary.",
+    "not_c_level": [
+      {
+        "word": "mile",
+        "estimated_level": "A2",
+        "reason": "Basic measurement vocabulary; too elementary for a B1/B2 target list."
+      },
+      {
+        "word": "live",
+        "estimated_level": "A1",
+        "reason": "Very common core verb; not a B-band vocabulary item."
+      },
+      {
+        "word": "act",
+        "estimated_level": "A2",
+        "reason": "Common everyday word; usually below B1 unless used in a specialized sense."
+      },
+      {
+        "word": "force",
+        "estimated_level": "A2",
+        "reason": "Core vocabulary with multiple common senses; generally too basic for a B1/B2-only list."
+      },
+      {
+        "word": "support",
+        "estimated_level": "A2",
+        "reason": "High-frequency everyday word; typically not a B-band target item."
+      },
+      {
+        "word": "thought",
+        "estimated_level": "A2",
+        "reason": "Common core noun/verb form; usually below B1."
+      },
+      {
+        "word": "control",
+        "estimated_level": "A2",
+        "reason": "Common everyday vocabulary; not distinctive enough for a B-level rare-word list."
+      },
+      {
+        "word": "state",
+        "estimated_level": "A2",
+        "reason": "Very common word with basic meanings; not a strong B-band choice."
+      },
+      {
+        "word": "version",
+        "estimated_level": "A2",
+        "reason": "Common modern vocabulary; generally too easy for B1/B2 targeting."
+      }
+    ]
+  },
+  "overall_score": 7.0,
+  "summary": "The translations are mostly valid Russian equivalents, but several entries have sense or part-of-speech problems, especially research, figure, display, and effect. The source list is clean, but the vocabulary set is not well calibrated for a B1/B2 rare-word list because it includes many very basic words.",
+  "tokens_used": {
+    "prompt": 1275,
+    "completion": 1274,
+    "total": 2549
+  }
+}

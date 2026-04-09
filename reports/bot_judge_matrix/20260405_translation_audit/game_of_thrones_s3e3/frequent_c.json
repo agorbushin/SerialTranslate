@@ -1,0 +1,65 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.750373",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 4,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "1) \"sapphire\" → \"сапфир\" is a correct direct translation of the gemstone. 2) \"eyrie\" → \"Орлиное Гнездо\" is contextually correct if the intended meaning is the proper noun Eyrie from Game of Thrones; however, it is not a lexical translation of the English word itself but a localized name for the place. 3) \"magician\" → \"волшебник\" is broadly correct, though in many contexts \"magician\" would more precisely be \"фокусник\"; without subtitle context, \"волшебник\" is still acceptable. 4) \"partridge\" → \"куропатка\" is correct. Overall, the translations are complete and mostly correct, with the main caveat being that \"eyrie\" is a proper noun rather than a normal vocabulary item and \"magician\" may be slightly sense-shifted.",
+    "issues": [
+      {
+        "word": "eyrie",
+        "translation": "Орлиное Гнездо",
+        "issue": "This is a localized proper-name rendering rather than a direct lexical translation; it is correct only if the source refers to the Game of Thrones location, not the common noun \"eyrie\"."
+      },
+      {
+        "word": "magician",
+        "translation": "волшебник",
+        "issue": "Semantically acceptable, but in many English contexts \"magician\" means \"фокусник\" rather than \"волшебник\"; the translation may be slightly imprecise without context."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "The list contains at least one clear non-vocabulary item: \"eyrie\" is a fantasy proper noun/place name in Game of Thrones, not a standard English vocabulary word for a general word list. The other items are genuine English words: \"sapphire\", \"magician\", and \"partridge\". Because one item slipped through that should have been filtered out, the score is reduced substantially.",
+    "violations": [
+      "eyrie"
+    ]
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is not well aligned with a C1/C2 vocabulary goal. \"sapphire\" is a fairly common concrete noun, typically B1/B2. \"magician\" is also common and usually B1/B2. \"partridge\" is a relatively uncommon bird name and can be C1/C2 or at least advanced enough for a specialized list. \"eyrie\" is not a normal vocabulary item at all; it is a fantasy proper noun here, so it does not count as C-level vocabulary. Since most entries are too basic or not valid advanced vocabulary items, the list performs poorly on this criterion.",
+    "not_c_level": [
+      {
+        "word": "sapphire",
+        "estimated_level": "B1/B2",
+        "reason": "A common gemstone name, not advanced C1/C2 vocabulary."
+      },
+      {
+        "word": "magician",
+        "estimated_level": "B1/B2",
+        "reason": "A fairly common everyday word; most intermediate learners already know it."
+      },
+      {
+        "word": "eyrie",
+        "estimated_level": "B2",
+        "reason": "In this list it functions as a proper noun/place name from the series rather than advanced English vocabulary."
+      }
+    ]
+  },
+  "overall_score": 4.7,
+  "summary": "The translations are mostly correct, but the list contains a non-vocabulary proper noun and does not fit a strong C-level learning set. The main strengths are accurate Russian equivalents for the common nouns, while the main weaknesses are item selection and advanced-level suitability.",
+  "tokens_used": {
+    "prompt": 1060,
+    "completion": 828,
+    "total": 1888
+  }
+}

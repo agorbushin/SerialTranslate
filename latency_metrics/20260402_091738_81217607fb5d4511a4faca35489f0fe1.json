@@ -1,0 +1,81 @@
+{
+  "request_id": "81217607fb5d4511a4faca35489f0fe1",
+  "mode": "movie",
+  "raw_input": "Matrix 1999",
+  "started_at": "2026-04-02T09:16:30.634703",
+  "finished_at": "2026-04-02T09:17:38.412284",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "movie_name": "Matrix",
+    "year": 1999
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 8,
+    "download_subtitle": 1801,
+    "analyze_subtitle": 58925,
+    "translate": 5341
+  },
+  "timings_ms": {
+    "total_e2e_ms": 67777
+  },
+  "analyze_metrics": {
+    "preload_ms": 4,
+    "parse_subtitle_ms": 146,
+    "gpt_cefr_ms": 6899,
+    "tier_build_ms": 16,
+    "gpt_filter_ms": 51790,
+    "save_outputs_ms": 43,
+    "total_ms": 58904,
+    "preload_cache_hit": 1,
+    "pipeline_skipped": 0
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 20,
+    "timings_ms": {
+      "prepare_ms": 14,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 2,
+      "total_ms": 5339,
+      "subtitle_read_skipped": 1,
+      "translations_reused": 0
+    },
+    "last_run_tier_ids": [
+      "b1",
+      "b2",
+      "tier_1"
+    ],
+    "tier_b1_word_count": 1,
+    "tier_b2_word_count": 14,
+    "tier_4_rare_c_word_count": 1,
+    "tier_4_rare_b_word_count": 36,
+    "tiers": {
+      "tier_1": {
+        "word_count": 5,
+        "to_translate": 5,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b1": {
+        "word_count": 1,
+        "to_translate": 1,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b2": {
+        "word_count": 14,
+        "to_translate": 14,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      }
+    }
+  },
+  "error": null
+}

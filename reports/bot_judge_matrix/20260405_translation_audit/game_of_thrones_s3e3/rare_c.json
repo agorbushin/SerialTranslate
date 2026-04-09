@@ -1,0 +1,48 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.750562",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_c",
+  "translation_csvs": [
+    "tier_4_rare_c_translations.csv"
+  ],
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 1,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "The pair is not empty and the Russian word 'финансировать' is a real translation related to the English source 'fund'. However, in English 'fund' is primarily a noun meaning 'fund, pool of money', while as a verb it means 'to finance'. Without a subtitle example, the safest judgment is that the translation is only conditionally correct: it matches the verbal sense but would be wrong if the episode used the noun sense. Because the context is unavailable, this is a partial rather than fully secure match.",
+    "issues": [
+      {
+        "word": "fund",
+        "translation": "финансировать",
+        "issue": "Potential sense mismatch: this is correct only if 'fund' is used as a verb ('to finance'); if the episode uses the common noun sense ('fund'), the translation is wrong or too specific."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "The source item 'fund' is a genuine English vocabulary word. It is not a character name, place name, invented term, or foreign word. No non-English entity slipped into the source list.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is supposed to contain advanced rare vocabulary, but 'fund' is a very common English word and does not belong to a C1/C2-focused rare-vocabulary set. Even if the verb sense is considered, it remains a basic, high-frequency item rather than advanced vocabulary.",
+    "not_c_level": [
+      {
+        "word": "fund",
+        "estimated_level": "B1",
+        "reason": "Common everyday vocabulary; not advanced enough for a C1/C2 rare-word list."
+      }
+    ]
+  },
+  "overall_score": 6.0,
+  "summary": "The source word is valid English and the Russian translation is plausible, but it is only contextually safe if the episode uses the verb sense of 'fund'. The main problem is that the item is too basic for an advanced rare-vocabulary list.",
+  "tokens_used": {
+    "prompt": 940,
+    "completion": 476,
+    "total": 1416
+  }
+}

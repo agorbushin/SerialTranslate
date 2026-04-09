@@ -1,0 +1,87 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.753017",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Fallout S2 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 14,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most pairs are translated correctly and naturally into Russian. 'messy' → 'неопрятный', 'spare' → 'запасной', 'legion' → 'Легион', 'massage' → 'массаж', 'plank' → 'доска', 'corporal' → 'капрал', 'defied' → 'ослушался', 'sword' → 'меч', 'chaos' → 'хаос', 'pardner' → 'приятель', and 'ranger' → 'рейнджер' are all acceptable. The main caveat is that some entries include series-specific proper-name notes ('Куп', 'Шейди'), but the underlying dictionary glosses are still provided. 'vet' → 'ветеринар' is potentially context-dependent because in English 'vet' can also mean 'veteran'; without subtitle context it is impossible to confirm the intended sense, but the translation itself is valid for one common meaning. Overall the list is mostly complete and correct, with only minor uncertainty about context-sensitive senses.",
+    "issues": [
+      {
+        "word": "vet",
+        "translation": "ветеринар",
+        "issue": "Potentially context-dependent: 'vet' can also mean 'veteran'; without subtitle context the intended sense cannot be fully verified."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 5,
+    "reasoning": "Several source items are not plain English vocabulary words and should likely have been filtered out before translation. 'coop' is presented as a character name ('Куп') with a note that the dictionary meaning is 'курятник', so in this dataset it functions as a proper name rather than a vocabulary item. 'shady' is also annotated as a series-specific name ('Шейди') rather than the ordinary adjective 'shady'. 'ranger' may be a normal English word, but in Fallout it can also be a faction title; however it still exists as English vocabulary, so it is not a clear violation. The rest are genuine English words. Because at least two entries are effectively names/proper nouns or series-specific terms, the list is only partially clean.",
+    "violations": [
+      "coop",
+      "shady"
+    ]
+  },
+  "criterion_3": {
+    "score": 6,
+    "reasoning": "The banding is mixed. Several [B1] items are fine at B1 level: 'messy', 'spare', and 'vet' are plausible B1 vocabulary. However, 'legion' is more typically B2/C1 in general English, not a straightforward B1 item. Among [B2] items, 'massage', 'plank', 'sword', 'chaos', and 'corporal' are mostly B1 or even A2/B1-level words, so they are too easy for B2. 'defied' is closer to B2 and fits better. 'coop' and 'shady' are problematic because they are treated as series names rather than vocabulary, which also weakens the banding validity. Overall, the list contains several words that are miscalibrated for the assigned CEFR band.",
+    "not_c_level": [
+      {
+        "word": "legion",
+        "estimated_level": "B2",
+        "reason": "Marked [B1], but 'legion' is generally more advanced and closer to B2/C1 than B1."
+      },
+      {
+        "word": "massage",
+        "estimated_level": "A2",
+        "reason": "Marked [B2], but 'massage' is a common everyday word and is too easy for B2."
+      },
+      {
+        "word": "plank",
+        "estimated_level": "B1",
+        "reason": "Marked [B2], but 'plank' is a fairly basic concrete noun, not typically B2."
+      },
+      {
+        "word": "corporal",
+        "estimated_level": "B1",
+        "reason": "Marked [B2], but 'corporal' is a relatively common rank term and is usually below B2."
+      },
+      {
+        "word": "sword",
+        "estimated_level": "A2",
+        "reason": "Marked [B2], but 'sword' is a very basic noun and not B2-level."
+      },
+      {
+        "word": "chaos",
+        "estimated_level": "B1",
+        "reason": "Marked [B2], but 'chaos' is common B1 vocabulary rather than B2."
+      },
+      {
+        "word": "coop",
+        "estimated_level": "B1",
+        "reason": "As a vocabulary item it is B1-ish, but in this list it is functioning as a proper name, so it does not cleanly fit the CEFR vocabulary criterion."
+      },
+      {
+        "word": "shady",
+        "estimated_level": "B1",
+        "reason": "As an adjective it is B1, but here it is treated as a series-specific name, so it does not cleanly fit the CEFR vocabulary criterion."
+      }
+    ]
+  },
+  "overall_score": 6.3,
+  "summary": "The translations are mostly accurate and natural, with only minor context uncertainty for a few items. The main weaknesses are dataset hygiene issues: some source entries are proper names or series-specific terms, and several words are mis-banded for the stated B1/B2 levels.",
+  "tokens_used": {
+    "prompt": 1332,
+    "completion": 1184,
+    "total": 2516
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.754915",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 1,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 2,
+    "reasoning": "Step 1: The Russian translation is present and not empty, so this is not a missing-translation case. Step 2: However, the subtitle evidence shows no matched line for 'head off' in this episode context, so there is no episode-specific usage to verify. Step 3: The gloss 'перехватить' is a plausible general meaning for 'head off' in some contexts, but without an actual occurrence in the episode it cannot be confirmed as contextually correct here. Step 4: Because the pair is not supported by episode evidence and may be an unverified or overly generic gloss, it should receive a low score rather than full credit.",
+    "issues": [
+      {
+        "phrasal_verb": "head off",
+        "translation": "перехватить",
+        "issue": "No subtitle line matched in the episode, so the translation cannot be validated against actual usage; the gloss is plausible but unverified and potentially too generic for this context."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 8,
+    "reasoning": "Step 1: 'head off' is a real English verb-particle construction and is widely used as a phrasal verb/idiom. Step 2: It is not tokenizer garbage or accidental adjacency; it is a legitimate lexical item with established meanings such as 'leave to go somewhere', 'turn aside', or 'prevent/stop'. Step 3: Since the source string itself is valid, it should score highly. Step 4: A small deduction is appropriate only because the episode context is absent, so the specific sense intended here cannot be checked, but that does not make the phrase invalid as a phrasal verb.",
+    "invalid_phrasals": []
+  },
+  "overall_score": 5.0,
+  "summary": "The source phrase 'head off' is a genuine phrasal verb, so it passes the idiom-validity check. However, there is no matched subtitle evidence in the episode, so the Russian gloss 'перехватить' cannot be confirmed as contextually correct for this specific case.",
+  "tokens_used": {
+    "prompt": 623,
+    "completion": 475,
+    "total": 1098
+  }
+}

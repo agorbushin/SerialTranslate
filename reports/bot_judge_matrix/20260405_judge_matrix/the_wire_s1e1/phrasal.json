@@ -1,0 +1,165 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/The Wire/Season 1/1",
+  "judged_at": "2026-04-05T22:55:11.810618",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "The Wire",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 393,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/The Wire/Season 1/the_wire_s1_e1.srt",
+  "criterion_1": {
+    "score": 2,
+    "reasoning": "Step 1: A small subset of entries are correct and contextually usable, such as 'come on' → 'давай', 'hold up' → 'подождать', 'what about' → 'что насчет', 'get out' → 'выйти', and 'hands up' → 'руки вверх'. Step 2: However, the list is dominated by incomplete fragments, overly literal glosses, or translations that do not match the episode context. Many entries are not real translations at all, e.g. 's up' → 'вверх', 'it up' → 'это', 'you in' → 'ты в', 'him out' → 'его', 'm down' → 'успокаиваться', which are either truncated or semantically too vague. Step 3: Several glosses are wrong for the actual usage in the subtitles: 'hold up' is used as 'wait', but the translation is acceptable only in that sense; 'get on' is glossed as 'ладить' but the subtitle example is 'Get on the ground', so the correct sense is 'встать/лечь на землю' or 'на землю'; 'put out' is translated as 'потушить' but in 'Eggy put out testers' it means 'выпустить/раздать'; 'go off' is translated as 'взорваться' but here it means a pager going off, i.e. 'сработать/зазвонить'. Step 4: There are also many entries that are clearly malformed or generic placeholders rather than learner-friendly glosses, such as 'car down' → 'автомобиль вниз', 'business out in' → 'дела внутрь', 'deterrent on' → 'сдерживающий фактор о', and 're on' → 'вновь на'. Overall, only a minority are usable and many are either missing, truncated, or contextually off, so the score is very low.",
+    "issues": [
+      {
+        "phrasal_verb": "s up",
+        "translation": "вверх",
+        "issue": "Truncated fragment, not a complete learner gloss; in context it functions as 'what's up'/'how's it going', not literally 'up'."
+      },
+      {
+        "phrasal_verb": "it up",
+        "translation": "это",
+        "issue": "Incomplete and semantically empty; does not convey the idiomatic meaning in 'make it up' or 'keep it up'."
+      },
+      {
+        "phrasal_verb": "you in",
+        "translation": "ты в",
+        "issue": "Too fragmentary and not a usable Russian gloss; this is ordinary adjacency, not a complete translation."
+      },
+      {
+        "phrasal_verb": "get on",
+        "translation": "ладить",
+        "issue": "Wrong sense for the episode example 'Get on the ground'; here it means 'лечь/встать на землю', not 'get along'."
+      },
+      {
+        "phrasal_verb": "put out",
+        "translation": "потушить",
+        "issue": "Wrong sense in context; 'Eggy put out testers' means 'выпустить/раздать', not 'extinguish'."
+      },
+      {
+        "phrasal_verb": "go off",
+        "translation": "взорваться",
+        "issue": "Wrong contextual sense; a pager 'go off' means 'сработать/зазвонить', not 'explode'."
+      },
+      {
+        "phrasal_verb": "hold up",
+        "translation": "подождать",
+        "issue": "Acceptable in context, but the entry is still generic; it should ideally reflect the imperative 'подожди/секунду'."
+      },
+      {
+        "phrasal_verb": "car down",
+        "translation": "автомобиль вниз",
+        "issue": "Nonsensical literal gloss; not a usable translation."
+      },
+      {
+        "phrasal_verb": "business out in",
+        "translation": "дела внутрь",
+        "issue": "Incorrect and contradictory to the source phrase; the gloss does not match the meaning."
+      },
+      {
+        "phrasal_verb": "deterrent on",
+        "translation": "сдерживающий фактор о",
+        "issue": "Awkward and incomplete Russian; not a natural or meaningful gloss."
+      },
+      {
+        "phrasal_verb": "re on",
+        "translation": "вновь на",
+        "issue": "Malformed fragment; not a real translation of a phrasal expression."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 1,
+    "reasoning": "Step 1: A limited number of entries are genuine phrasal verbs or established verb-particle/verb-preposition idioms, such as 'come on', 'hold up', 'get out', 'come back', 'go back', 'figure out', 'work out', 'pick up', 'put out', 'get on', 'get back', 'end up', 'deal with', 'let go', 'sit down', 'come in', 'run away', 'go off', 'go over', 'showed up', 'speak with', and 'look for'. Step 2: But a very large portion of the list consists of accidental word adjacency, sentence fragments, or tokenizer garbage rather than lexical phrasal units. Examples include bare pronoun/preposition combinations like 'you in', 'him out', 'man in', 'people on', 'court in', 'day in', 'glass with', 'address on', and many clipped strings like 's up', 'it up', 'm down', 't up', 're on'. Step 3: Some entries are not phrasal verbs at all but ordinary grammatical phrases or noun-preposition sequences, such as 'what about', 'that for', 'price for', 'report on', 'name on', 'war on', 'questions about', 'services in', and 'court with'. Step 4: Because the majority of the inventory is not a valid textbook-style phrasal verb or idiom, the list fails this criterion badly, even though a minority of entries are legitimate.",
+    "invalid_phrasals": [
+      {
+        "phrase": "s up",
+        "reason": "Truncated fragment; not a complete English phrasal verb or idiom."
+      },
+      {
+        "phrase": "it up",
+        "reason": "Incomplete fragment; lacks a verb and is not a standalone phrasal idiom."
+      },
+      {
+        "phrase": "you in",
+        "reason": "Ordinary pronoun + preposition adjacency, not a lexical phrasal idiom."
+      },
+      {
+        "phrase": "him out",
+        "reason": "Ordinary pronoun + particle adjacency; not a fixed phrasal verb by itself."
+      },
+      {
+        "phrase": "man in",
+        "reason": "Noun + preposition sequence, not a phrasal verb."
+      },
+      {
+        "phrase": "people on",
+        "reason": "Ordinary noun phrase with preposition; not a phrasal idiom."
+      },
+      {
+        "phrase": "court in",
+        "reason": "Noun + preposition sequence; not a phrasal verb."
+      },
+      {
+        "phrase": "day in",
+        "reason": "Noun phrase fragment, not a phrasal verb."
+      },
+      {
+        "phrase": "glass with",
+        "reason": "Noun + preposition fragment; not a phrasal idiom."
+      },
+      {
+        "phrase": "address on",
+        "reason": "Noun + preposition sequence; not a phrasal verb."
+      },
+      {
+        "phrase": "what about",
+        "reason": "Fixed prepositional phrase, but not a phrasal verb."
+      },
+      {
+        "phrase": "that for",
+        "reason": "Ordinary determiner + preposition sequence; not a phrasal idiom."
+      },
+      {
+        "phrase": "price for",
+        "reason": "Noun phrase with preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "report on",
+        "reason": "Can be a verb-preposition construction, but here the list item is often just a noun phrase fragment; not reliably a phrasal verb entry."
+      },
+      {
+        "phrase": "war on",
+        "reason": "Noun phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "questions about",
+        "reason": "Noun phrase fragment, not a phrasal verb."
+      },
+      {
+        "phrase": "services in",
+        "reason": "Noun phrase fragment, not a phrasal verb."
+      },
+      {
+        "phrase": "court with",
+        "reason": "Noun phrase fragment, not a phrasal verb."
+      },
+      {
+        "phrase": "re on",
+        "reason": "Truncated fragment; not a valid English idiom."
+      },
+      {
+        "phrase": "m down",
+        "reason": "Truncated fragment; not a valid phrasal verb."
+      }
+    ]
+  },
+  "overall_score": 1.5,
+  "summary": "A small number of entries are legitimate and contextually useful, but the list is heavily polluted by fragments, noun-preposition strings, and many literal or wrong Russian glosses. As a phrasal-verb learning resource for this episode, it is largely unreliable and needs substantial cleanup.",
+  "tokens_used": {
+    "prompt": 19864,
+    "completion": 2099,
+    "total": 21963
+  }
+}

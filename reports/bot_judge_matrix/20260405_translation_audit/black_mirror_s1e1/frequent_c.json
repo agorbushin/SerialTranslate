@@ -1,0 +1,66 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Black Mirror/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.757809",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Black Mirror",
+  "season": 1,
+  "episode": 1,
+  "word_count": 7,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Black Mirror/Season 1/black_mirror_s1_e1.srt",
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most translations are correct and fit the episode context. 'terrestrial' → 'эфирный', 'unsimulated' → 'неимитированный', 'obit' → 'некролог', 'mps' → 'члены парламента', and 'significance' → 'значение' are all acceptable in context. The main issue is 'ukn' → 'телеканал': in the subtitles this is clearly the broadcaster UKN, so the source item is an abbreviation/name rather than a common English word, and the translation is a contextual gloss rather than a direct lexical equivalent. 'carlton' is also not translated as a vocabulary item but annotated as a character name, which is acceptable for context but not a true word translation. Overall, the list is largely accurate with only minor contextual/lexical issues.",
+    "issues": [
+      {
+        "word": "ukn",
+        "translation": "телеканал",
+        "issue": "This is a broadcaster abbreviation/name in the episode, not a normal English vocabulary word; 'телеканал' is a contextual description rather than a direct translation."
+      },
+      {
+        "word": "carlton",
+        "translation": "Карлтон (имя в сериале), словарный перевод — поселение свободных крестьян",
+        "issue": "This is a character name, so the entry is not a true vocabulary translation; the added dictionary gloss is irrelevant to the episode context."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 3,
+    "reasoning": "Several source items are not genuine English vocabulary words and should have been filtered out before translation. 'ukn' is a broadcaster abbreviation/name, not a vocabulary item. 'carlton' is a proper name of a character in the episode, not a word to learn as vocabulary. The remaining items are real English words, though some are specialized or context-dependent. Because multiple non-vocabulary entities slipped through, this list fails the filtering criterion substantially.",
+    "violations": [
+      "ukn",
+      "carlton"
+    ]
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list contains a mix of advanced and non-advanced items. Some entries are clearly C-level or at least specialized in this context, such as 'terrestrial' in broadcasting, 'unsimulated' in a formal/technical sense, 'obit' as journalistic shorthand, and 'significance' in an abstract academic/media sense. However, 'ukn' and 'carlton' are not vocabulary items at all, and 'mps' is only moderately advanced because it is a common political abbreviation that many B2 learners may know. The list therefore does not consistently meet the goal of teaching C1/C2 vocabulary.",
+    "not_c_level": [
+      {
+        "word": "ukn",
+        "estimated_level": "B1",
+        "reason": "Not a real vocabulary item; it is a broadcaster abbreviation/name rather than advanced English vocabulary."
+      },
+      {
+        "word": "carlton",
+        "estimated_level": "B1",
+        "reason": "Proper name of a character, not vocabulary."
+      },
+      {
+        "word": "mps",
+        "estimated_level": "B2",
+        "reason": "Common political abbreviation for 'Members of Parliament'; useful but not strongly C1/C2-level vocabulary."
+      }
+    ]
+  },
+  "overall_score": 5.0,
+  "summary": "The translations are mostly accurate and contextually appropriate, with only minor issues in lexical purity and source filtering. The main weaknesses are that proper names/abbreviations were included in the vocabulary list, and the list is not consistently C-level in difficulty.",
+  "tokens_used": {
+    "prompt": 2212,
+    "completion": 823,
+    "total": 3035
+  }
+}

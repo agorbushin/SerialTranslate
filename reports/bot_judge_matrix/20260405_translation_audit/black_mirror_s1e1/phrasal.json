@@ -1,0 +1,251 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Black Mirror/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.757821",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Black Mirror",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 181,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Black Mirror/Season 1/black_mirror_s1_e1.srt",
+  "criterion_1": {
+    "score": 3,
+    "reasoning": "Step 1: A small subset of the Russian glosses are correct and fit the episode context well, such as \"go in\" → \"войти\", \"focus on\" → \"сосредоточиться на\", \"running out\" → \"заканчивается\", \"turn off\" → \"выключить\", and \"bring about\" → \"привести к\". Step 2: However, many entries are either not real translations, are too generic, or do not match the actual usage in the subtitles. Step 3: Several glosses are clearly wrong or awkward in context, especially where the English source is not even a proper phrasal verb or the Russian is a literal fragment rather than a usable learner gloss. Step 4: There are also many duplicated or malformed source strings (for example truncated forms like \"s on\", \"it off\", \"this on\", \"re out\"), which makes the translation set unreliable overall. Step 5: Because only a minority of the entries are both complete and contextually correct, the score must be low.",
+    "issues": [
+      {
+        "phrasal_verb": "s on",
+        "translation": "включить",
+        "issue": "Malformed source string; the intended phrase is likely \"is on\" or \"it's on\". The Russian gloss is plausible for the episode context, but the entry itself is incomplete and not a clean learner item."
+      },
+      {
+        "phrasal_verb": "her back",
+        "translation": "ее спина",
+        "issue": "Not a phrasal verb; the gloss is also wrong for the episode line \"We get her back\", where the meaning is \"get her back\" = вернуть ее / вернуть ее обратно."
+      },
+      {
+        "phrasal_verb": "it off",
+        "translation": "снять это",
+        "issue": "Truncated source string; in context \"get it off there\" means remove it from there, not simply \"снять это\"."
+      },
+      {
+        "phrasal_verb": "this on",
+        "translation": "это включить",
+        "issue": "Malformed source string; the episode line is closer to \"running this on air\" / \"put this on air\", so the gloss is not a stable translation."
+      },
+      {
+        "phrasal_verb": "head onto",
+        "translation": "направиться к",
+        "issue": "The Russian is too generic and misses the directional nuance of \"onto\"; in context it is about mapping a head onto a body, not heading somewhere."
+      },
+      {
+        "phrasal_verb": "it with",
+        "translation": "это с",
+        "issue": "Not a usable Russian gloss; it is just a fragment and does not translate the idiomatic meaning in context."
+      },
+      {
+        "phrasal_verb": "hours away",
+        "translation": "в нескольких часах",
+        "issue": "Overly generic and incomplete; in context it means \"X hours away\" = \"через несколько часов / осталось несколько часов\"."
+      },
+      {
+        "phrasal_verb": "get into",
+        "translation": "войти в",
+        "issue": "Too literal for the episode usage \"get into this\"; here it means \"вникнуть / разобраться\", not physical entry."
+      },
+      {
+        "phrasal_verb": "got in",
+        "translation": "вошел в",
+        "issue": "Wrong sense for the episode line about intruders or access; context is \"they got in\" = \"они проникли / вошли\", not necessarily \"вошел в\"."
+      },
+      {
+        "phrasal_verb": "lay down",
+        "translation": "лечь",
+        "issue": "Incomplete for the episode context \"Lay down on the floor\"; the gloss should reflect the full construction or be tied to the idiom \"lie down\"."
+      },
+      {
+        "phrasal_verb": "down on",
+        "translation": "сесть на",
+        "issue": "Wrong meaning; in context it is part of \"lay down on the floor\" and does not mean \"sit on\"."
+      },
+      {
+        "phrasal_verb": "put on",
+        "translation": "надеть",
+        "issue": "Correct only for clothing, but the stored example is about an invoice, where \"put on\" means \"вписать / указать\", so the gloss is contextually wrong."
+      },
+      {
+        "phrasal_verb": "go on",
+        "translation": "продолжать",
+        "issue": "The gloss is acceptable in general, but the stored example is missing and the entry is underspecified; in dialogue it can also mean \"происходить\" or \"давай\" depending on context."
+      },
+      {
+        "phrasal_verb": "get through",
+        "translation": "пройти через",
+        "issue": "Too literal; in the episode \"We'll get through this\" means \"мы справимся / переживем это\", not physical passage."
+      },
+      {
+        "phrasal_verb": "right down",
+        "translation": "прямо вниз",
+        "issue": "This is not the meaning in the episode line \"I'll be right down\"; there it means \"я сейчас спущусь / буду через минуту\"."
+      },
+      {
+        "phrasal_verb": "am in",
+        "translation": "находиться в",
+        "issue": "Not a phrasal verb and the gloss is only a generic copular phrase; it does not capture the actual sentence fragment."
+      },
+      {
+        "phrasal_verb": "held by",
+        "translation": "удерживаемый",
+        "issue": "Too generic and passive; in context it means \"held by one you will not trace\" = \"удерживаемая/находящаяся у того, кого вы не отследите\"."
+      },
+      {
+        "phrasal_verb": "instructed by",
+        "translation": "инструктирован",
+        "issue": "Awkward passive participle and not a natural learner gloss; in context it means \"as instructed by\" = \"как было велено / по инструкции\"."
+      },
+      {
+        "phrasal_verb": "by by",
+        "translation": "по",
+        "issue": "Garbage/truncated entry; not a meaningful translation."
+      },
+      {
+        "phrasal_verb": "security on",
+        "translation": "охрана за",
+        "issue": "Wrong and unnatural; in context \"security on her\" means security detail assigned to her, not \"охрана за\"."
+      },
+      {
+        "phrasal_verb": "notice out",
+        "translation": "обратите внимание",
+        "issue": "Wrong sense; in context \"put a notice out\" means issue a notice / send out a notice, not \"pay attention\"."
+      },
+      {
+        "phrasal_verb": "pissed off",
+        "translation": "раздосадованный",
+        "issue": "Too weak and adjectival; in the episode it means \"annoyed / pissed off\" in a stronger colloquial sense."
+      },
+      {
+        "phrasal_verb": "hereon in",
+        "translation": "с этого момента",
+        "issue": "Acceptable meaning, but the phrase is rare and the gloss is slightly stiff; still usable."
+      },
+      {
+        "phrasal_verb": "back up",
+        "translation": "поддерживать",
+        "issue": "The source is valid, but the episode example is a noun phrase \"back-up plan\", not the phrasal verb. The gloss does not match the stored example."
+      },
+      {
+        "phrasal_verb": "come on",
+        "translation": "давай",
+        "issue": "Too narrow; in the episode it functions as an exhortation, but the gloss should ideally reflect broader uses like \"давай же / ну же\"."
+      },
+      {
+        "phrasal_verb": "re out",
+        "translation": "выходите",
+        "issue": "Malformed source string; likely intended \"we're out\". The translation is not tied to a valid source phrase."
+      },
+      {
+        "phrasal_verb": "s out",
+        "translation": "выходите",
+        "issue": "Malformed source string; likely intended \"it's out\". The gloss is not reliable as a learner entry."
+      },
+      {
+        "phrasal_verb": "put in",
+        "translation": "вставить",
+        "issue": "Too literal; in context \"put in an assured performance\" means \"выступить / показать\" rather than physically insert."
+      },
+      {
+        "phrasal_verb": "minister into",
+        "translation": "вмешиваться в",
+        "issue": "Wrong construction and wrong meaning; the episode has \"coerced the Prime Minister into committing...\", where \"into\" is part of the verb pattern, not \"minister into\"."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 2,
+    "reasoning": "Step 1: A limited number of entries are genuine phrasal verbs or established verb-preposition patterns, such as \"turn off\", \"put on\", \"go on\", \"get out\", \"get through\", \"move on\", \"depend on\", \"insist on\", \"look for\", and \"run out\". Step 2: But a very large portion of the list consists of malformed fragments, accidental adjacency, or non-idiomatic strings created by tokenization or subtitle slicing, such as \"s on\", \"it off\", \"this on\", \"re out\", \"s out\", \"by by\", and \"am in\". Step 3: Many items are not phrasal verbs at all but ordinary noun phrases or prepositional phrases, for example \"her back\", \"hours away\", \"television on\", \"piece on\", \"image on\", \"event in\", and \"security on\". Step 4: Some are valid verb-preposition constructions but not really textbook phrasal verbs; however, the main problem is that the list is dominated by false positives and broken entries. Step 5: Because the majority of the source strings are not genuine phrasal-type idioms, the score is very low.",
+    "invalid_phrasals": [
+      {
+        "phrase": "s on",
+        "reason": "Truncated fragment, not a real English phrasal verb or idiom."
+      },
+      {
+        "phrase": "her back",
+        "reason": "Ordinary noun phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "it off",
+        "reason": "Incomplete fragment; not a standalone idiom in this form."
+      },
+      {
+        "phrase": "this on",
+        "reason": "Broken fragment from subtitle segmentation, not a lexical idiom."
+      },
+      {
+        "phrase": "it with",
+        "reason": "Incomplete fragment; not a valid phrasal construction."
+      },
+      {
+        "phrase": "hours away",
+        "reason": "Adjectival/prepositional time expression, not a phrasal verb."
+      },
+      {
+        "phrase": "am in",
+        "reason": "Copular verb plus preposition; not a phrasal verb."
+      },
+      {
+        "phrase": "by by",
+        "reason": "Garbage repetition, not an English idiom."
+      },
+      {
+        "phrase": "security on",
+        "reason": "Noun plus preposition phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "notice out",
+        "reason": "Verb plus particle is possible in English, but this exact form is not a standard textbook phrasal verb; here it is a subtitle-derived phrase."
+      },
+      {
+        "phrase": "hereon in",
+        "reason": "Fixed adverbial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "re out",
+        "reason": "Truncated fragment, not a valid idiom."
+      },
+      {
+        "phrase": "s out",
+        "reason": "Truncated fragment, not a valid idiom."
+      },
+      {
+        "phrase": "back up",
+        "reason": "Valid phrasal verb in general, but the stored example is a noun phrase \"back-up plan\", so the entry is not cleanly supported by the episode usage."
+      },
+      {
+        "phrase": "television on",
+        "reason": "Noun phrase with preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "piece on",
+        "reason": "Noun phrase plus preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "image on",
+        "reason": "Noun phrase plus preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "event in",
+        "reason": "Noun phrase plus preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "minister into",
+        "reason": "Not a lexical phrasal verb; it is a malformed extraction from a clause with \"coerced ... into\"."
+      }
+    ]
+  },
+  "overall_score": 2.5,
+  "summary": "The list contains a handful of real phrasal verbs with usable Russian glosses, but many entries are malformed subtitle fragments or ordinary noun/preposition combinations rather than true phrasal idioms. Translation quality is also inconsistent, with several glosses being too literal, too generic, or mismatched to the episode context.",
+  "tokens_used": {
+    "prompt": 9340,
+    "completion": 2974,
+    "total": 12314
+  }
+}

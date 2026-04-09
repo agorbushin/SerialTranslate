@@ -1,0 +1,131 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.750666",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "word_count": 29,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most pairs are translated into natural Russian words and are broadly semantically correct. Several items are good direct equivalents (tense, passive, cop, idiot, motel, airplane, overhead), and many sound-words are rendered acceptably for subtitle use (moaning, beeping, grunt, grunting, screaming, thudding, barking, banging, ringing). The main weakness is that a few translations are too generic or slightly off in context: 'bigger' → 'более сильный' shifts meaning from size to strength; 'yell' → 'кричать' is a verb rather than the noun/command sense often expected from the source item; 'fell' → 'попался' is not a direct translation of 'fell' and is context-dependent; 'beeping' → 'пиканье аппарата' is understandable but more explanatory than lexical; 'monk' includes a parenthetical note rather than a clean translation. Overall, the list is mostly correct with a few contextual/lexical imprecisions.",
+    "issues": [
+      {
+        "word": "bigger",
+        "translation": "более сильный",
+        "issue": "Wrong sense: 'bigger' means 'larger/more big', not 'stronger'."
+      },
+      {
+        "word": "yell",
+        "translation": "кричать",
+        "issue": "Too generic / wrong form: source is a noun/lexical item, while the translation is a verb; context may require 'крик' or 'крикнуть'."
+      },
+      {
+        "word": "fell",
+        "translation": "попался",
+        "issue": "Context-dependent and not a direct translation of 'fell'; likely a different sense was intended."
+      },
+      {
+        "word": "beeping",
+        "translation": "пиканье аппарата",
+        "issue": "Understandable but overly explanatory; not a clean lexical translation."
+      },
+      {
+        "word": "monk",
+        "translation": "Монк (имя в сериале), словарный перевод — монах",
+        "issue": "Contains commentary rather than a pure translation; the source word itself is not translated cleanly."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 7,
+    "reasoning": "Most source items are genuine English vocabulary words. However, at least one item is clearly not a normal vocabulary entry: 'Monk' is presented as a character name in the series, so it should have been filtered out if the task is vocabulary-only. 'nothin' is a colloquial clipped form of English 'nothing' and is acceptable as English slang, though it is nonstandard. The rest are ordinary English words.",
+    "violations": [
+      "monk"
+    ]
+  },
+  "criterion_3": {
+    "score": 6,
+    "reasoning": "The list is broadly aimed at B1/B2, but several entries are miscalibrated. Some items are too easy for B2 and belong closer to A1/A2 or B1, such as 'cop', 'idiot', 'motel', 'airplane', 'bowling', 'passive', 'tense', 'awkward', 'bigger', and 'hated'. A few are sound-effect or subtitle-specific forms that are not really standard B2 vocabulary items, though they can still appear in subtitles. Overall, the banding is mixed: many items are plausible B1/B2, but there are enough easy words in the B2 set to lower the calibration quality.",
+    "not_c_level": [
+      {
+        "word": "tense",
+        "estimated_level": "B1",
+        "reason": "Plausible B1 adjective, but not especially B2."
+      },
+      {
+        "word": "passive",
+        "estimated_level": "B1",
+        "reason": "Common B1 adjective; too easy for B2."
+      },
+      {
+        "word": "cop",
+        "estimated_level": "A2",
+        "reason": "Very common informal word; below B2."
+      },
+      {
+        "word": "idiot",
+        "estimated_level": "A2",
+        "reason": "Basic insult/vocabulary, not B2."
+      },
+      {
+        "word": "awkward",
+        "estimated_level": "B1",
+        "reason": "Common B1 adjective; not really B2."
+      },
+      {
+        "word": "bigger",
+        "estimated_level": "A1",
+        "reason": "Comparative of a basic adjective; far below B2."
+      },
+      {
+        "word": "motel",
+        "estimated_level": "A2",
+        "reason": "Common concrete noun, not B2."
+      },
+      {
+        "word": "airplane",
+        "estimated_level": "A1",
+        "reason": "Basic everyday noun; below B2."
+      },
+      {
+        "word": "bowling",
+        "estimated_level": "A2",
+        "reason": "Common leisure activity word, not B2."
+      },
+      {
+        "word": "hated",
+        "estimated_level": "A2",
+        "reason": "Simple past of a basic verb; below B2."
+      },
+      {
+        "word": "nothin",
+        "estimated_level": "B1",
+        "reason": "Colloquial clipped form of 'nothing'; acceptable English, but not a strong B2 vocabulary item."
+      },
+      {
+        "word": "beep",
+        "estimated_level": "A2",
+        "reason": "Basic sound word; below B2."
+      },
+      {
+        "word": "ringing",
+        "estimated_level": "A2",
+        "reason": "Common everyday verb/participle; below B2."
+      }
+    ]
+  },
+  "overall_score": 7.0,
+  "summary": "The translations are mostly understandable and often correct, but a few entries are imprecise or context-mismatched. The source list also contains at least one non-vocabulary item ('monk' as a character name), and the B1/B2 calibration is somewhat inflated by many easy words.",
+  "tokens_used": {
+    "prompt": 1722,
+    "completion": 1352,
+    "total": 3074
+  }
+}

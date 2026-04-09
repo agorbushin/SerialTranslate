@@ -1,0 +1,17 @@
+{
+  "request_id": "4bf1d3d6200b4deaa5a37ac7d2493a7c",
+  "mode": "series",
+  "raw_input": "A",
+  "started_at": "2026-04-01T22:45:01.705147",
+  "finished_at": "2026-04-01T22:45:01.706379",
+  "status": "failed",
+  "branch": "",
+  "identity": {},
+  "phase_timings_ms": {},
+  "timings_ms": {
+    "total_e2e_ms": 1
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "name_too_short"
+}

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# After git pull / merge: restart bot if merged commits changed Python or deps.
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+exec "$ROOT/.githooks/restart_if_code_changed.sh" ORIG_HEAD HEAD

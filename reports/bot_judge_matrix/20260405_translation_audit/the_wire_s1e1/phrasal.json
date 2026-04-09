@@ -1,0 +1,211 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/The Wire/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.756466",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "The Wire",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 393,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/The Wire/Season 1/the_wire_s1_e1.srt",
+  "criterion_1": {
+    "score": 3,
+    "reasoning": "Step 1: A small subset of entries are genuinely correct and context-appropriate, such as \"come on\" → \"давай\", \"hold up\" → \"подождать\", \"what about\" → \"что насчет\", \"get out\" → \"выйти\", \"come back\" → \"вернуться\", and \"hands up\" → \"руки вверх\". Step 2: However, many glosses are either too literal, too generic, or not the sense used in the episode. For example, \"hold up\" is used as an imperative to pause/wait, so \"подождать\" is acceptable, but many others are not idiomatic Russian renderings of the actual meaning in context. Step 3: A large number of translations are incomplete or awkwardly mapped to isolated particles rather than the full expression, e.g. \"s up\" → \"вверх\", \"it up\" → \"это\", \"you in\" → \"ты в\", \"him out\" → \"его\", \"m down\" → \"успокаиваться\". Step 4: Some are outright wrong or misleading for the episode context, such as \"have on\" → \"иметь на\" instead of \"иметь на руках/иметь компромат\", \"get in\" → \"войти\" where the line means \"arrive/report in early\", and \"put out\" → \"потушить\" where the episode usage is \"put out testers\" meaning distribute/place out. Step 5: There are also transliteration-like or non-translation entries such as \"barlow on\" → \"барлоу на\" and many highly generic glosses that do not capture the phrasal meaning. Overall, the list contains a mix of correct items and many incomplete or context-mismatched glosses, so the score is low but not zero.",
+    "issues": [
+      {
+        "phrasal_verb": "s up",
+        "translation": "вверх",
+        "issue": "Incomplete fragment rather than a real gloss; in context this is part of \"what's up\" and should not be translated as a standalone particle."
+      },
+      {
+        "phrasal_verb": "it up",
+        "translation": "это",
+        "issue": "Overly generic and incomplete; does not express the idiomatic meaning of \"make it up\" / \"keep it up\" in context."
+      },
+      {
+        "phrasal_verb": "you in",
+        "translation": "ты в",
+        "issue": "Fragmentary and not a proper Russian gloss; this is accidental adjacency rather than a meaningful translation."
+      },
+      {
+        "phrasal_verb": "have on",
+        "translation": "иметь на",
+        "issue": "Too literal and incomplete; in context it means \"have on this mope\" = have evidence/charges on him."
+      },
+      {
+        "phrasal_verb": "get in",
+        "translation": "войти",
+        "issue": "Wrong sense for the episode line; here it means \"arrive/report in early,\" not simply \"enter.\""
+      },
+      {
+        "phrasal_verb": "put out",
+        "translation": "потушить",
+        "issue": "Wrong sense in context; the line is about putting out testers/distributing, not extinguishing."
+      },
+      {
+        "phrasal_verb": "get on",
+        "translation": "ладить",
+        "issue": "Context mismatch; in the subtitle it is \"Get on the ground,\" meaning \"get down/on the ground,\" not \"get along.\""
+      },
+      {
+        "phrasal_verb": "m down",
+        "translation": "успокаиваться",
+        "issue": "Fragmentary source and awkward translation; this is not a stable phrasal entry."
+      },
+      {
+        "phrasal_verb": "barlow on",
+        "translation": "барлоу на",
+        "issue": "Transliteration/garbage gloss rather than Russian meaning."
+      },
+      {
+        "phrasal_verb": "re on",
+        "translation": "вновь на",
+        "issue": "Awkward and not contextually meaningful; the source is not a real phrasal unit here."
+      },
+      {
+        "phrasal_verb": "fucked up",
+        "translation": "облажался",
+        "issue": "Mostly acceptable colloquially, but in the episode it often means \"messed up / screwed up\" or \"this is messed up\"; the gloss is only partially aligned."
+      },
+      {
+        "phrasal_verb": "sitting in",
+        "translation": "участвовать",
+        "issue": "Too broad; in context it means attending/sitting in on a proceeding, not generic participation."
+      },
+      {
+        "phrasal_verb": "come on",
+        "translation": "давай",
+        "issue": "Acceptable in one context, but the gloss is too narrow because the phrase can also mean \"come on, man\" = urging or disbelief."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 2,
+    "reasoning": "Step 1: A minority of entries are genuine phrasal verbs or established verb-particle/verb-preposition idioms, such as \"come on,\" \"hold up,\" \"get out,\" \"come back,\" \"go back,\" \"figure out,\" \"work out,\" \"pick up,\" \"put out,\" \"get back,\" \"end up,\" \"deal with,\" \"let go,\" \"sit down,\" and \"speak with.\" Step 2: However, the list is dominated by false positives created from token fragments or accidental adjacency, such as \"s up,\" \"it up,\" \"you in,\" \"me up,\" \"up in,\" \"him in,\" \"s down,\" \"s in,\" \"m down,\" \"t up,\" \"m up,\" and many similar strings. These are not lexical phrasal verbs; they are pieces of larger utterances or parser artifacts. Step 3: Many noun phrases or ordinary prepositional phrases are also incorrectly treated as phrasal entries, for example \"the back,\" \"day in,\" \"glass with,\" \"court in,\" \"house on,\" \"room with,\" \"business out in,\" and \"murder in.\" Step 4: Some entries are real collocations but not phrasal verbs in the textbook sense, or are too incomplete to count as established idioms. Because the majority of the inventory is non-idiomatic or malformed, the overall score must be very low.",
+    "invalid_phrasals": [
+      {
+        "phrase": "s up",
+        "reason": "Tokenizer fragment, not a lexical phrasal verb."
+      },
+      {
+        "phrase": "it up",
+        "reason": "Fragment of a larger clause; not a standalone idiom."
+      },
+      {
+        "phrase": "you in",
+        "reason": "Ordinary pronoun + preposition adjacency, not a phrasal idiom."
+      },
+      {
+        "phrase": "me up",
+        "reason": "Incomplete fragment; not a valid source phrase by itself."
+      },
+      {
+        "phrase": "up in",
+        "reason": "Preposition sequence, not a phrasal verb."
+      },
+      {
+        "phrase": "him in",
+        "reason": "Accidental adjacency, not a lexical idiom."
+      },
+      {
+        "phrase": "s down",
+        "reason": "Fragmentary and not a real phrasal unit."
+      },
+      {
+        "phrase": "s in",
+        "reason": "Fragmentary and not a real phrasal unit."
+      },
+      {
+        "phrase": "m down",
+        "reason": "Fragmentary and not a real phrasal unit."
+      },
+      {
+        "phrase": "t up",
+        "reason": "Fragmentary and not a real phrasal unit."
+      },
+      {
+        "phrase": "m up",
+        "reason": "Fragmentary and not a real phrasal unit."
+      },
+      {
+        "phrase": "the back",
+        "reason": "Noun phrase, not a phrasal verb or idiom."
+      },
+      {
+        "phrase": "day in",
+        "reason": "Ordinary prepositional phrase, not a phrasal idiom."
+      },
+      {
+        "phrase": "glass with",
+        "reason": "Noun + preposition fragment, not a phrasal verb."
+      },
+      {
+        "phrase": "court in",
+        "reason": "Ordinary prepositional phrase, not a phrasal idiom."
+      },
+      {
+        "phrase": "house on",
+        "reason": "Noun phrase with preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "room with",
+        "reason": "Noun phrase with preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "business out in",
+        "reason": "Not a fixed phrasal idiom; looks like a clause fragment."
+      },
+      {
+        "phrase": "murder in",
+        "reason": "Noun phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "barlow on",
+        "reason": "Proper name plus preposition; not a phrasal idiom."
+      },
+      {
+        "phrase": "re on",
+        "reason": "Fragmentary and not a valid idiom."
+      },
+      {
+        "phrase": "nigger in",
+        "reason": "Not a phrasal verb; just an offensive noun phrase fragment."
+      },
+      {
+        "phrase": "avenue in",
+        "reason": "Noun phrase fragment, not a phrasal idiom."
+      },
+      {
+        "phrase": "car down",
+        "reason": "Not an established phrasal verb; looks like a noun phrase fragment."
+      },
+      {
+        "phrase": "car down on",
+        "reason": "Not a valid phrasal idiom; fragmentary."
+      },
+      {
+        "phrase": "00 in",
+        "reason": "Numeric/time fragment, not a phrasal verb."
+      },
+      {
+        "phrase": "7 back",
+        "reason": "Numeric fragment, not a phrasal idiom."
+      },
+      {
+        "phrase": "night in",
+        "reason": "Ordinary phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "here over",
+        "reason": "Not a lexical idiom; accidental adjacency."
+      }
+    ]
+  },
+  "overall_score": 2.5,
+  "summary": "The translation list contains a handful of usable episode-appropriate glosses, but many entries are incomplete fragments, overly literal, or contextually wrong. More importantly, a large portion of the English sources are not real phrasal verbs at all but tokenizer artifacts or ordinary phrase fragments, which severely lowers the quality.",
+  "tokens_used": {
+    "prompt": 19864,
+    "completion": 2381,
+    "total": 22245
+  }
+}

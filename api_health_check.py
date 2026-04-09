@@ -21,8 +21,10 @@ class APIHealthChecker:
             openai_api_key: OpenAI API key (optional, will try to get from env/config)
             opensubtitles_api_key: OpenSubtitles API key (optional, will use default)
         """
-        self.openai_api_key = openai_api_key or os.environ.get('OPENAI_API_KEY')
-        self.opensubtitles_api_key = opensubtitles_api_key or "8FcGUu17mWuXoaqMxKQisSvjXhvjZdct"
+        from env_config import get_openai_api_key, get_opensubtitles_api_key
+
+        self.openai_api_key = openai_api_key or get_openai_api_key() or None
+        self.opensubtitles_api_key = opensubtitles_api_key or get_opensubtitles_api_key() or None
     
     def check_openai_error(self, error: Exception) -> Dict[str, any]:
         """Check if OpenAI error is due to quota/billing/rate limits.

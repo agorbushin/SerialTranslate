@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-Translate words from tier lists using ChatGPT API.
-Uses subtitle context to provide series-specific translations and examples.
+Translate words from tier lists using ChatGPT API (legacy CLI / tests).
+
+Deprecated for production: the Telegram bot and pipeline use
+``translate_tier_translations.py`` (``run()``) as the canonical translator.
+Keep this module only for existing scripts and ``tests/test_translation.py``
+until those callers are migrated.
 """
 
 import csv

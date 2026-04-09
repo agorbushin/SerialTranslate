@@ -7,7 +7,6 @@ using ChatGPT (OpenAI API). Based on archive telegram_bot.filter_names_and_fanta
 import asyncio
 import csv
 import json
-import os
 import re
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Union
@@ -18,23 +17,10 @@ from openai import AsyncOpenAI, OpenAI
 NAME_FILTER_MODEL = "gpt-4o-mini"
 MAX_CONCURRENT_BATCHES = 5
 
-# Default API key: env, then fallback from project telegram_bot (which may load from archive)
 def _default_api_key() -> str:
-    key = os.environ.get("OPENAI_API_KEY", "")
-    if key and key.strip():
-        return key.strip()
-    try:
-        import sys
-        from pathlib import Path
-        _root = Path(__file__).resolve().parent
-        if str(_root) not in sys.path:
-            sys.path.insert(0, str(_root))
-        from telegram_bot import OPENAI_API_KEY as _k
-        if _k and _k.strip():
-            return _k.strip()
-    except Exception:
-        pass
-    return ""
+    from env_config import get_openai_api_key
+
+    return get_openai_api_key()
 
 
 def get_subtitle_text(subtitle_path: Path) -> str:

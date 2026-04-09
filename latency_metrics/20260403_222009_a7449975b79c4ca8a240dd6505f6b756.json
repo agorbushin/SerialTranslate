@@ -1,0 +1,83 @@
+{
+  "request_id": "a7449975b79c4ca8a240dd6505f6b756",
+  "mode": "series",
+  "raw_input": "game of throne s3e3",
+  "started_at": "2026-04-03T22:19:15.824143",
+  "finished_at": "2026-04-03T22:20:09.083468",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Game Of Thrones",
+    "season": 3,
+    "episode": 3
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "spellfix_title": 1239,
+    "find_existing": 2,
+    "download_subtitle": 0,
+    "analyze_subtitle": 43072,
+    "translate": 7044
+  },
+  "timings_ms": {
+    "total_e2e_ms": 53259
+  },
+  "analyze_metrics": {
+    "preload_ms": 5604,
+    "parse_subtitle_ms": 8,
+    "gpt_cefr_ms": 3391,
+    "tier_build_ms": 4,
+    "gpt_filter_ms": 33234,
+    "save_outputs_ms": 22,
+    "total_ms": 42267,
+    "preload_cache_hit": 0,
+    "pipeline_skipped": 0
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 28,
+    "timings_ms": {
+      "prepare_ms": 2,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 811,
+      "write_outputs_ms": 3,
+      "total_ms": 7019,
+      "subtitle_read_skipped": 1,
+      "translations_reused": 3
+    },
+    "last_run_tier_ids": [
+      "b1",
+      "b2",
+      "tier_1"
+    ],
+    "tier_b1_word_count": 3,
+    "tier_b2_word_count": 21,
+    "tier_4_rare_c_word_count": 1,
+    "tier_4_rare_b_word_count": 31,
+    "tiers": {
+      "tier_1": {
+        "word_count": 4,
+        "to_translate": 1,
+        "reused": 3,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b1": {
+        "word_count": 3,
+        "to_translate": 3,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b2": {
+        "word_count": 21,
+        "to_translate": 21,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 811
+      }
+    }
+  },
+  "error": null
+}

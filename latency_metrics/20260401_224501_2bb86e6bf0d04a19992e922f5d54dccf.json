@@ -1,0 +1,26 @@
+{
+  "request_id": "2bb86e6bf0d04a19992e922f5d54dccf",
+  "mode": "series",
+  "raw_input": "Fallout",
+  "started_at": "2026-04-01T22:45:01.536656",
+  "finished_at": "2026-04-01T22:45:01.585501",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Fallout",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 3,
+    "spellfix_title": 0,
+    "find_existing": 5,
+    "download_subtitle": 1
+  },
+  "timings_ms": {
+    "total_e2e_ms": 48
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

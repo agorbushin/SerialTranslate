@@ -1,0 +1,334 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Sherlock/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.768959",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Sherlock",
+  "season": 1,
+  "episode": 1,
+  "word_count": 51,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Sherlock/Season 1/sherlock_s1_e1.srt",
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "Most translations are correct and fit the episode context: e.g. cab→такси, murderer/killer→убийца, suicide→самоубийство, inspector→инспектор, lipstick→губная помада, alibi→алиби, dreadful→ужасный. However, several entries are inaccurate or too loose for the subtitle sense. Some are wrong by meaning or part of speech: wearing→носить should be 'носить/надевать' in context but the subtitle uses the progressive 'you're wearing lipstick' = 'ты носишь/на тебе'; bust→облава на наркотики is acceptable in context, but putting→отвлекать is wrong because it means 'мешать/сбивать с толку'; cleared→оправдал; убрался mixes two unrelated senses and only the first is relevant; wondering→хотел спросить is too specific and misses the common 'интересоваться/задавался вопросом'; traveled→ехала is too narrow and gendered, while the context is simply 'приехала/ехала'; intending→собирающийся is awkward but acceptable; recognised→узнан is passive and incomplete for the subtitle sense 'узнал/узнана'; blacked→потерял сознание is incomplete because the English form in context is 'blacked out' meaning 'потерял сознание'; losing→теряем is only one inflected form, not the lemma; supposed→должен is too generic but usable. Overall the list is mostly usable, but a handful of mistranslations and context mismatches prevent a high score.",
+    "issues": [
+      {
+        "word": "putting",
+        "translation": "отвлекать",
+        "issue": "Wrong meaning in context; here it means 'мешать, сбивать с толку' ('You're putting me off')."
+      },
+      {
+        "word": "cleared",
+        "translation": "оправдал; убрался",
+        "issue": "Mixed unrelated senses; in the episode it means 'cleared my name' / 'cleared off', so the translation is not a clean contextual match."
+      },
+      {
+        "word": "wondering",
+        "translation": "хотел спросить",
+        "issue": "Too specific and not the usual meaning; in context it is 'я хотел(а) спросить/я задумался/мне интересно'."
+      },
+      {
+        "word": "travelled",
+        "translation": "ехала",
+        "issue": "Too narrow and gendered; context requires a neutral past form like 'приехала/ехала'."
+      },
+      {
+        "word": "recognised",
+        "translation": "узнан",
+        "issue": "Incorrect form for the context; should be 'узнал/узнана/распознан' depending on sentence, not a bare passive participle."
+      },
+      {
+        "word": "blacked",
+        "translation": "потерял сознание",
+        "issue": "Incomplete phrase; the subtitle sense is 'blacked out' = 'потерял сознание'."
+      },
+      {
+        "word": "losing",
+        "translation": "теряем",
+        "issue": "Only one inflected form is given; as a vocabulary item it should be translated as the lemma 'терять/потеря'."
+      },
+      {
+        "word": "supposed",
+        "translation": "должен",
+        "issue": "Too generic; in context it means 'предполагается/я должен быть/мне полагается', depending on sentence."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words used in the episode. There are no character names, place names, or other non-vocabulary intrusions in the source list. Even items that are context-specific slang or forms like 'cabbie' and 'mummy' are still valid English words.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 7,
+    "reasoning": "The list is broadly well calibrated to B1/B2, with many items clearly fitting those bands: cab, dull, suicide, inspector, alibi, frankly, dreadful, etc. A few entries are arguably too easy for B2 or too advanced/specialized for B1, but the overall distribution is reasonable. The main issues are that some B1 items are very basic A1/A2 words, and a few B2 items are also quite basic or inflected forms rather than stable vocabulary lemmas.",
+    "not_c_level": [
+      {
+        "word": "cab",
+        "estimated_level": "A2",
+        "reason": "Common everyday word; usually below B1."
+      },
+      {
+        "word": "murderer",
+        "estimated_level": "A2",
+        "reason": "Basic high-frequency noun, not typically B1."
+      },
+      {
+        "word": "killer",
+        "estimated_level": "A2",
+        "reason": "Very common basic vocabulary."
+      },
+      {
+        "word": "lover",
+        "estimated_level": "A2",
+        "reason": "Common word, generally easier than B1."
+      },
+      {
+        "word": "dull",
+        "estimated_level": "A2",
+        "reason": "Simple adjective, not especially B1."
+      },
+      {
+        "word": "overnight",
+        "estimated_level": "A2",
+        "reason": "Common adverb/adjective, usually below B1."
+      },
+      {
+        "word": "suicide",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1, but on the easier side of the band."
+      },
+      {
+        "word": "cabbie",
+        "estimated_level": "B1",
+        "reason": "Colloquial but still fairly accessible; borderline B1/B2."
+      },
+      {
+        "word": "inspector",
+        "estimated_level": "A2",
+        "reason": "Common occupation/title word, not strongly B2."
+      },
+      {
+        "word": "dying",
+        "estimated_level": "A2",
+        "reason": "Basic participle from a very common verb."
+      },
+      {
+        "word": "flatmate",
+        "estimated_level": "B1",
+        "reason": "Reasonable B1, though somewhat UK-specific."
+      },
+      {
+        "word": "wearing",
+        "estimated_level": "A1",
+        "reason": "Very basic present participle of a common verb."
+      },
+      {
+        "word": "lipstick",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun."
+      },
+      {
+        "word": "sergeant",
+        "estimated_level": "A2",
+        "reason": "Common rank word, not especially B2."
+      },
+      {
+        "word": "bust",
+        "estimated_level": "B1",
+        "reason": "In the 'drugs bust' sense it is idiomatic but still not clearly B2."
+      },
+      {
+        "word": "idiot",
+        "estimated_level": "A2",
+        "reason": "Very common insult/basic noun."
+      },
+      {
+        "word": "housekeeper",
+        "estimated_level": "A2",
+        "reason": "Common household occupation word."
+      },
+      {
+        "word": "warned",
+        "estimated_level": "A2",
+        "reason": "Simple past participle of a common verb."
+      },
+      {
+        "word": "texted",
+        "estimated_level": "A2",
+        "reason": "Modern but very common verb form, usually below B2."
+      },
+      {
+        "word": "cleared",
+        "estimated_level": "B1",
+        "reason": "Can be B1, but the form is broad and not especially advanced."
+      },
+      {
+        "word": "childish",
+        "estimated_level": "A2",
+        "reason": "Straightforward adjective."
+      },
+      {
+        "word": "putting",
+        "estimated_level": "A1",
+        "reason": "Basic verb form, not B2."
+      },
+      {
+        "word": "bluff",
+        "estimated_level": "B1",
+        "reason": "Reasonable B1/B2 border item, but not strongly B2."
+      },
+      {
+        "word": "mummy",
+        "estimated_level": "A2",
+        "reason": "Basic family word in UK usage."
+      },
+      {
+        "word": "investigating",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1, though common in general English."
+      },
+      {
+        "word": "alibi",
+        "estimated_level": "B1",
+        "reason": "Reasonable B1 legal/crime vocabulary."
+      },
+      {
+        "word": "wondering",
+        "estimated_level": "A2",
+        "reason": "Common verb form, not B2."
+      },
+      {
+        "word": "landlady",
+        "estimated_level": "B1",
+        "reason": "Fairly specific but still accessible."
+      },
+      {
+        "word": "needing",
+        "estimated_level": "A1",
+        "reason": "Basic verb form."
+      },
+      {
+        "word": "lifetime",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1."
+      },
+      {
+        "word": "tan",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun/verb."
+      },
+      {
+        "word": "supposed",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1, though very common."
+      },
+      {
+        "word": "letting",
+        "estimated_level": "A2",
+        "reason": "Basic verb form."
+      },
+      {
+        "word": "guessing",
+        "estimated_level": "A2",
+        "reason": "Common verb form."
+      },
+      {
+        "word": "frankly",
+        "estimated_level": "B1",
+        "reason": "Good B1 adverb."
+      },
+      {
+        "word": "travelled",
+        "estimated_level": "A2",
+        "reason": "Basic past tense form."
+      },
+      {
+        "word": "intending",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1."
+      },
+      {
+        "word": "damp",
+        "estimated_level": "B1",
+        "reason": "Reasonable B1 adjective."
+      },
+      {
+        "word": "splash",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1 noun/verb."
+      },
+      {
+        "word": "driven",
+        "estimated_level": "A2",
+        "reason": "Basic past participle of a common verb."
+      },
+      {
+        "word": "bravery",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1 abstract noun."
+      },
+      {
+        "word": "distracting",
+        "estimated_level": "B1",
+        "reason": "Reasonable B1 participle/adjective."
+      },
+      {
+        "word": "recognised",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1 past participle spelling variant."
+      },
+      {
+        "word": "blacked",
+        "estimated_level": "B2",
+        "reason": "As a standalone form it is not a stable vocabulary item; the intended phrase 'blacked out' is phrasal and more idiomatic than a simple B2 lemma."
+      },
+      {
+        "word": "doorbell",
+        "estimated_level": "A2",
+        "reason": "Common household noun."
+      },
+      {
+        "word": "triple",
+        "estimated_level": "A2",
+        "reason": "Basic numeral adjective."
+      },
+      {
+        "word": "losing",
+        "estimated_level": "A2",
+        "reason": "Basic verb form."
+      },
+      {
+        "word": "ridiculous",
+        "estimated_level": "B1",
+        "reason": "Good B1 adjective."
+      },
+      {
+        "word": "copper",
+        "estimated_level": "B1",
+        "reason": "Colloquial police term, reasonable B1/B2 border item."
+      },
+      {
+        "word": "wasting",
+        "estimated_level": "A2",
+        "reason": "Basic verb form."
+      },
+      {
+        "word": "dreadful",
+        "estimated_level": "B1",
+        "reason": "Good B1 adjective."
+      }
+    ]
+  },
+  "overall_score": 7.7,
+  "summary": "The translations are mostly accurate and context-aware, with only a handful of clear mistakes or awkward choices. The source list is clean, and the B-level calibration is generally acceptable, though many items are somewhat easier than the tags suggest.",
+  "tokens_used": {
+    "prompt": 4402,
+    "completion": 2859,
+    "total": 7261
+  }
+}

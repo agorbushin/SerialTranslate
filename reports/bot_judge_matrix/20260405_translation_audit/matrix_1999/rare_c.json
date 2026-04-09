@@ -1,0 +1,42 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-06T02:53:53.749310",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_c",
+  "translation_csvs": [
+    "tier_4_rare_c_translations.csv"
+  ],
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "word_count": 1,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "The pair provided is complete: the English word \"able\" has a non-empty Russian translation, \"способный\". Semantically, this is a correct Russian equivalent for the core meaning of \"able\" as an adjective meaning capable or having the ability to do something. No subtitle example is available, so there is no evidence of a more specialized contextual sense being required. Because the translation is accurate and natural, there are no major completeness or correctness problems.",
+    "issues": []
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "The source item \"able\" is a genuine English vocabulary word. It is not a character name, place name, personal name, invented term, or foreign-language token. Therefore there are no non-English or non-vocabulary violations in the source list.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "Although \"able\" is a real English word, it is not an advanced C1/C2 item. It is a very common basic adjective typically learned at A2/B1 level. Since this task is meant to highlight advanced rare vocabulary, this entry is a mismatch for the intended band.",
+    "not_c_level": [
+      {
+        "word": "able",
+        "estimated_level": "A2",
+        "reason": "Common everyday adjective meaning capable; far too basic for an advanced rare vocabulary list."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The translation itself is correct and complete: \"able\" → \"способный\". However, the source item is too basic for an advanced vocabulary list, so it does not fit the intended C-band selection criteria.",
+  "tokens_used": {
+    "prompt": 934,
+    "completion": 394,
+    "total": 1328
+  }
+}

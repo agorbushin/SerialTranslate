@@ -1,0 +1,26 @@
+{
+  "request_id": "5901beb55cf24285a6c378aa5c321d8e",
+  "mode": "series",
+  "raw_input": "game of throne s3e4",
+  "started_at": "2026-04-03T23:53:56.462439",
+  "finished_at": "2026-04-04T02:47:16.084874",
+  "status": "timeout",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Game of Thrones",
+    "season": 3,
+    "episode": 4
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "spellfix_title": 1359,
+    "find_existing": 8,
+    "download_subtitle": 5
+  },
+  "timings_ms": {
+    "total_e2e_ms": 604082
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "request_timeout"
+}

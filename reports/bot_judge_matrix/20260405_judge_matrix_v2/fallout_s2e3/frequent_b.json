@@ -1,0 +1,87 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.758918",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Fallout S2 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 14,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most pairs are translated correctly and with appropriate Russian equivalents: messy→неопрятный, vet→ветеринар, spare→запасной, legion→Легион, massage→массаж, plank→доска, corporal→капрал, defied→ослушался, sword→меч, chaos→хаос, pardner→приятель, ranger→рейнджер. The main caveat is that some entries include series-specific proper-name glosses rather than pure dictionary translations: coop and shady are annotated as names in the series, with the dictionary meaning also given, which is acceptable if the subtitle context indeed uses them as names. The only potential weakness is that without subtitle examples, contextual sense cannot be fully verified, but no clear mistranslations are present.",
+    "issues": []
+  },
+  "criterion_2": {
+    "score": 7,
+    "reasoning": "Most source items are genuine English vocabulary words. However, several entries are not clean vocabulary-list items and appear to be proper names or series-specific terms: Coop and Shady are explicitly treated as names in the series, and Legion may also function as a faction/proper noun in Fallout rather than a general vocabulary item in the episode context. These should ideally have been filtered or separated from ordinary vocabulary entries.",
+    "violations": [
+      "coop",
+      "legion",
+      "shady"
+    ]
+  },
+  "criterion_3": {
+    "score": 6,
+    "reasoning": "Several [B1] items are plausible B1 vocabulary, but the list is somewhat miscalibrated overall. Vet, spare, messy, and legion are reasonable at B1, while many [B2] items are actually easier than B2: massage, plank, sword, chaos, corporal, ranger, and coop/shady as ordinary words are mostly A2/B1-level or proper nouns rather than true B2 vocabulary. Defied is closer to B2 and fits better. Because a substantial portion of the B2-tagged items are too easy or are names, the banding is only partially accurate.",
+    "not_c_level": [
+      {
+        "word": "massage",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun/verb, not typically B2."
+      },
+      {
+        "word": "plank",
+        "estimated_level": "A2",
+        "reason": "Basic concrete noun; usually below B2."
+      },
+      {
+        "word": "coop",
+        "estimated_level": "A2",
+        "reason": "As a common noun meaning 'chicken coop' it is basic vocabulary; in the list it is also used as a proper name, which is not a CEFR vocabulary item."
+      },
+      {
+        "word": "corporal",
+        "estimated_level": "B1",
+        "reason": "Military rank vocabulary, but generally not B2-level difficulty."
+      },
+      {
+        "word": "sword",
+        "estimated_level": "A2",
+        "reason": "Very basic noun, not B2."
+      },
+      {
+        "word": "chaos",
+        "estimated_level": "B1",
+        "reason": "Common abstract noun, usually B1 rather than B2."
+      },
+      {
+        "word": "pardner",
+        "estimated_level": "A2",
+        "reason": "Dialectal variant of 'partner'/'friend'; not a standard B2 vocabulary item."
+      },
+      {
+        "word": "ranger",
+        "estimated_level": "B1",
+        "reason": "Common noun/title, but not clearly B2."
+      },
+      {
+        "word": "shady",
+        "estimated_level": "B1",
+        "reason": "Common adjective, typically B1; also appears as a proper name in the series."
+      }
+    ]
+  },
+  "overall_score": 7.0,
+  "summary": "The translations are mostly correct and usable, with no major semantic errors. The main weaknesses are that a few source items are proper names or series-specific terms rather than clean vocabulary, and several B2 labels are too high for the actual difficulty of the words.",
+  "tokens_used": {
+    "prompt": 1332,
+    "completion": 900,
+    "total": 2232
+  }
+}

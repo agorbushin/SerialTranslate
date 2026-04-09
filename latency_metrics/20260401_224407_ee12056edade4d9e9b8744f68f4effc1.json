@@ -1,0 +1,25 @@
+{
+  "request_id": "ee12056edade4d9e9b8744f68f4effc1",
+  "mode": "series",
+  "raw_input": "Test Series",
+  "started_at": "2026-04-01T22:44:07.686465",
+  "finished_at": "2026-04-01T22:44:07.687539",
+  "status": "failed",
+  "branch": "cache_hit_translations",
+  "identity": {
+    "series_name": "Test Series",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "spellfix_title": 0,
+    "find_existing": 0
+  },
+  "timings_ms": {
+    "total_e2e_ms": 1
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "'/var/folders/c6/_rv3w_hj7fn21txk3n1m14d40000gn/T/tmpxe2tk81d/translations/Test Series/Season 1/1' is not in the subpath of '/Users/arseniygorbushin/Documents/SerialTranslate' OR one path is relative "
+}

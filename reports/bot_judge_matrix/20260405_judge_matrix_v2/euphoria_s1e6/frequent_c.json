@@ -1,0 +1,98 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.759988",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Euphoria S1 E6",
+  "season": 1,
+  "episode": 1,
+  "word_count": 10,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most pairs are translated into natural Russian words with correct core meanings: \"rebirth\"→\"возрождение\", \"tequila\"→\"текила\", \"burden\"→\"обуза\", \"dyin\"→\"умираю\", \"blacked\"→\"отключился\", and \"bitty\"→\"крошечный\" are all plausible. However, there are a few likely sense or form issues. \"raped\" is translated as \"изнасилованная\", which is grammatically feminine and may not match the source form if the context is not feminine; it is still semantically close but not fully form-safe. \"blockin\"→\"перекрывая\" is a gerund/participle form and may be too context-dependent without the subtitle line, though it is a reasonable rendering of blocking/obstructing. The main problem is \"woo\"→\"ликовать\": \"woo\" in English usually means to court, attract, or cheer, and \"ликовать\" means to rejoice/exult, so this is likely the wrong sense. \"fascination\"→\"одержимость\" is also not exact: fascination is closer to \"очарование\", \"увлечение\", or \"завороженность\", while \"одержимость\" is stronger and more like obsession. Overall the translations are mostly complete, but a few are semantically off.",
+    "issues": [
+      {
+        "word": "woo",
+        "translation": "ликовать",
+        "issue": "Likely wrong sense: 'woo' usually means to court, attract, or cheer, not 'to rejoice/exult'."
+      },
+      {
+        "word": "fascination",
+        "translation": "одержимость",
+        "issue": "Too strong / wrong nuance: 'fascination' is closer to 'очарование', 'увлечение', or 'завороженность', not 'obsession'."
+      },
+      {
+        "word": "raped",
+        "translation": "изнасилованная",
+        "issue": "Semantically close, but the Russian form is feminine and may not match the source form/context; potentially mismatched morphology."
+      },
+      {
+        "word": "blockin",
+        "translation": "перекрывая",
+        "issue": "Reasonable but context-dependent; may be too generic without the subtitle line."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items appear to be genuine English vocabulary forms or colloquial spellings/inflections of English words. None of the entries are character names, place names, foreign words, or obvious non-vocabulary entities that should have been filtered out.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is dominated by fairly basic or intermediate vocabulary rather than C1/C2-level items. Several words are common everyday terms: 'tequila', 'burden', 'dyin' (die), 'blockin' (blocking), 'woo', 'bitty', and 'fascination' are not advanced enough for a C-level list. 'rebirth' and 'raped' are more advanced or specialized, and 'blacked' can be context-specific slang, but overall the set is much too easy for a C1/C2 learning list.",
+    "not_c_level": [
+      {
+        "word": "tequila",
+        "estimated_level": "B1",
+        "reason": "Common drink name; not advanced vocabulary."
+      },
+      {
+        "word": "burden",
+        "estimated_level": "B1",
+        "reason": "Fairly common abstract noun, typically learned before C1."
+      },
+      {
+        "word": "dyin",
+        "estimated_level": "A2",
+        "reason": "Colloquial spelling of 'dying'; very basic verb vocabulary."
+      },
+      {
+        "word": "blockin",
+        "estimated_level": "A2",
+        "reason": "Colloquial spelling of 'blocking'; basic everyday verb."
+      },
+      {
+        "word": "woo",
+        "estimated_level": "B2",
+        "reason": "Can be somewhat idiomatic, but still not C-level in most senses."
+      },
+      {
+        "word": "blacked",
+        "estimated_level": "B2",
+        "reason": "Slang/colloquial usage, but not clearly C1/C2 vocabulary."
+      },
+      {
+        "word": "bitty",
+        "estimated_level": "B2",
+        "reason": "Uncommon but still not advanced specialized vocabulary."
+      },
+      {
+        "word": "fascination",
+        "estimated_level": "B2",
+        "reason": "Common academic/general vocabulary, usually below C1."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The translations are mostly complete and generally understandable, with only a few clear semantic problems, especially 'woo' and 'fascination'. The source list itself is valid English, but it is not well aligned with a C1/C2 vocabulary goal because many items are basic or intermediate rather than advanced.",
+  "tokens_used": {
+    "prompt": 1189,
+    "completion": 1138,
+    "total": 2327
+  }
+}

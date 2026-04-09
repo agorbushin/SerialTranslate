@@ -1,0 +1,34 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:55:11.809708",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 1,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 2,
+    "reasoning": "The translation is present and not empty: \"перехватить\" is a real Russian word. However, there is no subtitle line matched for \"head off\", so the episode-specific usage cannot be verified from the provided context. In general English, \"head off\" most often means \"to prevent/avert\" or \"to leave in a direction / set off\", while \"перехватить\" usually means \"to intercept\" or sometimes \"to grab before someone else\". That makes the gloss only partially compatible and likely too narrow or wrong for many uses of \"head off\". Because the episode context is missing, the safest evaluation is that the translation is not clearly supported and may be a wrong-sense or overly specific gloss.",
+    "issues": [
+      {
+        "phrasal_verb": "head off",
+        "translation": "перехватить",
+        "issue": "No subtitle match is provided, so the episode-specific sense cannot be confirmed; the gloss may be wrong or too narrow because \"head off\" often means \"prevent/avert\" or \"set off/leave\", not necessarily \"intercept\"."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "\"Head off\" is a genuine English verb-particle phrasal verb / idiomatic construction. It is well established in learner dictionaries and can mean, depending on context, \"leave for a destination\", \"turn away\", or \"prevent something from happening\". It is not accidental adjacency or tokenizer garbage, so it fully qualifies as a valid phrasal-type idiom.",
+    "invalid_phrasals": []
+  },
+  "overall_score": 6.0,
+  "summary": "The source phrase \"head off\" is a valid phrasal verb, but the Russian gloss \"перехватить\" cannot be confirmed from the provided episode context and may not match the usual sense. Overall, the entry is structurally valid but translation quality is uncertain and likely incomplete.",
+  "tokens_used": {
+    "prompt": 623,
+    "completion": 446,
+    "total": 1069
+  }
+}

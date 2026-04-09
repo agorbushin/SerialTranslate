@@ -1,0 +1,114 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-06T02:53:53.749323",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "word_count": 15,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 5,
+    "reasoning": "Several translations are correct and natural, such as vase→ваза, civilization→цивилизация, sewer→канализация, and miracle→чудо. However, a number of entries are either too generic, wrong in sense, or awkward for the likely subtitle context: supposed→положено is not a good match for the common subtitle sense of 'supposed' (usually 'должен/предполагаемый/якобы'); believing→считал is only partially aligned and depends on context; expecting→ожидающий is a participle rather than the likely contextual meaning 'ожидая/ожидающий'; trace→отслеживание is a noun and does not fit the likely verb sense; marveled→восхищались is acceptable but may miss the exact tense/voice; unplugged→отключённые от Матрицы is contextually good but more explanatory than direct; sooner→рано или поздно is a different phrase and not a direct translation of 'sooner'; telling→говорить is too generic and misses the likely gerund/participle sense; dodge→уклониться is close but infinitive form may not fit context; reinsert→снова подключить is contextually understandable but not a direct lexical equivalent. Overall, the list contains a mix of correct, approximate, and incorrect translations.",
+    "issues": [
+      {
+        "word": "supposed",
+        "translation": "положено",
+        "issue": "Wrong common sense for subtitle usage; usually means 'должен', 'предполагаемый', or 'якобы', not 'it is prescribed'."
+      },
+      {
+        "word": "believed",
+        "translation": "считал",
+        "issue": "Only partially correct; depends on context and may miss passive/participle meaning such as 'believed' = 'считалось/верил'."
+      },
+      {
+        "word": "expecting",
+        "translation": "ожидающий",
+        "issue": "Grammatically possible but often too literal; subtitle context may require 'ожидая' or a more natural verbal form."
+      },
+      {
+        "word": "trace",
+        "translation": "отслеживание",
+        "issue": "Likely wrong part of speech and sense; 'trace' in subtitles is often a verb or noun meaning 'след', 'отследить', not 'tracking' as a noun."
+      },
+      {
+        "word": "sooner",
+        "translation": "рано или поздно",
+        "issue": "Incorrect meaning; this translates the phrase 'sooner or later' rather than the comparative 'sooner' ('раньше', 'скорее')."
+      },
+      {
+        "word": "telling",
+        "translation": "говорить",
+        "issue": "Too generic and likely wrong form; 'telling' often means 'рассказывая', 'говорящий', or 'сообщая' depending on context."
+      },
+      {
+        "word": "dodge",
+        "translation": "уклониться",
+        "issue": "Close but may be mismatched in form; if the source is a noun or imperative, the Russian should reflect that."
+      },
+      {
+        "word": "reinsert",
+        "translation": "снова подключить",
+        "issue": "Contextually understandable but not a direct translation; 'reinsert' usually means 'вставить обратно' or 'снова подключить' only in a specific technical sense."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words. None of the entries are obvious character names, place names, real personal names, foreign-language intrusions, or invented non-English terms. The list is lexically valid as an English vocabulary set.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 6,
+    "reasoning": "Most items are broadly within B1-B2 territory, but several are miscalibrated by band. Some entries are too easy for B2, such as vase, sewer, and miracle, which are more A2/B1. Others are acceptable B2 items like civilization, expecting, trace, marveled, unplugged, and reinsert. The list is not badly broken, but it mixes easier everyday words with B2-tagged items, so the banding is only moderately accurate.",
+    "not_c_level": [
+      {
+        "word": "vase",
+        "estimated_level": "A2",
+        "reason": "Common household noun; too easy for a B1 tag."
+      },
+      {
+        "word": "sewer",
+        "estimated_level": "A2",
+        "reason": "Basic concrete noun; generally below B2 difficulty."
+      },
+      {
+        "word": "miracle",
+        "estimated_level": "B1",
+        "reason": "Common everyday vocabulary, not typically B2."
+      },
+      {
+        "word": "supposed",
+        "estimated_level": "B1",
+        "reason": "Common and versatile, but often learned earlier than B2."
+      },
+      {
+        "word": "happening",
+        "estimated_level": "A2",
+        "reason": "As a form of 'happen', this is very common and not B2-level by itself."
+      },
+      {
+        "word": "believed",
+        "estimated_level": "B1",
+        "reason": "Common past participle/past form of a basic verb; usually not B2."
+      },
+      {
+        "word": "telling",
+        "estimated_level": "A2",
+        "reason": "Very common verb form; too easy for B2."
+      }
+    ]
+  },
+  "overall_score": 7.0,
+  "summary": "The translation set is mixed: some entries are correct and natural, but several are too literal, too generic, or wrong in meaning. The source list itself is clean English vocabulary, though the difficulty labeling is somewhat inflated because a few clearly easier words are marked B2.",
+  "tokens_used": {
+    "prompt": 1346,
+    "completion": 1322,
+    "total": 2668
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-05T22:56:06.752410",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "word_count": 15,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 5,
+    "reasoning": "Several translations are correct and natural, such as \"vase\" → \"ваза\", \"civilization\" → \"цивилизация\", \"sewer\" → \"канализация\", and \"miracle\" → \"чудо\". However, a number of entries are either too generic, wrong in sense, or awkward for the likely subtitle context: \"supposed\" → \"положено\" is only correct in a narrow impersonal sense and may miss the more common meaning \"предполагалось/должен был\"; \"believed\" → \"считал\" is acceptable but context-dependent; \"expecting\" → \"ожидающий\" is participial and often not the right subtitle rendering; \"trace\" → \"отслеживание\" is a noun, not the likely verb sense; \"marveled\" → \"восхищались\" changes tense/voice and may not fit; \"unplugged\" → \"отключённые от Матрицы\" is contextually good; \"sooner\" → \"рано или поздно\" is a phrase meaning \"sooner or later,\" not the literal comparative \"earlier\"; \"telling\" → \"говорить\" is too generic and misses the gerund/participle nuance; \"dodge\" → \"уклониться\" is close but infinitive form may be off; \"reinsert\" → \"снова подключить\" is contextually plausible in Matrix terminology but not a direct lexical equivalent. Overall, the list is partially correct but has multiple sense and form mismatches.",
+    "issues": [
+      {
+        "word": "supposed",
+        "translation": "положено",
+        "issue": "Potentially wrong sense; in subtitle context it may require 'предполагалось', 'должен был', or 'как будто', not only impersonal 'it is supposed to be'."
+      },
+      {
+        "word": "expecting",
+        "translation": "ожидающий",
+        "issue": "Awkward/over-literal participle; subtitle context may require a verb form like 'ожидая' or 'ждущий' depending on usage."
+      },
+      {
+        "word": "trace",
+        "translation": "отслеживание",
+        "issue": "Wrong part of speech and likely wrong sense; the English word in context is often a verb ('отследить', 'проследить') rather than the noun 'tracking'."
+      },
+      {
+        "word": "marveled",
+        "translation": "восхищались",
+        "issue": "Tense/voice mismatch and possibly wrong nuance; may need 'изумлялись' or a past singular/plural form matching the source."
+      },
+      {
+        "word": "sooner",
+        "translation": "рано или поздно",
+        "issue": "This is the fixed phrase 'sooner or later', not the standalone comparative 'sooner' ('раньше')."
+      },
+      {
+        "word": "telling",
+        "translation": "говорить",
+        "issue": "Too generic and likely wrong form; 'telling' may need 'говоря', 'рассказывая', or 'сказать' depending on context."
+      },
+      {
+        "word": "dodge",
+        "translation": "уклониться",
+        "issue": "Infinitive form may be acceptable in isolation, but the likely subtitle usage may require a different form such as 'уворачиваться' or 'уклоняться'."
+      },
+      {
+        "word": "reinsert",
+        "translation": "снова подключить",
+        "issue": "Contextually plausible in Matrix jargon, but not a direct lexical translation; 'reinsert' usually means 'вставить обратно/снова вставить'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words. None of the entries are character names, place names, real personal names, foreign-language intrusions, or obvious invented non-lexical terms. The list is clean from the standpoint of source-word validity.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list is labeled B1/B2, but several items are miscalibrated for those bands. Some B2 items are actually quite basic A2/B1 vocabulary or simple verb forms, while a few are acceptable B2 words. The main issue is that the set mixes ordinary high-frequency words with more advanced items, so the banding is only partially accurate.",
+    "not_c_level": [
+      {
+        "word": "vase",
+        "estimated_level": "A2",
+        "reason": "Common concrete noun; too easy for a B1 label."
+      },
+      {
+        "word": "supposed",
+        "estimated_level": "B1",
+        "reason": "Common and fairly basic; B2 is somewhat high for this item."
+      },
+      {
+        "word": "happening",
+        "estimated_level": "A2",
+        "reason": "Very common verb form/participle; not B2-level vocabulary."
+      },
+      {
+        "word": "believed",
+        "estimated_level": "A2",
+        "reason": "Past tense of a very common verb; too easy for B2."
+      },
+      {
+        "word": "civilization",
+        "estimated_level": "B1",
+        "reason": "Reasonable B1/B2 word, but not strongly B2; borderline and somewhat easier than typical B2 vocabulary."
+      },
+      {
+        "word": "expecting",
+        "estimated_level": "A2",
+        "reason": "Common verb form; not distinctly B2."
+      },
+      {
+        "word": "trace",
+        "estimated_level": "B1",
+        "reason": "Common word with multiple senses; usually not B2-level difficulty."
+      },
+      {
+        "word": "marveled",
+        "estimated_level": "B2",
+        "reason": "Acceptable B2 item, though somewhat less common; still not a clear mismatch."
+      },
+      {
+        "word": "unplugged",
+        "estimated_level": "B1",
+        "reason": "Basic phrasal/derived form; in Matrix context it is specialized, but the English word itself is not B2-level vocabulary."
+      },
+      {
+        "word": "sooner",
+        "estimated_level": "A2",
+        "reason": "Very common comparative adverb; too easy for B2."
+      },
+      {
+        "word": "telling",
+        "estimated_level": "A2",
+        "reason": "Common verb form; not B2-level vocabulary."
+      },
+      {
+        "word": "dodge",
+        "estimated_level": "B1",
+        "reason": "Fairly common verb; B2 is a bit high."
+      },
+      {
+        "word": "sewer",
+        "estimated_level": "B1",
+        "reason": "Common noun; not especially B2."
+      },
+      {
+        "word": "reinsert",
+        "estimated_level": "B2",
+        "reason": "Less common verb and acceptable as B2, though context-specific."
+      },
+      {
+        "word": "miracle",
+        "estimated_level": "B1",
+        "reason": "Common abstract noun; more B1 than B2."
+      }
+    ]
+  },
+  "overall_score": 6.3,
+  "summary": "The translations are mixed: some are accurate and natural, but several entries are too literal, wrong in sense, or mismatched in grammatical form. The source list itself is valid English, but the B1/B2 calibration is uneven, with many items being easier than the assigned band.",
+  "tokens_used": {
+    "prompt": 1346,
+    "completion": 1693,
+    "total": 3039
+  }
+}

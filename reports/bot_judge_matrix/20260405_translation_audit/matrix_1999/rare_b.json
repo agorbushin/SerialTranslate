@@ -1,0 +1,198 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-06T02:53:53.749248",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_b",
+  "translation_csvs": [
+    "tier_4_rare_b_translations.csv"
+  ],
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "word_count": 36,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 4,
+    "reasoning": "Several translations are correct at the dictionary level, such as specific→конкретный, social→социальный, law→закон, known→известный, whether→ли, few→несколько, equipment→оборудование, united→объединённый, similar→похожий, basic→основной, speed→скорость, mile→миля, cell→камера, access→доступ, though→хотя, beauty→красота, continue→продолжать, natural→природный, item→предмет, death→смерть. However, a number of entries are wrong or too context-dependent. unit→полицейский наряд is a specific sense but cannot be verified from the provided context and is not the default meaning; apply→относиться is only one sense and may be wrong without context; security→социальное обеспечение is a narrow sense and likely not the intended one; individual→человек is too generic and misses the adjective/noun nuance; source→источник энергии is overly specific; major→серьёзный is not the usual core meaning; service→коммуникации is incorrect; step→шагнуть is a verb form while the source word is a noun/verb lemma; track→выследить is only one verb sense; working→действовать is not the usual translation of the adjective/participle; state→Стейт (название улицы), словарный перевод — штат is not a clean translation and mixes a proper noun note with the dictionary meaning; position→местоположение is only one sense; charge→включить is wrong for the common meanings of charge. Overall, the list contains a mix of correct, overly narrow, and incorrect translations.",
+    "issues": [
+      {
+        "word": "unit",
+        "translation": "полицейский наряд",
+        "issue": "Overly specific sense; without episode context this is not a reliable translation of the general word 'unit'."
+      },
+      {
+        "word": "apply",
+        "translation": "относиться",
+        "issue": "Only one possible sense; may be wrong if the episode uses 'apply' in the common sense 'apply (for), use, put on'."
+      },
+      {
+        "word": "security",
+        "translation": "социальное обеспечение",
+        "issue": "Very narrow sense; likely wrong if the episode uses 'security' in the common sense 'security/safety'."
+      },
+      {
+        "word": "individual",
+        "translation": "человек",
+        "issue": "Too generic; loses the meaning of 'individual' as 'individual person' or adjective 'individual'."
+      },
+      {
+        "word": "source",
+        "translation": "источник энергии",
+        "issue": "Overly specific; the base meaning is simply 'source'."
+      },
+      {
+        "word": "major",
+        "translation": "серьёзный",
+        "issue": "Not the core meaning; 'major' usually means 'main/major/important' or a rank."
+      },
+      {
+        "word": "service",
+        "translation": "коммуникации",
+        "issue": "Incorrect meaning; 'service' does not normally translate as 'communications'."
+      },
+      {
+        "word": "step",
+        "translation": "шагнуть",
+        "issue": "Wrong part of speech; source word is a noun/verb lemma, but translation is only the verb 'to step'."
+      },
+      {
+        "word": "track",
+        "translation": "выследить",
+        "issue": "Only one verb sense; may be wrong if the episode uses 'track' as noun 'track/path' or verb 'follow'."
+      },
+      {
+        "word": "working",
+        "translation": "действовать",
+        "issue": "Incorrect or too narrow; 'working' usually means 'working', 'operating', or 'functioning'."
+      },
+      {
+        "word": "state",
+        "translation": "Стейт (название улицы), словарный перевод — штат",
+        "issue": "Not a clean translation; includes a proper-noun note and the dictionary meaning is only partially relevant."
+      },
+      {
+        "word": "position",
+        "translation": "местоположение",
+        "issue": "Only one sense; 'position' can also mean 'stance', 'job', or 'place'."
+      },
+      {
+        "word": "charge",
+        "translation": "включить",
+        "issue": "Wrong meaning; 'charge' usually means 'charge, accuse, fee, load, power' depending on context, not 'turn on'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are real English vocabulary words. None of the entries are obvious character names, place names, foreign-language insertions, or invented terms that should have been filtered out before translation.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 3,
+    "reasoning": "The list is dominated by very common A1/A2 vocabulary items such as law, few, speed, mile, cell, access, beauty, continue, death, and similar. A B1/B2 learner list should focus on less basic vocabulary, but many items here are elementary and therefore poorly calibrated for the stated purpose. A smaller number of items are more appropriate B1/B2 words, but the overall balance is too basic.",
+    "not_c_level": [
+      {
+        "word": "law",
+        "estimated_level": "A2",
+        "reason": "Very common basic vocabulary, not a B1/B2 target item."
+      },
+      {
+        "word": "few",
+        "estimated_level": "A1",
+        "reason": "Elementary quantifier."
+      },
+      {
+        "word": "speed",
+        "estimated_level": "A2",
+        "reason": "Common everyday word."
+      },
+      {
+        "word": "mile",
+        "estimated_level": "A2",
+        "reason": "Basic measurement vocabulary."
+      },
+      {
+        "word": "cell",
+        "estimated_level": "A2",
+        "reason": "Common word with basic senses; not especially B1/B2 by itself."
+      },
+      {
+        "word": "access",
+        "estimated_level": "A2",
+        "reason": "Frequent and fairly basic in modern English."
+      },
+      {
+        "word": "though",
+        "estimated_level": "A2",
+        "reason": "Common conjunction/adverb."
+      },
+      {
+        "word": "beauty",
+        "estimated_level": "A2",
+        "reason": "Basic vocabulary."
+      },
+      {
+        "word": "continue",
+        "estimated_level": "A1",
+        "reason": "Very common core verb."
+      },
+      {
+        "word": "natural",
+        "estimated_level": "A2",
+        "reason": "Basic adjective."
+      },
+      {
+        "word": "item",
+        "estimated_level": "A2",
+        "reason": "Common general noun."
+      },
+      {
+        "word": "death",
+        "estimated_level": "A2",
+        "reason": "Basic high-frequency noun."
+      },
+      {
+        "word": "specific",
+        "estimated_level": "B1",
+        "reason": "Acceptable, but still on the easier side compared with the rest of the list."
+      },
+      {
+        "word": "social",
+        "estimated_level": "A2",
+        "reason": "Common adjective, often taught early."
+      },
+      {
+        "word": "security",
+        "estimated_level": "B1",
+        "reason": "Can fit B1, but the list uses a specialized sense and the overall set is still too basic."
+      },
+      {
+        "word": "basic",
+        "estimated_level": "A2",
+        "reason": "Core adjective."
+      },
+      {
+        "word": "service",
+        "estimated_level": "A2",
+        "reason": "Very common word."
+      },
+      {
+        "word": "position",
+        "estimated_level": "A2",
+        "reason": "Common word with multiple basic senses."
+      },
+      {
+        "word": "state",
+        "estimated_level": "A2",
+        "reason": "Common word, though polysemous."
+      }
+    ]
+  },
+  "overall_score": 5.7,
+  "summary": "The translation set is mixed: many common words are translated correctly, but several entries are too narrow, wrong, or awkwardly phrased. The source list is linguistically clean, but it is poorly calibrated for a B1/B2 vocabulary list because it contains many very basic words.",
+  "tokens_used": {
+    "prompt": 1633,
+    "completion": 1747,
+    "total": 3380
+  }
+}

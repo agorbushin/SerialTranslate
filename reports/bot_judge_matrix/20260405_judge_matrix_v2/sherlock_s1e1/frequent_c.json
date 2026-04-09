@@ -1,0 +1,85 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Sherlock/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.766671",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Sherlock",
+  "season": 1,
+  "episode": 1,
+  "word_count": 17,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Sherlock/Season 1/sherlock_s1_e1.srt",
+  "criterion_1": {
+    "score": 7,
+    "reasoning": "Most pairs are translated correctly and match the episode context: 'psychosomatic', 'psychopath', 'flatshare', 'traumatic', 'sustain', 'haunted', 'unnoticed', 'vicious', 'sniffer', 'sociopath', and 'aneurism' are all acceptable. A few entries are weaker or context-dependent: 'erm' is rendered as a filler sound, which is fine; 'sake' as 'ради бога' captures the exclamation in context; 'sally' includes the character-name gloss, which is acceptable but not a pure vocabulary translation. The main problem is 'arch' → 'заклятый': in the subtitle it means 'arch-enemy' = 'заклятый враг', so the translation is only partially complete because it omits the noun 'враг' and is not a standalone equivalent. 'soother' → 'успокоительное' is plausible in context, though the English word can also mean a pacifier; here it fits the line. 'nerf' is empty, so it is missing. Overall the list is mostly correct, with one missing item and one contextually incomplete translation.",
+    "issues": [
+      {
+        "word": "arch",
+        "translation": "заклятый",
+        "issue": "Context requires the full sense 'arch-enemy' = 'заклятый враг'; the translation is incomplete and not a standalone equivalent."
+      },
+      {
+        "word": "nerf",
+        "translation": "(empty)",
+        "issue": "Missing/empty translation."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "Several source items are not vocabulary words and should have been filtered out before translation. 'sally' is used as a character name in the episode and the translation explicitly notes it as an имени в сериале; this is not a pure vocabulary item. 'sake' is a real English noun, so it is acceptable. 'aneurism' is a legitimate English spelling variant, though less common than 'aneurysm'. 'nerf' is a real English word, but in this episode list it appears without a subtitle example and may be an extraction artifact; still, it is not inherently non-English. The main clear violation is the proper name 'sally' as a character name, which should not be in a vocabulary list.",
+    "violations": [
+      "sally"
+    ]
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list contains a mix of advanced and too-basic items. Many are appropriately C1/C2 or at least advanced in this context: 'psychosomatic', 'traumatic', 'sustain', 'haunted', 'vicious', 'psychopath', 'sociopath', and 'aneurism' are suitable. However, several entries are too basic for a C-level vocabulary list: 'erm' is just a filler interjection, 'sake' in the phrase 'for God's sake' is common B1/B2, 'flatshare' is fairly common B2, 'unnoticed' is B1/B2, 'sniffer' is basic B2, and 'soother' is not especially advanced in this usage. 'arch' as used in 'arch-enemy' is also not C-level by itself; the phrase is more idiomatic than advanced. Therefore the list is only partially aligned with the intended C-level difficulty.",
+    "not_c_level": [
+      {
+        "word": "erm",
+        "estimated_level": "A1/A2",
+        "reason": "A simple hesitation filler, not advanced vocabulary."
+      },
+      {
+        "word": "arch",
+        "estimated_level": "B2",
+        "reason": "In 'arch-enemy' it is an idiomatic modifier, but the word itself is not C-level vocabulary."
+      },
+      {
+        "word": "sake",
+        "estimated_level": "B1/B2",
+        "reason": "Common in fixed expressions like 'for God's sake'; not advanced."
+      },
+      {
+        "word": "flatshare",
+        "estimated_level": "B2",
+        "reason": "A fairly common everyday term in British English."
+      },
+      {
+        "word": "unnoticed",
+        "estimated_level": "B1/B2",
+        "reason": "A transparent, fairly common adjective; not C-level."
+      },
+      {
+        "word": "sniffer",
+        "estimated_level": "B2",
+        "reason": "Basic noun derived from a common verb; not advanced."
+      },
+      {
+        "word": "soother",
+        "estimated_level": "B2",
+        "reason": "Not especially advanced; more of an everyday noun."
+      }
+    ]
+  },
+  "overall_score": 5.0,
+  "summary": "The translations are mostly accurate and context-aware, with only a couple of clear problems: one missing entry and one incomplete rendering. The bigger issue is list quality: it includes a proper name and several words that are too basic for a C-level vocabulary set.",
+  "tokens_used": {
+    "prompt": 2691,
+    "completion": 1106,
+    "total": 3797
+  }
+}

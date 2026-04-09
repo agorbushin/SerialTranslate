@@ -1,0 +1,28 @@
+{
+  "series": "Matrix",
+  "season": "Movie (1999)",
+  "season_number": 0,
+  "episode_number": 0,
+  "subtitle_file": "matrix_1999.srt",
+  "analysis_date": "2026-04-02T09:17:32.013159",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 85317360,
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 5,
+    "tier_2_random": 232,
+    "tier_3_common": 22,
+    "tier_4_rare_in_series": 5,
+    "tier_5_filtered": 206,
+    "tier_b1_words": 1,
+    "tier_b2_words": 14,
+    "tier_4_rare_c_words": 1,
+    "tier_4_rare_b_words": 36
+  },
+  "is_movie": true,
+  "year": 1999,
+  "excluded_names_fantasy_count": 32
+}

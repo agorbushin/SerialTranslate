@@ -1,0 +1,184 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Sherlock/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.758568",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Sherlock",
+  "season": 1,
+  "episode": 1,
+  "word_count": 51,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Sherlock/Season 1/sherlock_s1_e1.srt",
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "Most word pairs are translated correctly and fit the episode context: cab→такси, murderer/killer→убийца, suicide→самоубийство, inspector→инспектор, alibi→алиби, landlady→хозяйка квартиры, etc. However, several entries are inaccurate or too context-insensitive. Some are wrong sense choices: 'wearing' is translated as 'носить' instead of the contextual progressive 'носит/надета/на тебе', 'putting' is translated as 'отвлекать' instead of 'сбивать с толку/отвлекать', 'cleared' is partly wrong because 'убрался' does not fit the meaning in the subtitle, 'travelled' as 'ехала' is too narrow and gendered, 'recognised' as 'узнан' is an awkward passive participle rather than a natural translation in this context, and 'blacked' should be 'потерял сознание/вырубился' but the given form is incomplete. 'bust' is rendered as 'облава на наркотики', which is acceptable in context, but some entries are overly generic or slightly off: 'overnight' as 'на одну ночь' is okay, while 'supposed' as 'должен' misses the modal nuance of 'supposed to'. Overall the list is mostly usable, but there are enough semantic and grammatical mismatches to prevent a high score.",
+    "issues": [
+      {
+        "word": "wearing",
+        "translation": "носить",
+        "issue": "Wrong form and context: in the subtitle it means 'you are wearing' / 'на тебе', not the infinitive 'носить'."
+      },
+      {
+        "word": "putting",
+        "translation": "отвлекать",
+        "issue": "Wrong sense: here it means 'distracting me' / 'сбивать меня с толку', not the verb 'отвлекать' as a direct translation of the participle alone."
+      },
+      {
+        "word": "cleared",
+        "translation": "оправдал; убрался",
+        "issue": "Mixed meanings; 'убрался' is incorrect in this context. The subtitle uses 'He cleared my name' / 'Cleared off', requiring different senses."
+      },
+      {
+        "word": "travelled",
+        "translation": "ехала",
+        "issue": "Too narrow and gendered; the English word is neutral past participle/past tense and should be translated more generally as 'ехал/ехала/прибыла/добралась' depending on context."
+      },
+      {
+        "word": "recognised",
+        "translation": "узнан",
+        "issue": "Awkward and incomplete Russian; in context it should be 'будет опознан/узнан' or 'распознается'."
+      },
+      {
+        "word": "blacked",
+        "translation": "потерял сознание",
+        "issue": "Incomplete form: the subtitle context is 'blacked out', so the translation should reflect the phrasal verb, e.g. 'потерял сознание/вырубился'."
+      },
+      {
+        "word": "supposed",
+        "translation": "должен",
+        "issue": "Too generic; in 'what am I supposed to be doing here?' it means 'предполагается/я должен по идее', not just 'должен'."
+      },
+      {
+        "word": "letting",
+        "translation": "впуская",
+        "issue": "Partly context-dependent and incomplete; in the subtitle it means 'letting you in' / 'пускать', but the gerund form alone is not fully captured."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words used in the episode. There are no character names, place names, personal names, or obvious non-English intrusions in the source list. Even items like 'cabbie', 'flatmate', and 'housekeeper' are valid English lexical items, not violations.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 7,
+    "reasoning": "The list is broadly consistent with B1/B2 vocabulary, especially for a Sherlock episode subtitle set. Most B1 items are ordinary everyday words, and most B2 items are plausible intermediate-plus vocabulary. A few entries are slightly miscalibrated: some B1 items are arguably too easy (A1/A2), while some B2 items are also easy or highly frequent. There are no major C-level intrusions, but the banding is not perfectly strict.",
+    "not_c_level": [
+      {
+        "word": "cab",
+        "estimated_level": "A2",
+        "reason": "Very common everyday word; below B1 for most learners."
+      },
+      {
+        "word": "murderer",
+        "estimated_level": "A2",
+        "reason": "Common and transparent vocabulary; usually learned before B1."
+      },
+      {
+        "word": "killer",
+        "estimated_level": "A2",
+        "reason": "Basic common word, not really B1-level."
+      },
+      {
+        "word": "lover",
+        "estimated_level": "A2",
+        "reason": "Common everyday vocabulary; typically below B1."
+      },
+      {
+        "word": "dull",
+        "estimated_level": "A2",
+        "reason": "Fairly basic adjective; often learned before B1."
+      },
+      {
+        "word": "suicide",
+        "estimated_level": "B1",
+        "reason": "Acceptable at B1, but not especially B2."
+      },
+      {
+        "word": "inspector",
+        "estimated_level": "A2",
+        "reason": "Common job title; usually below B1."
+      },
+      {
+        "word": "idiot",
+        "estimated_level": "A2",
+        "reason": "Very common insult/basic vocabulary."
+      },
+      {
+        "word": "lipstick",
+        "estimated_level": "A2",
+        "reason": "Everyday noun, generally below B1."
+      },
+      {
+        "word": "sergeant",
+        "estimated_level": "B1",
+        "reason": "Reasonable B1 item, but not strongly B2."
+      },
+      {
+        "word": "childish",
+        "estimated_level": "A2",
+        "reason": "Simple adjective, usually below B1."
+      },
+      {
+        "word": "bluff",
+        "estimated_level": "B1",
+        "reason": "Plausible B1, though still fairly common and not clearly B2."
+      },
+      {
+        "word": "mummy",
+        "estimated_level": "A2",
+        "reason": "Basic family vocabulary; below B1."
+      },
+      {
+        "word": "alibi",
+        "estimated_level": "B1",
+        "reason": "Reasonable B1 legal/crime vocabulary, but not necessarily B2."
+      },
+      {
+        "word": "frankly",
+        "estimated_level": "B1",
+        "reason": "Common discourse adverb; often learned by B1, not distinctly B2."
+      },
+      {
+        "word": "damp",
+        "estimated_level": "A2",
+        "reason": "Basic adjective, usually below B1."
+      },
+      {
+        "word": "splash",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun/verb; below B1."
+      },
+      {
+        "word": "doorbell",
+        "estimated_level": "A2",
+        "reason": "Simple household noun, usually below B1."
+      },
+      {
+        "word": "ridiculous",
+        "estimated_level": "B1",
+        "reason": "Acceptable B1 adjective, but not especially B2."
+      },
+      {
+        "word": "copper",
+        "estimated_level": "B1",
+        "reason": "Informal British word for police officer; plausible B1, not clearly B2."
+      },
+      {
+        "word": "dreadful",
+        "estimated_level": "A2",
+        "reason": "Common adjective, generally below B1."
+      }
+    ]
+  },
+  "overall_score": 7.7,
+  "summary": "The translations are mostly correct and usable in context, with a handful of notable issues around tense, aspect, and sense selection. The source vocabulary is clean, and the B-level tagging is broadly reasonable, though several items are easier than the stated band.",
+  "tokens_used": {
+    "prompt": 4402,
+    "completion": 1892,
+    "total": 6294
+  }
+}

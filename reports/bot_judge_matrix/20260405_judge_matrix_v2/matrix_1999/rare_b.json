@@ -1,0 +1,215 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-05T22:56:06.752779",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_b",
+  "translation_csvs": [
+    "tier_4_rare_b_translations.csv"
+  ],
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "word_count": 36,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 4,
+    "reasoning": "Several translations are correct at the dictionary level, such as specific→конкретный, law→закон, known→известный, whether→ли, few→несколько, equipment→оборудование, similar→похожий, basic→основной, speed→скорость, beauty→красота, continue→продолжать, natural→природный, item→предмет, and death→смерть. However, a number of entries are either too context-dependent, too generic, or clearly wrong. unit→полицейский наряд is a specific contextual guess rather than a general translation of 'unit'; apply→относиться is only one sense and may be wrong without context; security→социальное обеспечение is a narrow sense and likely not the intended one in a general vocabulary list; individual→человек is too generic and misses the adjective/noun nuance; source→источник энергии is overly specific; major→серьёзный is not the core meaning 'major/important'; service→коммуникации is incorrect; step→шагнуть is a verb while the English word can be noun/verb; track→выследить is only one verb sense; working→действовать is too narrow; state→Стейт (название улицы), словарный перевод — штат mixes a proper-name note with a dictionary gloss and is not a clean translation; charge→включить is wrong for the common meanings of 'charge'. Overall, the list contains a mix of correct translations and several sense errors or overly specific guesses.",
+    "issues": [
+      {
+        "word": "unit",
+        "translation": "полицейский наряд",
+        "issue": "Overly specific contextual guess; not a general translation of 'unit'."
+      },
+      {
+        "word": "apply",
+        "translation": "относиться",
+        "issue": "Only one sense; may be wrong depending on context."
+      },
+      {
+        "word": "security",
+        "translation": "социальное обеспечение",
+        "issue": "Narrow and likely incorrect sense for a general vocabulary item."
+      },
+      {
+        "word": "individual",
+        "translation": "человек",
+        "issue": "Too generic; misses the usual 'individual' meaning as adjective or noun."
+      },
+      {
+        "word": "source",
+        "translation": "источник энергии",
+        "issue": "Overly specific; adds 'energy' not present in the source word."
+      },
+      {
+        "word": "major",
+        "translation": "серьёзный",
+        "issue": "Incorrect core meaning; 'major' usually means 'major/important/main'."
+      },
+      {
+        "word": "service",
+        "translation": "коммуникации",
+        "issue": "Wrong meaning."
+      },
+      {
+        "word": "step",
+        "translation": "шагнуть",
+        "issue": "Verb form only; misses the common noun meaning 'step'."
+      },
+      {
+        "word": "track",
+        "translation": "выследить",
+        "issue": "Only one verb sense; may miss noun or other common meanings."
+      },
+      {
+        "word": "working",
+        "translation": "действовать",
+        "issue": "Too narrow and not a direct equivalent for the adjective/participle 'working'."
+      },
+      {
+        "word": "state",
+        "translation": "Стейт (название улицы), словарный перевод — штат",
+        "issue": "Mixed proper-name note with dictionary gloss; not a clean translation."
+      },
+      {
+        "word": "charge",
+        "translation": "включить",
+        "issue": "Wrong meaning for the common senses of 'charge'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 9,
+    "reasoning": "Almost all source items are genuine English vocabulary words. The only clear non-vocabulary contamination is 'state' as presented with a proper-name note 'Стейт (название улицы)', which indicates a place-name interpretation slipped into the list. The rest are standard English words, not names or foreign terms.",
+    "violations": [
+      "state"
+    ]
+  },
+  "criterion_3": {
+    "score": 3,
+    "reasoning": "The list is heavily skewed toward very common A1/A2 vocabulary rather than B1/B2 items. Words like law, few, known, whether, beauty, continue, natural, item, death, and even basic, speed, and social are generally too elementary for a B-band list. A smaller subset such as specific, individual, security, environment, resource, and access are more plausibly B1/B2, but they are outnumbered by basic vocabulary and some specialized or context-specific items.",
+    "not_c_level": [
+      {
+        "word": "law",
+        "estimated_level": "A2",
+        "reason": "Very common basic vocabulary, not a B1/B2 target word."
+      },
+      {
+        "word": "few",
+        "estimated_level": "A1",
+        "reason": "Elementary quantifier."
+      },
+      {
+        "word": "known",
+        "estimated_level": "A2",
+        "reason": "Common high-frequency adjective/participle."
+      },
+      {
+        "word": "whether",
+        "estimated_level": "A2",
+        "reason": "Common conjunction, usually taught before B1."
+      },
+      {
+        "word": "equipment",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun, not especially B-level."
+      },
+      {
+        "word": "major",
+        "estimated_level": "A2",
+        "reason": "Common adjective with basic meanings."
+      },
+      {
+        "word": "similar",
+        "estimated_level": "A2",
+        "reason": "Basic comparison vocabulary."
+      },
+      {
+        "word": "basic",
+        "estimated_level": "A2",
+        "reason": "Elementary adjective."
+      },
+      {
+        "word": "speed",
+        "estimated_level": "A2",
+        "reason": "Very common everyday noun."
+      },
+      {
+        "word": "mile",
+        "estimated_level": "A2",
+        "reason": "Basic measurement word."
+      },
+      {
+        "word": "cell",
+        "estimated_level": "A2",
+        "reason": "Common word with basic senses; not inherently B-level."
+      },
+      {
+        "word": "though",
+        "estimated_level": "A2",
+        "reason": "High-frequency connector."
+      },
+      {
+        "word": "step",
+        "estimated_level": "A1",
+        "reason": "Very basic noun/verb."
+      },
+      {
+        "word": "beauty",
+        "estimated_level": "A2",
+        "reason": "Common basic noun."
+      },
+      {
+        "word": "continue",
+        "estimated_level": "A2",
+        "reason": "Common verb, usually pre-B1."
+      },
+      {
+        "word": "natural",
+        "estimated_level": "A2",
+        "reason": "Basic adjective."
+      },
+      {
+        "word": "such",
+        "estimated_level": "A2",
+        "reason": "Common determiner/pronoun."
+      },
+      {
+        "word": "item",
+        "estimated_level": "A2",
+        "reason": "Basic noun."
+      },
+      {
+        "word": "position",
+        "estimated_level": "A2",
+        "reason": "Common noun with basic meanings."
+      },
+      {
+        "word": "death",
+        "estimated_level": "A2",
+        "reason": "Basic high-frequency noun."
+      },
+      {
+        "word": "social",
+        "estimated_level": "A2",
+        "reason": "Common adjective, not specifically B-level."
+      },
+      {
+        "word": "service",
+        "estimated_level": "A2",
+        "reason": "Very common noun with basic meanings."
+      },
+      {
+        "word": "access",
+        "estimated_level": "B1",
+        "reason": "Can be B1, but in many learner lists it is borderline and often appears earlier; here the set overall is still too elementary."
+      }
+    ]
+  },
+  "overall_score": 5.3,
+  "summary": "The translation set is mixed: many entries are acceptable, but several important items are mistranslated, overly specific, or contextually shaky. The source list also looks poorly calibrated for a B1/B2 vocabulary set because it contains many very basic words and at least one proper-name contamination.",
+  "tokens_used": {
+    "prompt": 1633,
+    "completion": 1874,
+    "total": 3507
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.754588",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Euphoria S1 E6",
+  "season": 1,
+  "episode": 1,
+  "word_count": 24,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 4,
+    "reasoning": "Most of the Russian translations are correct and natural: broccoli→«брокколи», halloween→«Хэллоуин», confess→«признаться», literally→«буквально», rehab→«реабилитационный центр», realized→«понял», numb→«онемевший», addict→«наркоман», pond→«пруд», stronger→«сильнее», booth→«будка», chaperone→«сопровождающий», idiot→«идиот», assaulted→«напал» are all broadly acceptable. However, several entries are wrong or too imprecise for the likely episode context: hut→«команда для начала розыгрыша» is completely unrelated to the English word 'hut'; weird→«странно» is the adverb form, not the adjective 'weird' ('странный'); bang→«стук» is too narrow and likely misses the intended sense; supposed→«должен» is often too generic and can miss the modal/passive sense ('supposed to' = 'должен/предполагается'); highland→«Хайленд (топоним), словарный перевод — нагорье» mixes a place-name transliteration with a dictionary gloss, which is not a clean translation; mash→«картофельное пюре» is only correct if the context is food, otherwise it is too specific; lovin→«любовь» is not a faithful rendering of the colloquial form 'lovin'' (usually 'любовь/кайф/люблю' depending on context); soaking→«промокший насквозь» is adjectival and may be fine, but if the source is a gerund/participle in context it may need a different form; pushed→«толкали» is plural past tense and may not match the source form if singular or passive was intended. Overall, the list is partially correct but contains several clear mismatches and some context-insensitive choices.",
+    "issues": [
+      {
+        "word": "hut",
+        "translation": "команда для начала розыгрыша",
+        "issue": "Completely wrong meaning; this is not the English noun 'hut'."
+      },
+      {
+        "word": "weird",
+        "translation": "странно",
+        "issue": "Wrong part of speech; 'weird' is an adjective, so the correct form would be 'странный/странная/странное'."
+      },
+      {
+        "word": "bang",
+        "translation": "стук",
+        "issue": "Too narrow and likely context-mismatched; 'bang' can mean a loud удар/хлопок/бах, not just 'knock'."
+      },
+      {
+        "word": "supposed",
+        "translation": "должен",
+        "issue": "Potentially too generic; in context 'supposed to' often means 'должен/предполагается', and the bare form may miss the intended nuance."
+      },
+      {
+        "word": "highland",
+        "translation": "Хайленд (топоним), словарный перевод — нагорье",
+        "issue": "Mixed transliteration and gloss; not a clean translation and may indicate a place name rather than the vocabulary item."
+      },
+      {
+        "word": "mash",
+        "translation": "картофельное пюре",
+        "issue": "Overly specific; correct only for the food sense, not for the general verb/noun 'mash'."
+      },
+      {
+        "word": "lovin",
+        "translation": "любовь",
+        "issue": "Colloquial clipped form is not faithfully rendered; 'lovin'' usually needs a context-sensitive colloquial equivalent."
+      },
+      {
+        "word": "soaking",
+        "translation": "промокший насквозь",
+        "issue": "May be acceptable as an adjective, but can be contextually off if the source is a verb/participle requiring a different form."
+      },
+      {
+        "word": "pushed",
+        "translation": "толкали",
+        "issue": "May not match the source form exactly; tense/number/voice could be wrong depending on context."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 8,
+    "reasoning": "Almost all source items are genuine English vocabulary words. The main concern is 'halloween', which is a borrowed cultural term but fully established in English, so it is acceptable. 'highland' is also a real English word, though it can function as a place-related term; it is not itself a non-English item. No obvious character names, foreign-language intrusions, or invented fantasy terms appear in the source list. Therefore the list is largely clean for criterion 2.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 5,
+    "reasoning": "The list is mostly within the B1-B2 range, but several items are miscalibrated. Some entries are too easy for B2: 'broccoli', 'halloween', 'carnival', 'pond', 'idiot', and arguably 'booth' are closer to A1-A2/B1 than B2. 'weird', 'confess', 'literally', 'realized', 'numb', 'addict', 'stronger', 'chaperone', 'assaulted' are more plausibly B1-B2. 'rehab' can be B2 in colloquial usage, though the full phrase 'rehabilitation center' is easier than the standalone slang. 'highland' is a problematic inclusion because it is often a geographic/common noun but not a typical B2 vocabulary target in this form. Overall, the list contains a noticeable number of items that are below the claimed band, especially among the B2 rows.",
+    "not_c_level": [
+      {
+        "word": "broccoli",
+        "estimated_level": "A1",
+        "reason": "Basic food vocabulary, much easier than B2."
+      },
+      {
+        "word": "halloween",
+        "estimated_level": "A2",
+        "reason": "Common cultural term, not B2-level vocabulary."
+      },
+      {
+        "word": "carnival",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun, typically below B2."
+      },
+      {
+        "word": "pond",
+        "estimated_level": "A2",
+        "reason": "Simple concrete noun, not B2."
+      },
+      {
+        "word": "booth",
+        "estimated_level": "A2",
+        "reason": "Common noun, usually learned earlier than B2."
+      },
+      {
+        "word": "idiot",
+        "estimated_level": "A2",
+        "reason": "Very common insult/basic noun, not B2."
+      },
+      {
+        "word": "highland",
+        "estimated_level": "B1",
+        "reason": "More of a geographic/common noun than a clear B2 vocabulary item; the entry is also partly a place name."
+      }
+    ]
+  },
+  "overall_score": 5.7,
+  "summary": "The translation set is mixed: many common items are translated correctly, but there are several clear errors and a few context-insensitive choices. The vocabulary banding is also somewhat inflated, with multiple B2-tagged words actually being much easier than B2.",
+  "tokens_used": {
+    "prompt": 1603,
+    "completion": 1637,
+    "total": 3240
+  }
+}

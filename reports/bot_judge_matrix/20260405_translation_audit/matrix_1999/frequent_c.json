@@ -1,0 +1,65 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-06T02:53:53.749567",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "word_count": 5,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most translations are semantically correct and complete. \"scaffold\" → \"строительные леса\" is correct in the usual construction sense, and \"emp\" → \"электромагнитный импульс\" is a correct expansion of the abbreviation. \"mainframe\" → \"центральный компьютер\" is acceptable and captures the intended meaning of a large central computer system. \"deja\" → \"дежавю\" is plausible if the source is the clipped form of \"déjà vu\" used in dialogue. The only weaker item is \"jujitsu\" → \"боевое искусство\": this is too generic, because the source word refers specifically to the martial art jujitsu/jiu-jitsu, not martial arts in general.",
+    "issues": [
+      {
+        "word": "jujitsu",
+        "translation": "боевое искусство",
+        "issue": "Too generic: the source refers to the specific martial art 'джиу-джитсу/дзюдзюцу', not just any martial art."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 7,
+    "reasoning": "Most source items are genuine English vocabulary or established loanwords used in English. However, \"emp\" is problematic as a standalone source word: it is an abbreviation/acronym rather than a normal vocabulary item, and in a vocabulary list it should usually be filtered or expanded. The other items are acceptable as English lexical items in this context, though \"deja\" is a clipped foreign borrowing rather than a standard standalone English word.",
+    "violations": [
+      "emp"
+    ]
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is not well aligned with C1/C2 vocabulary teaching. Several items are specialized, but some are not advanced vocabulary in the intended sense. \"scaffold\" is a fairly common B2 word, \"deja\" is not a standard standalone English vocabulary item, and \"jujitsu\" is a specific loanword rather than advanced English lexis. \"emp\" is an acronym, not a C-level vocabulary word. Only \"mainframe\" is clearly specialized enough to fit an advanced list.",
+    "not_c_level": [
+      {
+        "word": "scaffold",
+        "estimated_level": "B2",
+        "reason": "Common enough in general English, especially in construction contexts; not clearly C1/C2."
+      },
+      {
+        "word": "emp",
+        "estimated_level": "B1",
+        "reason": "An abbreviation/acronym rather than advanced vocabulary; not a C-level lexical item."
+      },
+      {
+        "word": "deja",
+        "estimated_level": "B2",
+        "reason": "Not a standard standalone English word; it is a clipped foreign borrowing from 'déjà vu'."
+      },
+      {
+        "word": "jujitsu",
+        "estimated_level": "B2",
+        "reason": "A specific loanword/name for a martial art, but not advanced C1/C2 English vocabulary."
+      }
+    ]
+  },
+  "overall_score": 5.7,
+  "summary": "The translations are mostly accurate, with one notable issue of overgeneralization for \"jujitsu.\" The bigger problem is list quality: one item is an acronym, one is a clipped foreign form, and several entries are not really C-level vocabulary.",
+  "tokens_used": {
+    "prompt": 1081,
+    "completion": 755,
+    "total": 1836
+  }
+}

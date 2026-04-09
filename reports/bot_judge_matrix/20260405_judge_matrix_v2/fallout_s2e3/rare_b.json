@@ -1,0 +1,143 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.759437",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_b",
+  "translation_csvs": [
+    "tier_4_rare_b_translations.csv"
+  ],
+  "series": "Fallout S2 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 19,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "Most pairs are translated into real Russian words and are broadly semantically related to the English source. However, several translations are too context-dependent or slightly off in meaning: 'system' → 'система вооружения' is overly specific and adds 'weapons' that is not in the source; 'district' → 'избирательный округ' is a very specific political sense and may be wrong if the episode uses a general district; 'issue' → 'вопрос' is often acceptable but can miss meanings like 'problem' or 'matter'; 'research' → 'исследовательский' is an adjective, not a noun/verb equivalent; 'figure' → 'сообразить' captures only one verbal sense and not the noun 'figure'; 'display' → 'предъявить' is only one possible sense and may be too narrow; 'effect' → 'следствие' is a noun meaning 'consequence', which may not match the intended 'effect' in context. The rest are mostly acceptable direct translations.",
+    "issues": [
+      {
+        "word": "system",
+        "translation": "система вооружения",
+        "issue": "Too specific; adds 'weapons' and may not match the episode context."
+      },
+      {
+        "word": "district",
+        "translation": "избирательный округ",
+        "issue": "Very specific political sense; may be the wrong meaning if the context is just 'district'."
+      },
+      {
+        "word": "issue",
+        "translation": "вопрос",
+        "issue": "Acceptable in some contexts, but can be too generic if the intended meaning is 'problem' or 'matter'."
+      },
+      {
+        "word": "research",
+        "translation": "исследовательский",
+        "issue": "Wrong part of speech; this is an adjective, not a direct translation of the noun/verb 'research'."
+      },
+      {
+        "word": "figure",
+        "translation": "сообразить",
+        "issue": "Only covers the verb sense 'to figure out'; does not cover the noun 'figure' and may be incomplete."
+      },
+      {
+        "word": "display",
+        "translation": "предъявить",
+        "issue": "Only one narrow sense; may not match the intended meaning 'show/display'."
+      },
+      {
+        "word": "effect",
+        "translation": "следствие",
+        "issue": "Means 'consequence/result' rather than 'effect'; likely a sense mismatch."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words. None of the entries are obvious character names, place names, foreign-language insertions, or invented non-lexical terms. Even if some are context-sensitive or polysemous, they still belong in an English vocabulary list.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list mixes some B1/B2 vocabulary with several very basic A1/A2 words and a few items that are arguably too specialized or sense-specific for a general B-level list. Words like 'live', 'force', 'support', 'control', 'risk', 'state', 'mile', and 'option' are common A1/A2 or early B1 vocabulary, while 'district', 'research', and 'effect' can be B2 or higher depending on sense. Overall, the calibration is weak because the set is not consistently B1/B2 and includes many everyday words that would usually be filtered out of a rare-vocabulary list.",
+    "not_c_level": [
+      {
+        "word": "option",
+        "estimated_level": "A2",
+        "reason": "Common everyday vocabulary; usually too basic for a rare B1/B2 list."
+      },
+      {
+        "word": "system",
+        "estimated_level": "A2",
+        "reason": "Very common core vocabulary, not rare enough for a B-level list."
+      },
+      {
+        "word": "force",
+        "estimated_level": "A2",
+        "reason": "Basic high-frequency word; not a good fit for a rare vocabulary list."
+      },
+      {
+        "word": "opportunity",
+        "estimated_level": "B1",
+        "reason": "Borderline, but still common and often taught before B2."
+      },
+      {
+        "word": "issue",
+        "estimated_level": "B1",
+        "reason": "Common general vocabulary; not especially rare."
+      },
+      {
+        "word": "act",
+        "estimated_level": "A2",
+        "reason": "Very common word with multiple basic senses; too elementary."
+      },
+      {
+        "word": "support",
+        "estimated_level": "A2",
+        "reason": "Core everyday vocabulary; not rare enough."
+      },
+      {
+        "word": "thought",
+        "estimated_level": "A2",
+        "reason": "Basic common word."
+      },
+      {
+        "word": "live",
+        "estimated_level": "A1",
+        "reason": "Elementary vocabulary."
+      },
+      {
+        "word": "control",
+        "estimated_level": "A2",
+        "reason": "Common basic word."
+      },
+      {
+        "word": "risk",
+        "estimated_level": "B1",
+        "reason": "Common and often taught before B2."
+      },
+      {
+        "word": "mile",
+        "estimated_level": "A2",
+        "reason": "Basic measurement vocabulary, not rare."
+      },
+      {
+        "word": "state",
+        "estimated_level": "A2",
+        "reason": "Very common word with multiple basic senses."
+      },
+      {
+        "word": "version",
+        "estimated_level": "B1",
+        "reason": "Common general vocabulary, not especially advanced."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The translations are mostly understandable and all source words are genuine English, but several entries are too specific, wrong in part of speech, or only partially match the intended sense. The bigger issue is list calibration: many items are basic A1/A2 words rather than rare B1/B2 vocabulary, so the set is not well tuned for the stated purpose.",
+  "tokens_used": {
+    "prompt": 1275,
+    "completion": 1368,
+    "total": 2643
+  }
+}

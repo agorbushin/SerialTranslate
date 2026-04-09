@@ -1,0 +1,26 @@
+{
+  "series": "Euphoria S1 E4",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "euphoria_s1_e4.srt",
+  "analysis_date": "2026-04-01T22:47:26.652023",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 124198539,
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 6,
+    "tier_2_random": 131,
+    "tier_3_common": 17,
+    "tier_4_rare_in_series": 5,
+    "tier_5_filtered": 131,
+    "tier_b1_words": 0,
+    "tier_b2_words": 15,
+    "tier_4_rare_c_words": 0,
+    "tier_4_rare_b_words": 13
+  },
+  "excluded_names_fantasy_count": 28
+}

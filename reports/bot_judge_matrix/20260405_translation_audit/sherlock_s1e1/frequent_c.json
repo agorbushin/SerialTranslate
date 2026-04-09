@@ -1,0 +1,90 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Sherlock/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.758593",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Sherlock",
+  "season": 1,
+  "episode": 1,
+  "word_count": 17,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Sherlock/Season 1/sherlock_s1_e1.srt",
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most word pairs are translated correctly and match the sense used in the episode. The translations for psychosomatic, psychopath, flatshare, traumatic, sustain, haunted, unnoticed, vicious, sniffer, sociopath, soother, and aneurism are all acceptable in context. The main problems are that 'erm' is only rendered as a hesitation sound rather than a lexical translation, which is acceptable but not ideal for a vocabulary list; 'arch' is translated as 'заклятый', which fits 'arch-enemy' in context; and 'sally' is mixed with the character name, but the lexical sense 'выпад' is not the intended meaning in the subtitle examples, where it is a proper name. 'sake' as 'ради бога' captures the idiomatic phrase 'for God's sake' rather than the standalone word 'sake', so it is contextually acceptable but not a direct vocabulary equivalent. The only clear completeness issue is 'nerf' with an empty translation.",
+    "issues": [
+      {
+        "word": "nerf",
+        "translation": "(empty)",
+        "issue": "Missing translation."
+      },
+      {
+        "word": "sally",
+        "translation": "Салли (имя в сериале), словарный перевод — выпад",
+        "issue": "Mixed proper-name annotation with a lexical gloss; in the episode this is a character name, so the vocabulary sense is not actually the intended one."
+      },
+      {
+        "word": "sake",
+        "translation": "ради бога",
+        "issue": "Idiomatic phrase translation rather than a direct translation of the standalone word; acceptable in context but not a clean vocabulary entry."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 6,
+    "reasoning": "Most source items are genuine English vocabulary words. However, the list contains at least one clear non-vocabulary entry: 'sally' is used as a character name in the episode, not as the common noun/verb sense. 'aneurism' is also a spelling variant of a medical term, but it is still an English word form. 'nerf' is a real English word, though it appears to be unsupported by the episode context here. Overall, the main filtering issue is the inclusion of a proper name.",
+    "violations": [
+      "sally"
+    ]
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list is mixed in level. Several items are genuinely advanced or specialized, such as psychosomatic, psychopath, traumatic, sustain, haunted, vicious, sociopath, and aneurism. But there are also multiple items that are too basic for a C1/C2 vocabulary list, or are not really vocabulary targets in this episode. These lower the quality of the list as an advanced-learning set.",
+    "not_c_level": [
+      {
+        "word": "erm",
+        "estimated_level": "A1/A2",
+        "reason": "A hesitation filler, not advanced vocabulary."
+      },
+      {
+        "word": "sally",
+        "estimated_level": "B1/B2",
+        "reason": "As used here it is a proper name, not a C-level vocabulary item."
+      },
+      {
+        "word": "sake",
+        "estimated_level": "B1/B2",
+        "reason": "Common word/phrase component in a very frequent idiom; not C-level."
+      },
+      {
+        "word": "flatshare",
+        "estimated_level": "B1/B2",
+        "reason": "Fairly common modern British English term, not advanced enough for a C-level list."
+      },
+      {
+        "word": "sniffer",
+        "estimated_level": "B1/B2",
+        "reason": "Basic derivation from 'sniff'; the word itself is not advanced."
+      },
+      {
+        "word": "soother",
+        "estimated_level": "B1/B2",
+        "reason": "Common derivative with a straightforward meaning; not C-level."
+      },
+      {
+        "word": "nerf",
+        "estimated_level": "B1/B2",
+        "reason": "Not an advanced vocabulary item in this context, and no subtitle example is provided."
+      }
+    ]
+  },
+  "overall_score": 6.0,
+  "summary": "The translations are mostly accurate, with only one clearly missing entry and a few context/formatting issues. The bigger problem is that the source list is not consistently curated for advanced vocabulary: it includes a proper name and several fairly basic words that do not fit a C1/C2 learning set.",
+  "tokens_used": {
+    "prompt": 2691,
+    "completion": 1002,
+    "total": 3693
+  }
+}

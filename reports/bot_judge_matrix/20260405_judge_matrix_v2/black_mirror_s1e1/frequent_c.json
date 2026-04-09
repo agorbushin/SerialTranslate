@@ -1,0 +1,66 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Black Mirror/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.766848",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Black Mirror",
+  "season": 1,
+  "episode": 1,
+  "word_count": 7,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Black Mirror/Season 1/black_mirror_s1_e1.srt",
+  "criterion_1": {
+    "score": 7,
+    "reasoning": "Most translations are semantically correct in the episode context. 'terrestrial' → 'эфирный', 'unsimulated' → 'неимитированный', 'obit' → 'некролог', 'mps' → 'члены парламента', and 'significance' → 'значение' are all acceptable, though 'significance' is a bit generic but still correct. The main problem is 'ukn' → 'телеканал': in context this is the broadcaster UKN, so the translation should preserve the proper-name/channel identity rather than replace it with a generic common noun. 'carlton' is also problematic because the source item is a proper name, and the translation mixes a name with a dictionary gloss; for this episode context, the relevant meaning is the character name 'Карлтон', not the lexical meaning of 'carlton' as a settlement term.",
+    "issues": [
+      {
+        "word": "ukn",
+        "translation": "телеканал",
+        "issue": "Wrong sense / too generic: in context this is the broadcaster UKN, so it should be treated as a proper name or channel name, not just 'телеканал'."
+      },
+      {
+        "word": "carlton",
+        "translation": "Карлтон (имя в сериале), словарный перевод — поселение свободных крестьян",
+        "issue": "Contextually the item is a character name, so the lexical gloss is irrelevant and the entry is mixed with an unnecessary dictionary meaning."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 3,
+    "reasoning": "Several source items are not genuine English vocabulary words for a teaching list. 'ukn' is an abbreviation/proper broadcaster name, not a vocabulary item. 'carlton' is a proper name in this episode, not a target vocabulary word. The rest are real English words or standard abbreviations ('obit', 'mps') that can be acceptable in a vocabulary list, though 'mps' is an abbreviation rather than a lexical headword. Because multiple non-vocabulary entities slipped through, the list fails this criterion substantially.",
+    "violations": [
+      "ukn",
+      "carlton"
+    ]
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "Only some items are truly C1/C2. 'terrestrial' in the broadcast sense is advanced/specialized and fits C-level. 'unsimulated' is also relatively advanced in this specific collocation. However, 'obit' is more of a journalistic abbreviation and not strongly C-level, 'significance' is common B2-level vocabulary, and 'mps' is just an abbreviation. The list therefore mixes advanced items with several too-basic or non-advanced entries, so it does not consistently meet the C-level goal.",
+    "not_c_level": [
+      {
+        "word": "obit",
+        "estimated_level": "B2",
+        "reason": "A shortened journalistic form of 'obituary'; useful but not strongly C1/C2 vocabulary."
+      },
+      {
+        "word": "mps",
+        "estimated_level": "B1",
+        "reason": "An abbreviation for 'Members of Parliament'; the underlying phrase is common and the abbreviation itself is not advanced vocabulary."
+      },
+      {
+        "word": "significance",
+        "estimated_level": "B2",
+        "reason": "Common academic/general vocabulary, but not typically C1/C2-level for a dedicated advanced word list."
+      }
+    ]
+  },
+  "overall_score": 4.7,
+  "summary": "The translations are mostly accurate, but the list contains source items that are not suitable vocabulary targets, especially proper names and abbreviations. It also mixes advanced words with several mid-level items, so it only partially fits a C-level learning list.",
+  "tokens_used": {
+    "prompt": 2212,
+    "completion": 856,
+    "total": 3068
+  }
+}

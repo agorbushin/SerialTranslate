@@ -1,0 +1,26 @@
+{
+  "request_id": "0fa3dd599c164653bd608000f3578958",
+  "mode": "series",
+  "raw_input": "Inception",
+  "started_at": "2026-04-03T22:18:50.075805",
+  "finished_at": "2026-04-03T22:18:54.300395",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Inception",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "spellfix_title": 2615,
+    "find_existing": 188,
+    "download_subtitle": 717
+  },
+  "timings_ms": {
+    "total_e2e_ms": 4226
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "subtitle_download_failed"
+}

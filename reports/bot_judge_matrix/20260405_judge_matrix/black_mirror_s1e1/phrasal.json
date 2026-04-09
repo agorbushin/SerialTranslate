@@ -1,0 +1,951 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Black Mirror/Season 1/1",
+  "judged_at": "2026-04-05T22:55:11.813467",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Black Mirror",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 181,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Black Mirror/Season 1/black_mirror_s1_e1.srt",
+  "criterion_1": {
+    "score": 3,
+    "reasoning": "Step 1: A small subset of entries are correct and contextually appropriate, such as 'depends on' → 'зависит от', 'focus on' → 'сосредоточиться на', 'turn off' → 'выключить', 'bring about' → 'привести к', and 'appear on' → 'появиться на'. Step 2: However, many translations are either too generic, semantically off, or awkward for the episode context: some are literal but not idiomatic in Russian, some miss the exact sense, and some are clearly malformed or incomplete. Step 3: There are also entries where the English source is not actually the relevant phrasal unit in context, so the Russian gloss cannot be judged as a proper translation of the episode usage. Step 4: Because the list contains many correct-looking items but also a large number of weak or wrong glosses, the overall completeness/correctness is low-to-moderate rather than high.",
+    "issues": [
+      {
+        "phrasal_verb": "s on",
+        "translation": "включить",
+        "issue": "Malformed source string; likely intended 'is on'. The gloss is contextually fine for 'It's on CNN and Fox', but the source itself is broken."
+      },
+      {
+        "phrasal_verb": "go in",
+        "translation": "войти",
+        "issue": "Acceptable in context, but the episode uses 'go in now' as an instruction; 'войти' is fine though slightly underspecified."
+      },
+      {
+        "phrasal_verb": "intercourse with",
+        "translation": "секс с",
+        "issue": "Not a phrasal verb; translation is understandable but too colloquial and not a true gloss of the formal phrase 'sexual intercourse with'."
+      },
+      {
+        "phrasal_verb": "it off",
+        "translation": "снять это",
+        "issue": "Source is incomplete/garbled; in context 'get it off there' means remove it, so the Russian is only partially accurate."
+      },
+      {
+        "phrasal_verb": "this on",
+        "translation": "это включить",
+        "issue": "Malformed source; the intended meaning is 'put this on air' / 'run this on air', so the gloss is too literal and unnatural."
+      },
+      {
+        "phrasal_verb": "head onto",
+        "translation": "направиться к",
+        "issue": "Not a standard phrasal verb in this form; in context it is a compositional motion phrase, not a fixed idiom."
+      },
+      {
+        "phrasal_verb": "it with",
+        "translation": "это с",
+        "issue": "Incomplete source and incomplete gloss; the phrase is not a usable translation unit."
+      },
+      {
+        "phrasal_verb": "running out for",
+        "translation": "выбегать за",
+        "issue": "Wrong sense. In context 'time is running out for the Prime Minister' means 'время на исходе', not 'выбегать за'."
+      },
+      {
+        "phrasal_verb": "out for",
+        "translation": "в поисках",
+        "issue": "Too generic and only partly fits some contexts; here it is part of 'running out for', not an independent 'in search of' meaning."
+      },
+      {
+        "phrasal_verb": "lay down",
+        "translation": "лечь",
+        "issue": "Contextually okay, but the episode uses the imperative 'Lay down on the floor', so the translation should reflect the command more directly."
+      },
+      {
+        "phrasal_verb": "down on",
+        "translation": "сесть на",
+        "issue": "Wrong sense for 'lay down on the floor'; it should be 'лечь на', not 'сесть на'."
+      },
+      {
+        "phrasal_verb": "put on",
+        "translation": "надеть",
+        "issue": "In the episode 'put on the invoice' means 'put/write on', not 'wear'. The gloss is wrong for this context."
+      },
+      {
+        "phrasal_verb": "go on",
+        "translation": "продолжать",
+        "issue": "No matching subtitle line; translation is plausible generally, but unsupported in this episode excerpt."
+      },
+      {
+        "phrasal_verb": "get down",
+        "translation": "спуститься",
+        "issue": "In the episode 'Get down!' is an imperative to crouch/get low, not simply 'descend'."
+      },
+      {
+        "phrasal_verb": "right down",
+        "translation": "прямо вниз",
+        "issue": "This is an adverbial phrase, not a phrasal verb; translation is literal but not idiomatic."
+      },
+      {
+        "phrasal_verb": "am in",
+        "translation": "находиться в",
+        "issue": "Not a phrasal verb; it is a copular verb plus preposition. Translation is acceptable but the source category is wrong."
+      },
+      {
+        "phrasal_verb": "held by",
+        "translation": "удерживаемый",
+        "issue": "Not a phrasal verb; participial passive construction. Translation is acceptable but not a lexical phrasal idiom."
+      },
+      {
+        "phrasal_verb": "instructed by",
+        "translation": "инструктирован",
+        "issue": "Passive participle, not a phrasal verb. Also the Russian is awkward; 'предписано' or 'как велено' would fit better."
+      },
+      {
+        "phrasal_verb": "by by",
+        "translation": "по",
+        "issue": "Garbage/duplicate token string; not a valid translation unit."
+      },
+      {
+        "phrasal_verb": "security on",
+        "translation": "охрана за",
+        "issue": "Wrong and unnatural; in context 'security on her' means 'охрана у неё/на ней', not 'за'."
+      },
+      {
+        "phrasal_verb": "each with",
+        "translation": "каждый с",
+        "issue": "Literal but clunky; in context it is a distributive phrase, not a phrasal idiom."
+      },
+      {
+        "phrasal_verb": "notice out",
+        "translation": "обратите внимание",
+        "issue": "Wrong sense. 'Put a notice out' means issue/post a notice, not 'pay attention'."
+      },
+      {
+        "phrasal_verb": "complying for",
+        "translation": "соблюдая для",
+        "issue": "Malformed and not idiomatic; no such phrasal unit in context."
+      },
+      {
+        "phrasal_verb": "pissed off",
+        "translation": "раздосадованный",
+        "issue": "Meaning is close, but the Russian is adjectival and weak; in context it means 'разозлится/будет недоволен'."
+      },
+      {
+        "phrasal_verb": "sicking up",
+        "translation": "тошнить",
+        "issue": "Nonstandard spelling; the intended idiom is 'sick up'. Translation is understandable but the source form is dubious."
+      },
+      {
+        "phrasal_verb": "hereon in",
+        "translation": "с этого момента",
+        "issue": "Acceptable, though slightly formal; contextually fine."
+      },
+      {
+        "phrasal_verb": "it up",
+        "translation": "это",
+        "issue": "Incomplete source and useless gloss; the intended idiom is likely 'shove it up'."
+      },
+      {
+        "phrasal_verb": "re across",
+        "translation": "пересекать",
+        "issue": "Malformed source; likely 'you're across it' meaning 'you understand it'. The gloss does not match."
+      },
+      {
+        "phrasal_verb": "transmitted in",
+        "translation": "передано в",
+        "issue": "Too literal; in context 'to be transmitted in full' is better rendered as 'будет транслироваться полностью'."
+      },
+      {
+        "phrasal_verb": "workable by",
+        "translation": "выполнимо",
+        "issue": "Too generic; the phrase is adjectival, not a phrasal idiom."
+      },
+      {
+        "phrasal_verb": "ruled out",
+        "translation": "исключено",
+        "issue": "Good overall, though contextually it is 'ruled out the major players' = 'исключили'."
+      },
+      {
+        "phrasal_verb": "black out",
+        "translation": "потерять сознание",
+        "issue": "Contextually plausible, but the episode excerpt does not use it as a clear phrasal verb in the main dialogue."
+      },
+      {
+        "phrasal_verb": "heads up",
+        "translation": "предупреждение",
+        "issue": "Acceptable as a noun phrase, but not a phrasal verb."
+      },
+      {
+        "phrasal_verb": "head off",
+        "translation": "отправляться",
+        "issue": "Wrong sense. In context 'take her head off' means decapitate, not 'depart'."
+      },
+      {
+        "phrasal_verb": "asking for",
+        "translation": "требующий",
+        "issue": "Too adjectival and incomplete; in context it means 'asking for a million quid' = 'просить'."
+      },
+      {
+        "phrasal_verb": "runs with",
+        "translation": "сопровождается",
+        "issue": "Wrong sense. In media context 'runs with' means 'publishes/uses as a headline', not 'is accompanied by'."
+      },
+      {
+        "phrasal_verb": "by over",
+        "translation": "через",
+        "issue": "Not a phrasal idiom; just a prepositional fragment."
+      },
+      {
+        "phrasal_verb": "thinking about",
+        "translation": "думая о",
+        "issue": "Acceptable gerundial translation, but not a phrasal verb."
+      },
+      {
+        "phrasal_verb": "position away",
+        "translation": "позиционировать вдали",
+        "issue": "Not a real idiom; the source is an accidental adjacency and the Russian is unnatural."
+      },
+      {
+        "phrasal_verb": "happening in",
+        "translation": "происходя в",
+        "issue": "Not a phrasal verb; participial phrase."
+      },
+      {
+        "phrasal_verb": "palace on",
+        "translation": "дворец на",
+        "issue": "Not a phrasal idiom; it is a noun phrase in dialogue."
+      },
+      {
+        "phrasal_verb": "pumping away",
+        "translation": "откачивать",
+        "issue": "Wrong sense. In context it is sexual slang or vigorous motion, not 'pump out'."
+      },
+      {
+        "phrasal_verb": "them away",
+        "translation": "убрать их",
+        "issue": "Fragmentary phrase, not a stable phrasal idiom."
+      },
+      {
+        "phrasal_verb": "looking for",
+        "translation": "ищу",
+        "issue": "Good meaning, but the Russian should match person/number in context; still acceptable."
+      },
+      {
+        "phrasal_verb": "everything in",
+        "translation": "всё в",
+        "issue": "Incomplete fragment; not a usable gloss."
+      },
+      {
+        "phrasal_verb": "lights on",
+        "translation": "свет включен",
+        "issue": "Acceptable as a descriptive phrase, but not a phrasal verb."
+      },
+      {
+        "phrasal_verb": "one for",
+        "translation": "один для",
+        "issue": "Ordinary prepositional phrase, not a phrasal idiom."
+      },
+      {
+        "phrasal_verb": "heading for",
+        "translation": "направляясь к",
+        "issue": "Contextually fine, but it is a participial motion phrase rather than a textbook phrasal verb."
+      },
+      {
+        "phrasal_verb": "there by",
+        "translation": "там к",
+        "issue": "Not a phrasal idiom; fragmentary and awkward."
+      },
+      {
+        "phrasal_verb": "outside in",
+        "translation": "снаружи внутрь",
+        "issue": "Not a phrasal verb; just a spatial phrase."
+      },
+      {
+        "phrasal_verb": "prised away",
+        "translation": "вытолкнутый",
+        "issue": "Wrong sense. 'Prised away' means pried off/removed, not pushed out."
+      },
+      {
+        "phrasal_verb": "think about",
+        "translation": "подумать о",
+        "issue": "Correct in context, though aspect may vary; acceptable."
+      },
+      {
+        "phrasal_verb": "fuck up",
+        "translation": "облажаться",
+        "issue": "Correct colloquial equivalent."
+      },
+      {
+        "phrasal_verb": "came for",
+        "translation": "пришли за",
+        "issue": "Contextually okay, but it is a simple verb-preposition construction rather than a strong phrasal idiom."
+      },
+      {
+        "phrasal_verb": "back up",
+        "translation": "поддерживать",
+        "issue": "No matching subtitle line; also the common sense 'support' is not evidenced in this episode excerpt."
+      },
+      {
+        "phrasal_verb": "crew with",
+        "translation": "команда с",
+        "issue": "Not a phrasal idiom; just a noun phrase fragment."
+      },
+      {
+        "phrasal_verb": "stay down",
+        "translation": "оставайся на месте",
+        "issue": "Meaning is close, but more literally 'не вставай/лежать'."
+      },
+      {
+        "phrasal_verb": "re out",
+        "translation": "выходите",
+        "issue": "Malformed source; likely 'we're out'."
+      },
+      {
+        "phrasal_verb": "s out",
+        "translation": "выходите",
+        "issue": "Malformed source; not a valid lexical item."
+      },
+      {
+        "phrasal_verb": "play out",
+        "translation": "развиваться",
+        "issue": "Good contextual sense, though a more natural Russian is 'разворачиваться'."
+      },
+      {
+        "phrasal_verb": "act on",
+        "translation": "действовать по",
+        "issue": "In context 'perform an indecent act on your screens' is not 'act on' in the usual sense; the gloss is misleading."
+      },
+      {
+        "phrasal_verb": "it through",
+        "translation": "это пройдет",
+        "issue": "Wrong sense. 'See it through' means 'довести до конца'."
+      },
+      {
+        "phrasal_verb": "been on",
+        "translation": "был на",
+        "issue": "Grammatically incomplete and too literal."
+      },
+      {
+        "phrasal_verb": "on for",
+        "translation": "на протяжении",
+        "issue": "Acceptable as a duration phrase, but not a phrasal verb."
+      },
+      {
+        "phrasal_verb": "stumbling about",
+        "translation": "блуждая",
+        "issue": "Acceptable participial rendering, but not a phrasal verb."
+      },
+      {
+        "phrasal_verb": "all about",
+        "translation": "все о",
+        "issue": "Contextually okay, but not a phrasal verb."
+      },
+      {
+        "phrasal_verb": "put in",
+        "translation": "вставить",
+        "issue": "Wrong sense. In context 'put in an assured performance' means 'выступил/показал'."
+      },
+      {
+        "phrasal_verb": "minister into",
+        "translation": "вмешиваться в",
+        "issue": "Not a real phrasal idiom; it is a verb plus preposition/object pattern in a coercion construction."
+      },
+      {
+        "phrasal_verb": "event in",
+        "translation": "событие в",
+        "issue": "Not a phrasal idiom; ordinary noun phrase."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 2,
+    "reasoning": "Step 1: A minority of entries are genuine phrasal verbs or established verb-particle / verb-preposition combinations, such as 'go in', 'focus on', 'turn off', 'put on', 'get out', 'get through', 'move on', 'rule out', 'pull in', 'wait for', 'think about', 'fuck up', and 'play out'. Step 2: However, the list is heavily polluted by fragments, malformed strings, and ordinary prepositional or participial phrases that are not textbook phrasal verbs. Step 3: Many items are accidental adjacency from subtitles ('am in', 'held by', 'each with', 'by over', 'event in', 'palace on', 'camera in', 'lights on'), duplicated garbage ('instructed by by', 'by by', 's on', 're out', 's out'), or noun phrases ('heads up', 'piece on', 'notice on'). Step 4: Because false positives dominate, the set is mostly not a clean phrasal-verb inventory.",
+    "invalid_phrasals": [
+      {
+        "phrase": "s on",
+        "reason": "Malformed fragment; not a real English phrasal verb."
+      },
+      {
+        "phrase": "intercourse with",
+        "reason": "Not a phrasal verb; just a noun phrase with a preposition."
+      },
+      {
+        "phrase": "her back",
+        "reason": "Not a phrasal verb; noun phrase."
+      },
+      {
+        "phrase": "it off",
+        "reason": "Incomplete fragment; not a lexical phrasal unit."
+      },
+      {
+        "phrase": "this on",
+        "reason": "Incomplete fragment; not a standard phrasal verb."
+      },
+      {
+        "phrase": "head onto",
+        "reason": "Not a textbook phrasal verb; compositional motion phrase."
+      },
+      {
+        "phrase": "it with",
+        "reason": "Fragmentary and not idiomatic."
+      },
+      {
+        "phrase": "hours away",
+        "reason": "Adverbial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "got in",
+        "reason": "Can be a verb phrase, but here it is just past tense of 'get in'; not a distinct phrasal idiom entry."
+      },
+      {
+        "phrase": "running out for",
+        "reason": "Extended fragment, not a standard phrasal verb."
+      },
+      {
+        "phrase": "out for",
+        "reason": "Prepositional phrase; not a phrasal verb by itself."
+      },
+      {
+        "phrase": "lay down",
+        "reason": "Can be a phrasal verb, but in this dataset it is used as a command phrase; borderline rather than a strong idiom."
+      },
+      {
+        "phrase": "down on",
+        "reason": "Prepositional fragment; not a standalone phrasal verb."
+      },
+      {
+        "phrase": "not out",
+        "reason": "Adjectival/idiomatic phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "am in",
+        "reason": "Copula plus preposition; not a phrasal verb."
+      },
+      {
+        "phrase": "held by",
+        "reason": "Passive participle construction, not a phrasal verb."
+      },
+      {
+        "phrase": "instructed by",
+        "reason": "Passive participle construction, not a phrasal verb."
+      },
+      {
+        "phrase": "instructed by by",
+        "reason": "Garbage duplicate string."
+      },
+      {
+        "phrase": "by by",
+        "reason": "Garbage duplicate string."
+      },
+      {
+        "phrase": "security on",
+        "reason": "Noun phrase fragment, not a phrasal verb."
+      },
+      {
+        "phrase": "each with",
+        "reason": "Ordinary distributive phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "appear on",
+        "reason": "Verb-preposition combination, but not a phrasal verb in the strict textbook sense."
+      },
+      {
+        "phrase": "television on",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "no on",
+        "reason": "Fragmentary and ungrammatical."
+      },
+      {
+        "phrase": "ends with",
+        "reason": "Ordinary verb-preposition pattern, not a phrasal verb."
+      },
+      {
+        "phrase": "specifications for",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "live on",
+        "reason": "Can be a phrasal verb in other senses, but here it is an adverbial broadcast phrase; not clearly a phrasal idiom."
+      },
+      {
+        "phrase": "checking with",
+        "reason": "Progressive verb plus preposition; not a phrasal verb."
+      },
+      {
+        "phrase": "dialogue with",
+        "reason": "Noun phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "channel for",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "exists in",
+        "reason": "Ordinary verb-preposition construction, not a phrasal verb."
+      },
+      {
+        "phrase": "did after",
+        "reason": "Not a phrasal verb; malformed context fragment."
+      },
+      {
+        "phrase": "notice out",
+        "reason": "Verb plus particle can be possible in 'put notice out', but this fragment alone is not a standard phrasal verb entry."
+      },
+      {
+        "phrase": "complying for",
+        "reason": "Not a real idiom; malformed fragment."
+      },
+      {
+        "phrase": "trending on",
+        "reason": "Modern collocation, but not a classic phrasal verb."
+      },
+      {
+        "phrase": "twitter for",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "weeks ahead",
+        "reason": "Temporal phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "tone with",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "notice on",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "hereon in",
+        "reason": "Adverbial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "it up",
+        "reason": "Fragment; not a valid phrasal entry."
+      },
+      {
+        "phrase": "re across",
+        "reason": "Malformed fragment; not a real idiom."
+      },
+      {
+        "phrase": "camera in",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "transmitted in",
+        "reason": "Passive/participial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "workable by",
+        "reason": "Adjectival phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "pulled in",
+        "reason": "Can be a phrasal verb, but here it is passive participle; borderline as an entry."
+      },
+      {
+        "phrase": "black out",
+        "reason": "Can be a real phrasal verb, but the entry is not clearly used as such in the provided context."
+      },
+      {
+        "phrase": "heads up",
+        "reason": "Noun phrase/interjection, not a phrasal verb."
+      },
+      {
+        "phrase": "here on",
+        "reason": "Prepositional phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "pleading for",
+        "reason": "Progressive verb-preposition phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "round up",
+        "reason": "Real phrasal verb."
+      },
+      {
+        "phrase": "address in",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "head off",
+        "reason": "Real phrasal verb, but the episode also uses a literal body-part phrase 'take her head off'; the entry is ambiguous."
+      },
+      {
+        "phrase": "asking for",
+        "reason": "Verb-preposition pattern; not a strong phrasal verb."
+      },
+      {
+        "phrase": "runs with",
+        "reason": "Can be idiomatic in media usage, but here it is closer to a reporting collocation than a textbook phrasal verb."
+      },
+      {
+        "phrase": "piece on",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "watched by",
+        "reason": "Passive participle phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "by over",
+        "reason": "Fragmentary prepositional sequence."
+      },
+      {
+        "phrase": "wait for",
+        "reason": "Ordinary verb-preposition combination; not a phrasal verb in the strict sense."
+      },
+      {
+        "phrase": "tuning in",
+        "reason": "Can be a phrasal verb, but here it is a broadcast idiom; acceptable borderline."
+      },
+      {
+        "phrase": "thinking about",
+        "reason": "Verb plus preposition; not a phrasal verb."
+      },
+      {
+        "phrase": "position away",
+        "reason": "Not a real idiom; accidental adjacency."
+      },
+      {
+        "phrase": "abnormal for",
+        "reason": "Adjective plus preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "happening in",
+        "reason": "Progressive verb-preposition phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "palace on",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "her for",
+        "reason": "Pronoun plus preposition fragment."
+      },
+      {
+        "phrase": "rules for",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "light for",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "pumping away",
+        "reason": "Can be a verb-particle phrase, but in this dataset it is not clearly a standard idiom and is contextually slangy."
+      },
+      {
+        "phrase": "them away",
+        "reason": "Pronoun plus particle fragment; not a lexical entry."
+      },
+      {
+        "phrase": "dwell on",
+        "reason": "Real verb-preposition idiom."
+      },
+      {
+        "phrase": "looking for",
+        "reason": "Verb-preposition combination; borderline, not a classic phrasal verb."
+      },
+      {
+        "phrase": "everything in",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "traceback on",
+        "reason": "Technical noun phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "image on",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "lights on",
+        "reason": "Noun phrase/adjectival phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "but with",
+        "reason": "Conjunction/preposition phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "one for",
+        "reason": "Ordinary determiner/preposition phrase."
+      },
+      {
+        "phrase": "bosh in",
+        "reason": "Not a standard English phrasal verb."
+      },
+      {
+        "phrase": "in out",
+        "reason": "Malformed fragment; not a real idiom."
+      },
+      {
+        "phrase": "heading for",
+        "reason": "Verb-preposition motion phrase; borderline rather than a textbook phrasal verb."
+      },
+      {
+        "phrase": "postcode in",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "there by",
+        "reason": "Adverb/preposition sequence, not a phrasal verb."
+      },
+      {
+        "phrase": "outside in",
+        "reason": "Spatial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "prised away",
+        "reason": "Can be a real verb-particle phrase, but it is not a common textbook phrasal verb."
+      },
+      {
+        "phrase": "instructions with",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "disgust with",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "blood on",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "line with",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "came for",
+        "reason": "Verb-preposition pattern, not a strong phrasal verb."
+      },
+      {
+        "phrase": "this in",
+        "reason": "Fragmentary pronoun-preposition sequence."
+      },
+      {
+        "phrase": "ukn along",
+        "reason": "Garbage fragment."
+      },
+      {
+        "phrase": "ukn along with",
+        "reason": "Garbage fragment."
+      },
+      {
+        "phrase": "along with",
+        "reason": "Prepositional phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "trickery in",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "a back",
+        "reason": "Not a phrasal verb; part of 'back-up'."
+      },
+      {
+        "phrase": "back up",
+        "reason": "Real phrasal verb, but the entry is incomplete in context and the list does not show a clear phrasal use."
+      },
+      {
+        "phrase": "bitch with",
+        "reason": "Not a standard phrasal verb."
+      },
+      {
+        "phrase": "knew about",
+        "reason": "Ordinary verb-preposition construction, not a phrasal verb."
+      },
+      {
+        "phrase": "well with",
+        "reason": "Adverb/preposition fragment."
+      },
+      {
+        "phrase": "who with",
+        "reason": "Interrogative fragment, not a phrasal verb."
+      },
+      {
+        "phrase": "request in",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "pissing around",
+        "reason": "Real colloquial phrasal/verb-preposition idiom."
+      },
+      {
+        "phrase": "advising for",
+        "reason": "Not a standard phrasal verb; fragmentary usage."
+      },
+      {
+        "phrase": "crew with",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "yourself in",
+        "reason": "Reflexive pronoun plus preposition fragment."
+      },
+      {
+        "phrase": "here with",
+        "reason": "Adverb/preposition fragment."
+      },
+      {
+        "phrase": "stay down",
+        "reason": "Real imperative verb-particle phrase."
+      },
+      {
+        "phrase": "come on",
+        "reason": "Real interjection/phrasal verb."
+      },
+      {
+        "phrase": "fuck off",
+        "reason": "Real phrasal verb."
+      },
+      {
+        "phrase": "re out",
+        "reason": "Garbage fragment."
+      },
+      {
+        "phrase": "embarrassment over",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "border on",
+        "reason": "Real verb-preposition idiom."
+      },
+      {
+        "phrase": "that out",
+        "reason": "Fragment; not a lexical idiom by itself."
+      },
+      {
+        "phrase": "insist on",
+        "reason": "Real verb-preposition idiom."
+      },
+      {
+        "phrase": "arrangements for",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "s out",
+        "reason": "Garbage fragment."
+      },
+      {
+        "phrase": "travelling across",
+        "reason": "Progressive motion phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "law after",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "people off",
+        "reason": "Fragment; not a standard phrasal verb entry."
+      },
+      {
+        "phrase": "play out",
+        "reason": "Real phrasal verb."
+      },
+      {
+        "phrase": "bravery in",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "act on",
+        "reason": "Real verb-preposition idiom, though context here is not a clean example."
+      },
+      {
+        "phrase": "screens in",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "commence after",
+        "reason": "Verb plus preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "it through",
+        "reason": "Fragment of 'see it through'; not a standalone phrasal verb."
+      },
+      {
+        "phrase": "aids in",
+        "reason": "Verb-preposition phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "been on",
+        "reason": "Auxiliary + preposition, not a phrasal verb."
+      },
+      {
+        "phrase": "been on for",
+        "reason": "Extended auxiliary phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "on for",
+        "reason": "Prepositional phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "stumbling about",
+        "reason": "Participial motion phrase, not a textbook phrasal verb."
+      },
+      {
+        "phrase": "stumbling about in",
+        "reason": "Extended participial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "about in",
+        "reason": "Fragmentary and not idiomatic."
+      },
+      {
+        "phrase": "minutes before",
+        "reason": "Temporal phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "all about",
+        "reason": "Adverbial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "well on",
+        "reason": "Fragmentary and not a standard idiom here."
+      },
+      {
+        "phrase": "put in",
+        "reason": "Real phrasal verb."
+      },
+      {
+        "phrase": "accompanied by",
+        "reason": "Participial prepositional phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "figure in",
+        "reason": "Real verb-preposition idiom."
+      },
+      {
+        "phrase": "also before",
+        "reason": "Adverbial phrase, not a phrasal verb."
+      },
+      {
+        "phrase": "minister into",
+        "reason": "Not a standard phrasal verb; coercive verb-preposition construction."
+      },
+      {
+        "phrase": "controversy by",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "significance with",
+        "reason": "Noun phrase fragment."
+      },
+      {
+        "phrase": "event in",
+        "reason": "Noun phrase fragment."
+      }
+    ]
+  },
+  "overall_score": 2.5,
+  "summary": "The translation list contains a handful of correct episode-relevant glosses, but many entries are incomplete, overly literal, or wrong for the actual context. The source list is also heavily contaminated with fragments and non-phrasal constructions, so it is not a clean phrasal-verb inventory.",
+  "tokens_used": {
+    "prompt": 9340,
+    "completion": 8111,
+    "total": 17451
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "request_id": "def804aa625c48d18666a01d36d34d06",
+  "mode": "series",
+  "raw_input": "AB",
+  "started_at": "2026-03-31T22:33:38.910805",
+  "finished_at": "2026-03-31T22:33:39.266799",
+  "status": "failed",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "AB",
+    "season": 1,
+    "episode": 1
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "find_existing": 30
+  },
+  "timings_ms": {
+    "total_e2e_ms": 356
+  },
+  "analyze_metrics": null,
+  "translator_metrics": null,
+  "error": "OpenSubtitles search failed: 403 Client Error: Forbidden for url: https://api.opensubtitles.com/api/v1/subtitles?episode_number=1&languages=en&query=ab&season_number=1"
+}

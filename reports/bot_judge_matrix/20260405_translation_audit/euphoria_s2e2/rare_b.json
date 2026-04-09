@@ -1,0 +1,168 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.751223",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_b",
+  "translation_csvs": [
+    "tier_4_rare_b_translations.csv"
+  ],
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "word_count": 20,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "Most pairs are translated into valid Russian words and several are semantically correct in a general sense: source→источник, article→статья, sex→секс, decision→решение, death→смерть, loss→потеря, recent→недавний, human→человек, act→поступок, beauty→красота, store→магазин, statement→утверждение. However, there are notable sense problems. least→по крайней мере is a phrase meaning 'at least', not the standalone adjective/adverb 'least' ('least' would usually be 'наименее' or part of 'по крайней мере' only in a fixed expression). effect→следствие is often 'consequence/result' rather than 'effect', so it may be too narrow or wrong depending on context. figure→понять is incorrect because 'figure' usually means 'figure/person/number' or 'to figure out' only in phrasal usage; the Russian should reflect the actual sense, not just 'understand'. found→счёл is a specific past tense of 'to consider', which may be correct only if the episode uses 'found' in the sense 'considered'; otherwise it is a wrong sense for the common verb 'find'. though→правда is not a direct equivalent; 'though' is usually 'хотя/однако/впрочем'. control→контролировать себя is too specific if the source word is just 'control'. cell→мобильный телефон is acceptable only if the context is 'cell phone'; otherwise it is a narrowed sense. Overall, the list is partly correct but contains several sense mismatches and over-specific translations.",
+    "issues": [
+      {
+        "word": "least",
+        "translation": "по крайней мере",
+        "issue": "This is a fixed phrase meaning 'at least', not a direct translation of the standalone word 'least'; likely wrong sense or incomplete lexical match."
+      },
+      {
+        "word": "effect",
+        "translation": "следствие",
+        "issue": "Too narrow or potentially wrong sense; 'effect' is usually 'эффект/воздействие', while 'следствие' means 'consequence/result'."
+      },
+      {
+        "word": "figure",
+        "translation": "понять",
+        "issue": "Incorrect translation for the standalone word; 'figure' is not normally 'понять' unless part of 'figure out', which is not shown here."
+      },
+      {
+        "word": "found",
+        "translation": "счёл",
+        "issue": "Possible wrong sense unless the episode uses 'found' meaning 'considered'; otherwise this does not match the common meaning 'found/discovered'."
+      },
+      {
+        "word": "though",
+        "translation": "правда",
+        "issue": "Incorrect or very loose equivalent; 'though' is usually 'хотя', 'однако', or 'впрочем'."
+      },
+      {
+        "word": "control",
+        "translation": "контролировать себя",
+        "issue": "Overly specific; if the source word is just 'control', the translation should not be restricted to 'control oneself' unless context clearly requires it."
+      },
+      {
+        "word": "cell",
+        "translation": "мобильный телефон",
+        "issue": "Acceptable only if the context is 'cell phone'; otherwise it is a narrowed phrase rather than a direct translation of 'cell'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words. None of them are character names, place names, real personal names, invented terms, or foreign words inserted as-is. The list is clean from a source-vocabulary filtering perspective.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list mixes some B1/B2 vocabulary with many very basic A1/A2 words. For a B-band learner list, items like source, control, least, article, sex, cell, decision, death, loss, recent, effect, figure, human, act, beauty, found, though, power, store, and statement are mostly common high-frequency words that are often A1/A2 or early B1, so the calibration is weak. A few items can be B1/B2 depending on sense and usage, but overall the set is too elementary and not well targeted to a rare-vocabulary episode list.",
+    "not_c_level": [
+      {
+        "word": "control",
+        "estimated_level": "A2",
+        "reason": "Very common everyday vocabulary; not a strong B1/B2 target unless used in a specialized sense."
+      },
+      {
+        "word": "least",
+        "estimated_level": "A2",
+        "reason": "Basic comparative/adverbial vocabulary, typically learned early."
+      },
+      {
+        "word": "article",
+        "estimated_level": "A2",
+        "reason": "Common everyday word with multiple basic meanings."
+      },
+      {
+        "word": "sex",
+        "estimated_level": "A2",
+        "reason": "Common core vocabulary, not a rare B-band item."
+      },
+      {
+        "word": "cell",
+        "estimated_level": "B1",
+        "reason": "Can be B1 in the sense of 'cell phone' or biology, but still not especially rare."
+      },
+      {
+        "word": "decision",
+        "estimated_level": "A2",
+        "reason": "Very common high-frequency noun."
+      },
+      {
+        "word": "death",
+        "estimated_level": "A2",
+        "reason": "Core vocabulary, usually below B1."
+      },
+      {
+        "word": "loss",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun."
+      },
+      {
+        "word": "recent",
+        "estimated_level": "A2",
+        "reason": "Basic adjective, not a B2-level rarity."
+      },
+      {
+        "word": "effect",
+        "estimated_level": "B1",
+        "reason": "Can be B1, but it is still common and not especially rare."
+      },
+      {
+        "word": "figure",
+        "estimated_level": "A2",
+        "reason": "Common word with several basic senses; not a strong B-band item."
+      },
+      {
+        "word": "human",
+        "estimated_level": "A2",
+        "reason": "Very common adjective/noun."
+      },
+      {
+        "word": "act",
+        "estimated_level": "A2",
+        "reason": "Basic verb/noun, usually early-level vocabulary."
+      },
+      {
+        "word": "beauty",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun."
+      },
+      {
+        "word": "found",
+        "estimated_level": "A2",
+        "reason": "Common past tense of 'find'; not a rare B-band item."
+      },
+      {
+        "word": "though",
+        "estimated_level": "A2",
+        "reason": "Common conjunction/adverb, typically learned early."
+      },
+      {
+        "word": "power",
+        "estimated_level": "A2",
+        "reason": "High-frequency core vocabulary."
+      },
+      {
+        "word": "store",
+        "estimated_level": "A1",
+        "reason": "Very basic everyday noun."
+      },
+      {
+        "word": "statement",
+        "estimated_level": "B1",
+        "reason": "Can fit B1, but it is still fairly common and not rare enough to justify a special B2-only list."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The translations are mostly valid Russian words, but several entries have sense mismatches or are too specific for the English source form. The source vocabulary is clean, but the list is poorly calibrated for a B1/B2 rare-vocabulary set because many items are basic A1/A2 words.",
+  "tokens_used": {
+    "prompt": 1298,
+    "completion": 1758,
+    "total": 3056
+  }
+}

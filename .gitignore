@@ -15,6 +15,10 @@ env/
 *.log
 *.tmp
 test_results/
+daily_subtitle_state.json
+
+# Secrets (loaded by env_config.load_dotenv)
+.env
 
 # Large binaries / assets (keep repo small)
 *.zip

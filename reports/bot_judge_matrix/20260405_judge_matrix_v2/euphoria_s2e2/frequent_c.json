@@ -1,0 +1,77 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.754959",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "word_count": 6,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 5,
+    "reasoning": "1) 'rue' is handled as the character name 'Ру', which is appropriate for this episode context; the added dictionary gloss 'сожалеть' is not the relevant sense here, but the translation itself is acceptable. 2) 'yeh' → 'да' is correct and complete. 3) 'vocalizing' → 'вокализация' is a reasonable Russian equivalent and preserves the meaning. 4) 'melancholy' → 'меланхоличный' is not a direct lexical match: the English source is a noun/adjective meaning 'melancholy' (sadness, gloom), while the Russian form given is an adjective meaning 'melancholic'; it is close but not fully precise without context. 5) 'suze' is treated as the character name 'Сьюз', which is acceptable in-series; the dictionary gloss 'Сьюзен' is not the actual translation of the source token, but the name mapping is fine. 6) 'haunted' → 'преследующий' is wrong for the usual meaning in this context; 'haunted' typically means 'haunted/tormented/pursued by something', not 'pursuing'. Overall, several entries are acceptable, but there is at least one clear semantic error and one imprecise match.",
+    "issues": [
+      {
+        "word": "melancholy",
+        "translation": "меланхоличный",
+        "issue": "Close but not exact: the source word is 'melancholy' (noun/adjective), while the Russian form is only the adjective 'melancholic'; the translation is somewhat shifted and may be too generic."
+      },
+      {
+        "word": "haunted",
+        "translation": "преследующий",
+        "issue": "Wrong sense: 'haunted' means 'haunted/tormented/by ghosts or memories', not 'pursuing' or 'chasing'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "The list contains some items that are not ordinary English vocabulary words and should have been filtered out. 'rue' and 'suze' are used as character names in the episode, not as vocabulary targets. 'yeh' is an informal spelling variant of 'yeah/yea' and is not a standard vocabulary item for a clean word list. The remaining items are genuine English words. Because multiple non-vocabulary or name-like items slipped through, the list does not fully satisfy the source-word filter requirement.",
+    "violations": [
+      "rue",
+      "yeh",
+      "suze"
+    ]
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "Most of the list is not C1/C2 vocabulary. 'yeh' is a very basic informal affirmative, roughly A1/A2. 'vocalizing' is a fairly common derived form, around B2 at most. 'melancholy' is more advanced and can fit C1, but the list overall is dominated by non-advanced items. 'haunted' is also common intermediate vocabulary, around B1/B2. In addition, 'rue' and 'suze' are names in context rather than vocabulary targets, so they do not support a C-level learning list. Therefore the set fails the advanced-vocabulary criterion badly.",
+    "not_c_level": [
+      {
+        "word": "yeh",
+        "estimated_level": "A1/A2",
+        "reason": "Very basic informal affirmative equivalent of 'yes'; not advanced vocabulary."
+      },
+      {
+        "word": "vocalizing",
+        "estimated_level": "B2",
+        "reason": "A transparent derived form from 'vocalize'; not typically C1/C2-level vocabulary."
+      },
+      {
+        "word": "haunted",
+        "estimated_level": "B1/B2",
+        "reason": "Common adjective/participle used in everyday and narrative contexts; not advanced enough for a C-level list."
+      },
+      {
+        "word": "rue",
+        "estimated_level": "B2",
+        "reason": "In this episode it functions as a character name, not a vocabulary item; as a word, it is not clearly C1/C2 in this usage."
+      },
+      {
+        "word": "suze",
+        "estimated_level": "B2",
+        "reason": "Character name in context, not a vocabulary target; does not belong in a C-level English word list."
+      }
+    ]
+  },
+  "overall_score": 3.7,
+  "summary": "The translations are mixed: some entries are correct or acceptable in context, but there is at least one clear mistranslation and several imprecise or name-based items. The source list also contains non-vocabulary items and mostly fails the C-level difficulty requirement.",
+  "tokens_used": {
+    "prompt": 1133,
+    "completion": 1069,
+    "total": 2202
+  }
+}

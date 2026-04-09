@@ -1,0 +1,26 @@
+{
+  "series": "Game Of Thrones S3 E4",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "game_of_thrones_s3_e4.srt",
+  "analysis_date": "2026-04-04T03:40:09.552420",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 75869839,
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 7,
+    "tier_2_random": 239,
+    "tier_3_common": 24,
+    "tier_4_rare_in_series": 6,
+    "tier_5_filtered": 156,
+    "tier_b1_words": 1,
+    "tier_b2_words": 23,
+    "tier_4_rare_c_words": 2,
+    "tier_4_rare_b_words": 25
+  },
+  "excluded_names_fantasy_count": 64
+}

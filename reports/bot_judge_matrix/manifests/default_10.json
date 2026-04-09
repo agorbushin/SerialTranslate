@@ -1,0 +1,42 @@
+[
+  {
+    "key": "matrix_1999",
+    "translations_dir": "translations/Movies/Matrix/matrix_1999"
+  },
+  {
+    "key": "game_of_thrones_s3e3",
+    "translations_dir": "translations/Game Of Thrones S3 E3/Season 1/1"
+  },
+  {
+    "key": "euphoria_s2e2",
+    "translations_dir": "translations/Euphoria S2 E2/Season 1/1"
+  },
+  {
+    "key": "fallout_s2e3",
+    "translations_dir": "translations/Fallout S2 E3/Season 1/1"
+  },
+  {
+    "key": "euphoria_s1e6",
+    "translations_dir": "translations/Euphoria S1 E6/Season 1/1"
+  },
+  {
+    "key": "the_wire_s1e1",
+    "translations_dir": "translations/The Wire/Season 1/1"
+  },
+  {
+    "key": "breaking_bad_s1e1",
+    "translations_dir": "translations/Breaking Bad/Season 1/1"
+  },
+  {
+    "key": "black_mirror_s1e1",
+    "translations_dir": "translations/Black Mirror/Season 1/1"
+  },
+  {
+    "key": "narcos_s1e1",
+    "translations_dir": "translations/Narcos/Season 1/1"
+  },
+  {
+    "key": "sherlock_s1e1",
+    "translations_dir": "translations/Sherlock/Season 1/1"
+  }
+]

@@ -1,0 +1,83 @@
+{
+  "request_id": "1ea36bdf80d1494c9aa5589d2a93394e",
+  "mode": "series",
+  "raw_input": "Euphoria s1e4",
+  "started_at": "2026-04-01T22:46:47.777847",
+  "finished_at": "2026-04-01T22:47:34.068427",
+  "status": "success",
+  "branch": "full_pipeline",
+  "identity": {
+    "series_name": "Euphoria",
+    "season": 1,
+    "episode": 4
+  },
+  "phase_timings_ms": {
+    "parse_input": 0,
+    "spellfix_title": 2668,
+    "find_existing": 63,
+    "download_subtitle": 0,
+    "analyze_subtitle": 34999,
+    "translate": 6445
+  },
+  "timings_ms": {
+    "total_e2e_ms": 46292
+  },
+  "analyze_metrics": {
+    "preload_ms": 3228,
+    "parse_subtitle_ms": 4,
+    "gpt_cefr_ms": 3635,
+    "tier_build_ms": 1,
+    "gpt_filter_ms": 27347,
+    "save_outputs_ms": 18,
+    "total_ms": 34238,
+    "preload_cache_hit": 0,
+    "pipeline_skipped": 0
+  },
+  "translator_metrics": {
+    "status": "ok",
+    "error": null,
+    "word_count": 21,
+    "timings_ms": {
+      "prepare_ms": 2,
+      "primary_translate_ms": 0,
+      "retry_translate_ms": 0,
+      "write_outputs_ms": 3,
+      "total_ms": 6443,
+      "subtitle_read_skipped": 1,
+      "translations_reused": 2
+    },
+    "last_run_tier_ids": [
+      "b1",
+      "b2",
+      "tier_1"
+    ],
+    "tier_b1_word_count": 0,
+    "tier_b2_word_count": 15,
+    "tier_4_rare_c_word_count": 0,
+    "tier_4_rare_b_word_count": 13,
+    "tiers": {
+      "tier_1": {
+        "word_count": 6,
+        "to_translate": 4,
+        "reused": 2,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b1": {
+        "word_count": 0,
+        "to_translate": 0,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      },
+      "b2": {
+        "word_count": 15,
+        "to_translate": 15,
+        "reused": 0,
+        "primary_translate_ms": 0,
+        "retry_translate_ms": 0
+      }
+    }
+  },
+  "error": null
+}

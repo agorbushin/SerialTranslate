@@ -1,0 +1,44 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Movies/Matrix/matrix_1999",
+  "judged_at": "2026-04-06T02:53:53.750036",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Matrix",
+  "season": 0,
+  "episode": 0,
+  "phrasal_count": 2,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 2,
+    "reasoning": "Step 1: Check whether each Russian gloss is present and usable. Both entries have Russian translations, so they are not missing or left in English.\nStep 2: Check contextual correctness for this episode. The subtitle matches are absent, so there is no direct episode evidence that these exact phrasal forms were used in the dialogue. That means the evaluation must rely on the stored example context only.\nStep 3: Assess each gloss. \"tumbling down\" → \"падать\" is broadly understandable, but it is overly generic and does not preserve the more specific sense of collapsing/falling down in a continuous or dramatic way. \"hack into\" → \"взломать\" is a reasonable translation in general, but as a phrasal construction it is incomplete because Russian often needs an object or a more explicit phrase like \"взломать (систему/сеть)\"; still, it is acceptable as a compact gloss.\nStep 4: Because one gloss is too generic and the other is only partially complete, the set is only weakly correct overall.",
+    "issues": [
+      {
+        "phrasal_verb": "tumbling down",
+        "translation": "падать",
+        "issue": "Too generic; loses the sense of collapsing/falling down in a more specific, dynamic way."
+      },
+      {
+        "phrasal_verb": "hack into",
+        "translation": "взломать",
+        "issue": "Acceptable but slightly incomplete as a learner gloss because it omits the typical target object/context (e.g. system, network)."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "Step 1: Determine whether each English source string is a genuine phrasal-type idiom.\nStep 2: \"hack into\" is a real verb-preposition construction and a valid idiomatic expression meaning to gain unauthorized access to a system. It clearly qualifies.\nStep 3: \"tumbling down\" is not a standard textbook phrasal verb. It is a participial/adjectival form of \"tumble down\" used in a literal descriptive way, not a fixed verb-particle idiom in the same sense as canonical phrasal verbs. It can occur naturally in English, but as a listed source string it is weaker and closer to ordinary grammar than a lexical phrasal item.\nStep 4: Since one entry is valid and one is borderline/non-idiomatic as a phrasal entry, the overall score should be below the midpoint.",
+    "invalid_phrasals": [
+      {
+        "phrase": "tumbling down",
+        "reason": "This is a participial form used descriptively, not a clear standalone phrasal verb or established verb-particle idiom."
+      }
+    ]
+  },
+  "overall_score": 3.0,
+  "summary": "The translations are present, but the set is only partially strong: one gloss is too generic and the other is acceptable but not fully specific. As phrasal entries, \"hack into\" is valid, while \"tumbling down\" is a weaker non-canonical item.",
+  "tokens_used": {
+    "prompt": 661,
+    "completion": 693,
+    "total": 1354
+  }
+}

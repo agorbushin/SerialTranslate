@@ -1,0 +1,139 @@
+{
+  "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.756390",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "idiomatic_expressions",
+  "series": "Euphoria S1 E6",
+  "season": 1,
+  "episode": 1,
+  "expression_count": 18,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 1,
+    "reasoning": "Step 1: The output does provide Russian glosses for every listed expression, so the problem is not missing translations in the strict sense. Step 2: However, the episode context is absent: there are no matched subtitle lines and no dialogue excerpt, so none of the glosses can be verified against actual usage in this episode. Step 3: Several translations are clearly too literal or unnatural for learner-facing subtitles. For example, 'i m gonna be honest' → 'я буду честен' is grammatical but stiff; 'tequila makes me' → 'текила делает меня' is incomplete and unnatural without the predicate; 'however strong you think you are' → 'насколько бы сильным ты себя ни считал, ты сильнее' is internally contradictory and not a valid gloss; 'i think we re gonna' → 'я думаю, мы собираемся' is overly literal and incomplete; 'real fucked up' → 'по-настоящему накосяченный' is not a natural Russian equivalent; 'fucked up shit' → 'накосяченные вещи' is awkward and semantically off. Step 4: Some entries are acceptable as rough learner glosses, such as 'i m sorry' → 'извини', 'good to see you' → 'рад тебя видеть', and 'gonna be honest with you' → 'буду честен с тобой', but the overall set is dominated by literal or awkward renderings. Step 5: Because the episode-specific context is missing, the translations cannot be judged as contextually correct, and several are plainly weak even in isolation.",
+    "issues": [
+      {
+        "expression": "i m gonna be honest",
+        "translation": "я буду честен",
+        "issue": "Grammatically acceptable but stiff and incomplete as a learner gloss; no episode context to confirm nuance."
+      },
+      {
+        "expression": "tequila makes me",
+        "translation": "текила делает меня",
+        "issue": "Incomplete and overly literal; not a natural Russian gloss without the rest of the clause."
+      },
+      {
+        "expression": "however strong you think you are",
+        "translation": "насколько бы сильным ты себя ни считал, ты сильнее",
+        "issue": "Semantically contradictory and likely incorrect; the second clause repeats/changes the meaning in a way that does not fit a gloss."
+      },
+      {
+        "expression": "i think we re gonna",
+        "translation": "я думаю, мы собираемся",
+        "issue": "Too literal and incomplete; 'we're gonna' should usually be rendered as 'мы собираемся / мы, наверное, ...' depending on context."
+      },
+      {
+        "expression": "real fucked up",
+        "translation": "по-настоящему накосяченный",
+        "issue": "Awkward and unnatural Russian; the profanity sense is not well captured."
+      },
+      {
+        "expression": "fucked up shit",
+        "translation": "накосяченные вещи",
+        "issue": "Semantically off and unnatural; 'shit' here is not well represented by 'вещи'."
+      },
+      {
+        "expression": "i mean i mean i",
+        "translation": "я имею в виду, я имею в виду, я",
+        "issue": "Not a usable translation; it mirrors the source mechanically instead of giving a natural discourse equivalent."
+      },
+      {
+        "expression": "can t i can t",
+        "translation": "не могу, не могу",
+        "issue": "Possible as a rough gloss, but too bare and context-dependent; may miss the repeated hesitation/emphasis."
+      },
+      {
+        "expression": "yeah come on yeah come",
+        "translation": "давай, давай, давай",
+        "issue": "Overly generic and may not reflect the exact pragmatic force of the repeated encouragement."
+      },
+      {
+        "expression": "i don t know what",
+        "translation": "я не знаю, что",
+        "issue": "Too generic and incomplete; acceptable only as a fragment, not a full learner gloss."
+      },
+      {
+        "expression": "i m a burden",
+        "translation": "я бремя",
+        "issue": "Unnatural Russian; better would be something like 'я обуза'."
+      },
+      {
+        "expression": "just couldn t",
+        "translation": "просто не смог",
+        "issue": "Acceptable as a fragment, but incomplete without context; may need a more natural continuation-based gloss."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 3,
+    "reasoning": "Step 1: A few entries are genuine formulaic units worth studying, such as 'i m sorry', 'good to see you', 'i m gonna be honest with you', and 'i don t know what'. Step 2: But many items are not idioms in the strict sense; they are ordinary compositional fragments or partial clauses. Examples include 'tequila makes me', 'i think we re gonna', 'made him feel', 'just couldn t', and 'i don t know what', which are not idiomatic units by themselves. Step 3: Several entries are especially weak as extraction targets because they are accidental n-grams or truncated speech fragments rather than reusable formulas: 'i mean i mean i', 'yeah come on yeah come', and 'can t i can t'. Step 4: Some profanity-based items like 'real fucked up' and 'fucked up shit' are colloquial, but they are still more like transparent slang combinations than stable idioms. Step 5: Overall, the list mixes a small number of valid discourse formulas with many plain grammatical chunks and truncated fragments, so it does not meet the standard of a high-quality idiom/formula list.",
+    "invalid_expressions": [
+      {
+        "expression": "tequila makes me",
+        "reason": "Truncated compositional clause, not an idiom or stable formula."
+      },
+      {
+        "expression": "however strong you think you are",
+        "reason": "Ordinary clause fragment, not a fixed idiomatic expression."
+      },
+      {
+        "expression": "made him feel",
+        "reason": "Plain compositional verb phrase, not a formulaic unit."
+      },
+      {
+        "expression": "i think we re gonna",
+        "reason": "Common speech fragment, but not an idiom; too incomplete and transparent."
+      },
+      {
+        "expression": "real fucked up",
+        "reason": "Colloquial slang phrase, but not a strong opaque idiom worth isolating as a formula."
+      },
+      {
+        "expression": "fucked up shit",
+        "reason": "Transparent slang combination rather than a reusable idiomatic unit."
+      },
+      {
+        "expression": "i mean i mean i",
+        "reason": "Accidental repetition / disfluency, not a formulaic expression."
+      },
+      {
+        "expression": "can t i can t",
+        "reason": "Fragmented hesitation, not a stable idiom."
+      },
+      {
+        "expression": "yeah come on yeah come",
+        "reason": "Truncated repetition from speech, not a lexicalized formula."
+      },
+      {
+        "expression": "i don t know what",
+        "reason": "Very common compositional clause starter, not an idiom."
+      },
+      {
+        "expression": "just couldn t",
+        "reason": "Plain grammatical fragment, not a formulaic expression."
+      }
+    ]
+  },
+  "overall_score": 2.0,
+  "summary": "The translations are present, but many are literal, awkward, or impossible to verify because the episode context is missing. The extraction quality is also weak: only a handful of entries are genuine formulaic expressions, while many are truncated speech fragments or ordinary compositional chunks.",
+  "improvement_suggestions": [
+    "Require subtitle evidence for each candidate expression and reject entries when no matching line is found.",
+    "Add a filter that removes truncated fragments and plain clause material unless they recur as a stable discourse formula across multiple lines.",
+    "Use a translation validation step that checks for natural Russian equivalents and flags literal calques or incomplete glosses."
+  ],
+  "tokens_used": {
+    "prompt": 1187,
+    "completion": 1766,
+    "total": 2953
+  }
+}

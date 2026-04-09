@@ -1,0 +1,54 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.753598",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 4,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "1) \"sapphire\" → \"сапфир\" is a correct direct translation. 2) \"eyrie\" → \"Орлиное Гнездо\" is contextually correct for Game of Thrones, where Eyrie is the proper name of the Arryn stronghold; this is a translation of the place name rather than the common noun sense. 3) \"magician\" → \"волшебник\" is a valid Russian equivalent, though in many contexts \"маг\" or \"фокусник\" could be more precise; without subtitle evidence, it is still acceptable. 4) \"partridge\" → \"куропатка\" is correct. No translations are missing or obviously wrong, and none are mere transliterations.",
+    "issues": []
+  },
+  "criterion_2": {
+    "score": 6,
+    "reasoning": "Most source items are genuine English vocabulary words, but \"eyrie\" is problematic for a vocabulary list because in this episode it functions as a proper noun/place name (the Eyrie), not a general English vocabulary item to teach as a standalone word. The other items are real English words. Because one item is a non-vocabulary proper name in context, the list is not fully clean.",
+    "violations": [
+      "eyrie"
+    ]
+  },
+  "criterion_3": {
+    "score": 3,
+    "reasoning": "The list is intended for C1/C2 vocabulary, but several items are much more basic. \"sapphire\" is a fairly common B2 word, \"magician\" is B1/B2, and \"partridge\" is B2 at most for many learners. \"eyrie\" is advanced in form, but here it is a proper noun rather than useful C-level vocabulary. Only one item clearly fits advanced vocabulary expectations, so the list is largely below the intended level.",
+    "not_c_level": [
+      {
+        "word": "sapphire",
+        "estimated_level": "B2",
+        "reason": "A common concrete noun for a gemstone; not typically C1/C2 vocabulary."
+      },
+      {
+        "word": "magician",
+        "estimated_level": "B1/B2",
+        "reason": "A fairly common everyday word, not advanced enough for a C-level list."
+      },
+      {
+        "word": "partridge",
+        "estimated_level": "B2",
+        "reason": "An uncommon animal name, but still not clearly C1/C2 specialized vocabulary."
+      }
+    ]
+  },
+  "overall_score": 5.7,
+  "summary": "The translations are mostly correct, with no major semantic errors. However, the source list is weakened by the inclusion of the proper noun \"eyrie\" and by several words that are not truly C-level vocabulary.",
+  "tokens_used": {
+    "prompt": 1060,
+    "completion": 619,
+    "total": 1679
+  }
+}

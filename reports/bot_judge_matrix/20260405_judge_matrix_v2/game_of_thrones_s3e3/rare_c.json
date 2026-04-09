@@ -1,0 +1,42 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Game Of Thrones S3 E3/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.753756",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_c",
+  "translation_csvs": [
+    "tier_4_rare_c_translations.csv"
+  ],
+  "series": "Game Of Thrones S3 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 1,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "The translation is not empty and is a real Russian word. However, the English word \"fund\" is ambiguous: as a noun it means \"fund\"/\"money pool\", while as a verb it means \"to finance\". The provided Russian translation \"финансировать\" matches the verb sense, so it is semantically correct only if the episode uses \"fund\" as a verb. Since no subtitle example is available, I cannot verify the exact in-context sense, but the translation itself is valid and not a transliteration or nonsense. The main risk is possible sense mismatch if the source occurrence was the noun.",
+    "issues": []
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "The source item \"fund\" is a genuine English vocabulary word. It is not a character name, place name, personal name, invented term, or foreign word used as-is. No non-English or non-vocabulary entity slipped into the source list.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is supposed to contain advanced rare vocabulary, but \"fund\" is a very common English word and does not belong to a C1/C2-focused rare-vocabulary set. Even though it can be used in a more advanced financial sense as a verb, the lemma itself is still basic and widely known. This makes it a poor fit for the intended band.",
+    "not_c_level": [
+      {
+        "word": "fund",
+        "estimated_level": "B1",
+        "reason": "Common everyday/financial vocabulary; not sufficiently advanced for a C1/C2 rare-word list."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The Russian translation is acceptable and likely correct if the episode uses \"fund\" as a verb. The main problem is that the source word is too basic for an advanced rare-vocabulary list, even though it is a legitimate English word.",
+  "tokens_used": {
+    "prompt": 940,
+    "completion": 453,
+    "total": 1393
+  }
+}

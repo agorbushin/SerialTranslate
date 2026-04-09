@@ -294,7 +294,7 @@ def judge_phrasal_translations(
 
     resolved_key = _load_api_key(api_key)
     if not resolved_key:
-        result["error"] = "OpenAI API key not set (OPENAI_API_KEY env or telegram_bot fallback)."
+        result["error"] = "OpenAI API key not set (OPENAI_API_KEY environment variable)."
         return result
 
     try:

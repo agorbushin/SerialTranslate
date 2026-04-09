@@ -1,0 +1,93 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Narcos/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.758530",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Narcos",
+  "season": 1,
+  "episode": 1,
+  "word_count": 9,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Narcos/Season 1/narcos_s1_e1.srt",
+  "criterion_1": {
+    "score": 7,
+    "reasoning": "Most entries are translated correctly for the episode context. 'trafficker' → 'наркоторговец', 'communist' → 'коммунист', 'contraband' → 'контрабанда', and 'distill' → 'перегонять' are acceptable. 'holocaust' is rendered as 'ядерный холокост', which matches the subtitle context of 'nuclear holocaust' even though it is slightly expanded. The main problems are the entries that include character-name glosses instead of clean lexical translations: 'cockroach' is given as 'Кокроч (имя в сериале), словарный перевод — таракан', which is not a proper Russian translation of the word in the subtitle sense and mixes in a transliteration/name note; 'cuca' and 'gacha' are similarly treated as names with dictionary glosses, but the source items themselves are proper names in the episode and not vocabulary translations. 'das' is translated as 'ДАС, колумбийская спецслужба', which is contextually correct as an acronym, but again it is not a normal vocabulary translation. Overall, the list is mostly usable, but several entries are not clean lexical translations and some are really named entities rather than vocabulary items.",
+    "issues": [
+      {
+        "word": "cockroach",
+        "translation": "Кокроч (имя в сериале), словарный перевод — таракан",
+        "issue": "Not a clean translation: it mixes a phonetic name note with the dictionary meaning, and the subtitle context requires the character nickname rather than a transliteration."
+      },
+      {
+        "word": "cuca",
+        "translation": "Кука (имя в сериале), словарный перевод — кука",
+        "issue": "This is treated as a character name rather than a vocabulary translation; the gloss is not a meaningful Russian lexical equivalent."
+      },
+      {
+        "word": "gacha",
+        "translation": "Гача (имя в сериале), словарный перевод — удача",
+        "issue": "This is treated as a character name rather than a vocabulary translation; the dictionary gloss is not a reliable contextual translation."
+      },
+      {
+        "word": "das",
+        "translation": "ДАС, колумбийская спецслужба",
+        "issue": "Contextually correct as an acronym, but it is an entity label rather than a standard Russian translation of a vocabulary item."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 4,
+    "reasoning": "Several source items are not genuine English vocabulary words and should have been filtered out before translation. 'cockroach' is used as a nickname/alias in the episode, not as a vocabulary target in this list. 'cuca' and 'gacha' are also proper names/aliases in the episode context. 'das' is an acronym for a Colombian agency, not a normal English vocabulary word. The remaining items ('trafficker', 'holocaust', 'communist', 'contraband', 'distill') are genuine English vocabulary. Because nearly half the list consists of names or entity-like items, this criterion is significantly violated.",
+    "violations": [
+      "cockroach",
+      "cuca",
+      "gacha",
+      "das"
+    ]
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list is not well aligned with a C1/C2 vocabulary-learning goal. Only a small subset is advanced enough: 'trafficker' is reasonably C1, 'contraband' is around C1, and 'distill' can be C1/C2 depending on sense. However, several items are basic or at most intermediate: 'communist' is common B1/B2 vocabulary, 'cockroach' is B1, and 'holocaust' is a specialized but widely known term rather than a strong C-level target. More importantly, 'cuca', 'gacha', and 'das' are not vocabulary items at all, so they do not belong in a C-level English list. The set therefore fails the intended difficulty band overall.",
+    "not_c_level": [
+      {
+        "word": "cockroach",
+        "estimated_level": "B1",
+        "reason": "A common concrete noun; not advanced C-level vocabulary."
+      },
+      {
+        "word": "cuca",
+        "estimated_level": "B2",
+        "reason": "Not a standard English vocabulary word; it is a proper name/alias in the episode."
+      },
+      {
+        "word": "holocaust",
+        "estimated_level": "B2",
+        "reason": "Important and somewhat specialized, but generally known and not clearly C1/C2-level vocabulary."
+      },
+      {
+        "word": "communist",
+        "estimated_level": "B1",
+        "reason": "A common political adjective/noun, not advanced enough for a C-level list."
+      },
+      {
+        "word": "gacha",
+        "estimated_level": "B2",
+        "reason": "Not a standard English vocabulary word; it is a proper name/alias in the episode."
+      },
+      {
+        "word": "das",
+        "estimated_level": "B2",
+        "reason": "An acronym for an agency, not a C-level English vocabulary item."
+      }
+    ]
+  },
+  "overall_score": 4.3,
+  "summary": "The translations are partly correct, but several entries are really names or acronyms rather than vocabulary items, and some are presented with awkward name/gloss formatting instead of clean Russian equivalents. The list also contains multiple words that are too basic or not suitable for a C1/C2 learning set, so it is only weakly aligned with the stated goal.",
+  "tokens_used": {
+    "prompt": 2311,
+    "completion": 1244,
+    "total": 3555
+  }
+}

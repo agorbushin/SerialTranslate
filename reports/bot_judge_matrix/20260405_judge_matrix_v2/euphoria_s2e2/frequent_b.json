@@ -1,0 +1,201 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.756359",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_b_merged",
+  "translation_csvs": [
+    "tier_b1_translations.csv",
+    "tier_b2_translations.csv"
+  ],
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "word_count": 29,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 7,
+    "reasoning": "Most entries are translated into natural Russian and are semantically acceptable in isolation: e.g. tense→«напряжённый», passive→«пассивный», cop→«полицейский», motel→«мотель», airplane→«самолёт». A few items are slightly too generic or context-dependent: screaming→«крик» is a noun rather than the verbal/ongoing sense, yell→«кричать» is fine but not a noun equivalent, and bigger→«более сильный» is not the direct meaning of 'bigger' (it should usually be «больше/крупнее»). The main issue is monk→«Монк (имя в сериале), словарный перевод — монах»: this is not a clean translation of the source word and mixes a proper name with a dictionary gloss, which is inappropriate for a vocabulary list. Overall, however, the majority of translations are correct and complete.",
+    "issues": [
+      {
+        "word": "monk",
+        "translation": "Монк (имя в сериале), словарный перевод — монах",
+        "issue": "Not a clean lexical translation; mixes a proper name with a gloss and does not provide a straightforward Russian equivalent for the source word."
+      },
+      {
+        "word": "screaming",
+        "translation": "крик",
+        "issue": "Too noun-like and generic; the source is a present participle/ongoing action, so a verbal form like «кричащий/крича» would better match context."
+      },
+      {
+        "word": "bigger",
+        "translation": "более сильный",
+        "issue": "Wrong sense: 'bigger' means 'larger/bigger', not 'stronger'."
+      },
+      {
+        "word": "beeping",
+        "translation": "пиканье аппарата",
+        "issue": "Acceptable but somewhat context-specific and slightly awkward as a dictionary translation; still understandable."
+      },
+      {
+        "word": "banging",
+        "translation": "стук",
+        "issue": "Too generic and noun-like; depending on context it may need a verbal or more specific sound/action equivalent."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 8,
+    "reasoning": "Almost all source items are genuine English vocabulary words. The main problem is 'monk', which is not a vocabulary item in this list as presented because the translation note explicitly treats it as a character name in the series; proper names should have been filtered out if that is the intended referent. The rest of the list consists of ordinary English words or forms.",
+    "violations": [
+      "monk"
+    ]
+  },
+  "criterion_3": {
+    "score": 6,
+    "reasoning": "Several [B2] items are actually much easier than B2, and a few are arguably B1/A2-level. The list contains many very common sound-effect or everyday words such as cop, idiot, motel, airplane, yell, and awkward, which are not strong B2 items. The [B1] items tense and passive are reasonable B1, but the overall calibration skews low because many [B2] entries are closer to A1/A2/B1 than B2.",
+    "not_c_level": [
+      {
+        "word": "moaning",
+        "estimated_level": "B1",
+        "reason": "Common participle/verb form; not especially B2."
+      },
+      {
+        "word": "beeping",
+        "estimated_level": "B1",
+        "reason": "Basic sound/action vocabulary; usually below B2."
+      },
+      {
+        "word": "monk",
+        "estimated_level": "B1",
+        "reason": "Common noun, but the entry is problematic because it appears to be a name in context."
+      },
+      {
+        "word": "grunt",
+        "estimated_level": "B1",
+        "reason": "Basic sound/action word, not strongly B2."
+      },
+      {
+        "word": "wished",
+        "estimated_level": "B1",
+        "reason": "Simple past of a very common verb."
+      },
+      {
+        "word": "grunting",
+        "estimated_level": "B1",
+        "reason": "Basic participle form of a common verb."
+      },
+      {
+        "word": "beep",
+        "estimated_level": "A2",
+        "reason": "Very common sound word; too easy for B2."
+      },
+      {
+        "word": "cop",
+        "estimated_level": "A2",
+        "reason": "Common informal word for police officer; typically below B2."
+      },
+      {
+        "word": "chanting",
+        "estimated_level": "B1",
+        "reason": "Common verb form; not clearly B2."
+      },
+      {
+        "word": "idiot",
+        "estimated_level": "A2",
+        "reason": "Very common insult/basic vocabulary."
+      },
+      {
+        "word": "screaming",
+        "estimated_level": "B1",
+        "reason": "Common verb form; not especially B2."
+      },
+      {
+        "word": "thudding",
+        "estimated_level": "B2",
+        "reason": "This is acceptable as B2, but still borderline and not a strong example."
+      },
+      {
+        "word": "yell",
+        "estimated_level": "B1",
+        "reason": "Common verb, generally below B2."
+      },
+      {
+        "word": "nothin",
+        "estimated_level": "A2",
+        "reason": "Colloquial pronunciation/spelling of 'nothing'; too easy and nonstandard."
+      },
+      {
+        "word": "awkward",
+        "estimated_level": "B1",
+        "reason": "Common adjective, usually B1 rather than B2."
+      },
+      {
+        "word": "believing",
+        "estimated_level": "B1",
+        "reason": "Basic verb form; not a strong B2 item."
+      },
+      {
+        "word": "bigger",
+        "estimated_level": "A2",
+        "reason": "Comparative of a very basic adjective."
+      },
+      {
+        "word": "barking",
+        "estimated_level": "B1",
+        "reason": "Common verb form; not clearly B2."
+      },
+      {
+        "word": "motel",
+        "estimated_level": "B1",
+        "reason": "Common noun, but not especially B2."
+      },
+      {
+        "word": "vent",
+        "estimated_level": "B1",
+        "reason": "Common noun in everyday usage; not strongly B2."
+      },
+      {
+        "word": "banging",
+        "estimated_level": "B1",
+        "reason": "Common sound/action word; below B2."
+      },
+      {
+        "word": "ringing",
+        "estimated_level": "B1",
+        "reason": "Common participle/verb form; not B2."
+      },
+      {
+        "word": "fell",
+        "estimated_level": "A2",
+        "reason": "Simple past of a very basic verb."
+      },
+      {
+        "word": "hated",
+        "estimated_level": "A2",
+        "reason": "Simple past of a very common verb."
+      },
+      {
+        "word": "bowling",
+        "estimated_level": "A2",
+        "reason": "Common leisure activity; too easy for B2."
+      },
+      {
+        "word": "airplane",
+        "estimated_level": "A1",
+        "reason": "Basic everyday noun."
+      },
+      {
+        "word": "overhead",
+        "estimated_level": "B1",
+        "reason": "Common preposition/adverb/adjective; not clearly B2."
+      }
+    ]
+  },
+  "overall_score": 7.0,
+  "summary": "The translations are mostly correct and natural, with only a few semantic issues such as 'bigger' and the awkward handling of 'monk'. The bigger weakness is vocabulary calibration: many items tagged B2 are actually much easier, so the list is not well matched to the stated CEFR level.",
+  "tokens_used": {
+    "prompt": 1722,
+    "completion": 1789,
+    "total": 3511
+  }
+}

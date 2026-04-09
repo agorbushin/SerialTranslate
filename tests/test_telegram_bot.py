@@ -176,10 +176,22 @@ class TestCommandHandlers:
         with open(phrasal_file, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(
-                ["phrasal_verb", "frequency", "translation", "example"]
+                [
+                    "phrasal_verb",
+                    "frequency",
+                    "translation",
+                    "idiomaticity_score",
+                    "literality_score",
+                    "score_rationale",
+                    "example",
+                ]
             )
-            writer.writerow(["look up", "3", "искать", ""])
-            writer.writerow(["give up", "2", "сдаваться", ""])
+            writer.writerow(
+                ["look up", "3", "искать", "7", "3", "mixed collocation", ""]
+            )
+            writer.writerow(
+                ["give up", "2", "сдаваться", "9", "2", "opaque particle", ""]
+            )
 
         mock_context.user_data["last_translations_dir"] = str(trans_dir)
         mock_context.user_data["last_series_name"] = "Test Series"
@@ -217,6 +229,62 @@ class TestCommandHandlers:
             or "title first" in message.lower()
         )
         assert "/phrasal" in message or "phrasal" in message.lower()
+
+    @pytest.mark.asyncio
+    async def test_idioms_command_with_context(self, mock_update, mock_context, temp_dir):
+        """Test /idioms with episode context — idioms feature shows WIP placeholder when disabled."""
+        from telegram_bot import send_idiomatic_expressions
+
+        trans_dir = temp_dir / "translations" / "Test Series" / "Season 1" / "1"
+        trans_dir.mkdir(parents=True)
+        (trans_dir / "translation_info.json").write_text(
+            json.dumps(
+                {"series": "Test Series", "season_number": 1, "episode_number": 1},
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        idiom_file = trans_dir / "idiomatic_expressions.csv"
+        with open(idiom_file, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(
+                [
+                    "expression",
+                    "frequency",
+                    "translation",
+                    "idiomacy_rating",
+                    "example",
+                ]
+            )
+            writer.writerow(
+                ["fair enough", "2", "справедливо", "8", ""]
+            )
+
+        mock_context.user_data["last_translations_dir"] = str(trans_dir)
+        mock_context.user_data["last_series_name"] = "Test Series"
+
+        await send_idiomatic_expressions(mock_update, mock_context)
+
+        assert mock_update.message.reply_text.called
+        call_args = mock_update.message.reply_text.call_args
+        message = call_args[0][0]
+        assert "work in progress" in message.lower()
+        assert "idioms" in message.lower()
+
+    @pytest.mark.asyncio
+    async def test_idioms_command_no_context(self, mock_update, mock_context):
+        """Test idioms with no episode context — WIP placeholder (no 'load title first' gate)."""
+        from telegram_bot import send_idiomatic_expressions
+
+        mock_context.user_data = {}
+
+        await send_idiomatic_expressions(mock_update, mock_context)
+
+        assert mock_update.message.reply_text.called
+        call_args = mock_update.message.reply_text.call_args
+        message = call_args[0][0]
+        assert "idioms" in message.lower() or "Idioms" in message
+        assert "work in progress" in message.lower()
 
 
 # ============================================================================
@@ -256,53 +324,42 @@ class TestMessageHandling:
     async def test_series_name_input_valid(self, mock_update, mock_context, monkeypatch):
         """Test series name input - valid series names."""
         from telegram_bot import handle_message
-        
+
         test_cases = [
             "Fallout",
             "Game of Thrones",
-            "Better Call Saul"
+            "Better Call Saul",
         ]
-        
+
         for series_name in test_cases:
             mock_update.message.text = series_name
-            
-            # Mock normalize_series_name
-            def mock_normalize(input_text, client):
-                return series_name
-            
-            # Mock find_existing_tier_lists
-            def mock_find_tier_lists(series):
-                return []
-            
-            with patch('telegram_bot.normalize_series_name', side_effect=mock_normalize):
-                with patch('telegram_bot.find_existing_tier_lists', side_effect=mock_find_tier_lists):
-                    with patch('telegram_bot.find_existing_subtitle', return_value=None):
+            with patch(
+                "telegram_bot._correct_series_title_typos",
+                new_callable=AsyncMock,
+                side_effect=lambda s: s,
+            ):
+                with patch(
+                    "telegram_bot._find_existing",
+                    return_value=(None, None, None),
+                ):
+                    with patch("telegram_bot._do_download", return_value=None):
                         await handle_message(mock_update, mock_context)
-                        
-                        # Should have replied
                         assert mock_update.message.reply_text.called
     
     @pytest.mark.asyncio
     async def test_series_name_with_season_episode(self, mock_update, mock_context, monkeypatch):
         """Test series name input - series with season/episode."""
         from telegram_bot import handle_message
-        
+
         mock_update.message.text = "Fallout S02E01"
-        
-        # Mock normalize_series_name
-        def mock_normalize(input_text, client):
-            return "Fallout"
-        
-        # Mock find_existing_tier_lists
-        def mock_find_tier_lists(series):
-            return []
-        
-        with patch('telegram_bot.normalize_series_name', side_effect=mock_normalize):
-            with patch('telegram_bot.find_existing_tier_lists', side_effect=mock_find_tier_lists):
-                with patch('telegram_bot.find_existing_subtitle', return_value=None):
+        with patch(
+            "telegram_bot._correct_series_title_typos",
+            new_callable=AsyncMock,
+            side_effect=lambda s: s,
+        ):
+            with patch("telegram_bot._find_existing", return_value=(None, None, None)):
+                with patch("telegram_bot._do_download", return_value=None):
                     await handle_message(mock_update, mock_context)
-                    
-                    # Should have replied
                     assert mock_update.message.reply_text.called
     
     @pytest.mark.asyncio
@@ -310,15 +367,14 @@ class TestMessageHandling:
         """Test series name input - invalid inputs (too short)."""
         from telegram_bot import handle_message
         
-        mock_update.message.text = "AB"  # Too short
-        
+        mock_update.message.text = "A"  # len(raw) < 2 triggers too-short branch
+
         await handle_message(mock_update, mock_context)
-        
-        # Should reply with error
+
         assert mock_update.message.reply_text.called
         call_args = mock_update.message.reply_text.call_args
         message = call_args[0][0]
-        
+
         assert "short" in message.lower() or "too short" in message.lower() or "at least" in message.lower()
     
     @pytest.mark.asyncio
@@ -335,75 +391,77 @@ class TestMessageHandling:
     
     @pytest.mark.asyncio
     async def test_series_name_normalization(self, mock_update, mock_context, monkeypatch):
-        """Test series name normalization with ChatGPT."""
-        from telegram_bot import normalize_series_name
-        from openai import OpenAI
-        
-        # Mock OpenAI client
-        mock_client = Mock(spec=OpenAI)
-        mock_response = MagicMock()
-        mock_response.choices = [MagicMock()]
-        mock_response.choices[0].message = MagicMock()
-        mock_response.choices[0].message.content = "Fallout"
-        mock_client.chat.completions.create.return_value = mock_response
-        
-        # Test normalization
-        result = await normalize_series_name("fallout", mock_client)
-        
-        assert result == "Fallout"
-        assert mock_client.chat.completions.create.called
+        """Test ChatGPT JSON normalization path used by the bot."""
+        import telegram_bot as tb
+
+        with patch.object(tb, "resolve_openai_api_key", return_value="sk-test"):
+            with patch("openai.OpenAI") as m_oa:
+                inst = m_oa.return_value
+                inst.chat.completions.create.return_value = MagicMock(
+                    choices=[
+                        MagicMock(
+                            message=MagicMock(
+                                content='{"series_name": "Fallout", "season": 1, "episode": 1}'
+                            )
+                        )
+                    ]
+                )
+                result = await tb._normalize_with_chatgpt("fallout")
+        assert result == ("Fallout", 1, 1)
+        assert inst.chat.completions.create.called
     
+    @pytest.mark.skip(reason="send_tier_list_results was removed; lists are sent via _send_translations_list")
     @pytest.mark.asyncio
     async def test_response_formatting(self, mock_update, mock_context, sample_episode_dir):
         """Test response formatting - verify tier list message format."""
-        from telegram_bot import send_tier_list_results
-        
-        # Set context
-        mock_context.user_data['last_episode_dir'] = str(sample_episode_dir)
-        mock_context.user_data['last_series_name'] = 'Test Series'
-        
-        await send_tier_list_results(mock_update, sample_episode_dir, mock_context)
-        
-        # Verify reply_text was called
-        assert mock_update.message.reply_text.called
-        
-        # Check message format
-        call_args = mock_update.message.reply_text.call_args
-        message = call_args[0][0]
-        
-        # Should contain series name, word count, and word list
-        assert "Test Series" in message or "series" in message.lower()
-        assert "Words" in message or "words" in message.lower()
     
     @pytest.mark.asyncio
-    async def test_context_management(self, mock_update, mock_context, sample_episode_dir, monkeypatch):
-        """Test context management - verify last_episode_dir is stored correctly."""
+    async def test_context_management(
+        self, mock_update, mock_context, sample_episode_dir, temp_dir, monkeypatch
+    ):
+        """Test context management - verify last_episode_dir is stored on cache hit."""
+        import json
+        import telegram_bot as tb
         from telegram_bot import handle_message
-        
+
+        monkeypatch.setattr(tb, "BASE_DIR", temp_dir)
+
+        trans_dir = temp_dir / "translations" / "Test Series" / "Season 1" / "1"
+        trans_dir.mkdir(parents=True)
+        (trans_dir / "tier_1_translations.csv").write_text(
+            "word,translation_ru\nhello,привет\n", encoding="utf-8"
+        )
+        (trans_dir / "translation_info.json").write_text(
+            json.dumps(
+                {
+                    "series": "Test Series",
+                    "season_number": 1,
+                    "episode_number": 1,
+                }
+            ),
+            encoding="utf-8",
+        )
+
         mock_update.message.text = "Test Series"
-        
-        # Mock functions
-        def mock_normalize(input_text, client):
-            return "Test Series"
-        
-        def mock_find_tier_lists(series):
-            return [sample_episode_dir]
-        
-        with patch('telegram_bot.normalize_series_name', side_effect=mock_normalize):
-            with patch('telegram_bot.find_existing_tier_lists', side_effect=mock_find_tier_lists):
-                with patch('telegram_bot.send_tier_list_results', new_callable=AsyncMock) as mock_send:
-                    # Ensure send_tier_list_results sets context
-                    async def mock_send_with_context(update, episode_dir, context):
-                        context.user_data['last_episode_dir'] = str(episode_dir)
-                        context.user_data['last_series_name'] = "Test Series"
-                    
-                    mock_send.side_effect = mock_send_with_context
+        status_msg = Mock()
+        status_msg.edit_text = AsyncMock()
+        mock_update.message.reply_text = AsyncMock(return_value=status_msg)
+
+        with patch(
+            "telegram_bot._correct_series_title_typos",
+            new_callable=AsyncMock,
+            side_effect=lambda s: s,
+        ):
+            with patch(
+                "telegram_bot._find_existing",
+                return_value=(sample_episode_dir, trans_dir, None),
+            ):
+                with patch("telegram_bot._send_translations_list", new_callable=AsyncMock):
                     await handle_message(mock_update, mock_context)
-                    
-                    # Verify context was set
-                    assert 'last_episode_dir' in mock_context.user_data
-                    assert mock_context.user_data['last_episode_dir'] == str(sample_episode_dir)
-                    assert mock_context.user_data.get('last_series_name') == "Test Series"
+
+        assert mock_context.user_data.get("last_episode_dir") == str(sample_episode_dir)
+        assert mock_context.user_data.get("last_series_name") == "Test Series"
+        assert mock_context.user_data.get("last_translations_dir") == str(trans_dir)
     
     @pytest.mark.asyncio
     async def test_context_persistence(self, mock_update, mock_context, sample_episode_dir):
@@ -429,23 +487,10 @@ class TestMessageHandling:
 class TestErrorHandling:
     """Test suite for error handling."""
     
+    @pytest.mark.skip(reason="send_tier_list_results was removed from telegram_bot")
     @pytest.mark.asyncio
     async def test_file_not_found_tier_list(self, mock_update, mock_context, temp_dir):
         """Test file not found errors - missing tier list files."""
-        from telegram_bot import send_tier_list_results
-        
-        # Create episode dir without tier file
-        episode_dir = temp_dir / "S01E01"
-        episode_dir.mkdir(parents=True, exist_ok=True)
-        
-        await send_tier_list_results(mock_update, episode_dir, mock_context)
-        
-        # Should reply with error message
-        assert mock_update.message.reply_text.called
-        call_args = mock_update.message.reply_text.call_args
-        message = call_args[0][0]
-        
-        assert "not found" in message.lower() or "Tier list" in message
     
     @pytest.mark.asyncio
     async def test_file_not_found_episode_info(self, mock_update, mock_context, temp_dir):
@@ -475,43 +520,19 @@ class TestErrorHandling:
     
     @pytest.mark.asyncio
     async def test_api_error_openai_failure(self, mock_update, mock_context, monkeypatch):
-        """Test API errors - OpenAI API failures."""
-        from telegram_bot import normalize_series_name
-        from openai import OpenAI
-        
-        # Mock OpenAI client that raises exception
-        mock_client = Mock(spec=OpenAI)
-        mock_client.chat.completions.create.side_effect = Exception("API Error")
-        
-        # Should handle error gracefully
-        try:
-            result = await normalize_series_name("test", mock_client)
-            # If it doesn't raise, should return a fallback value
-            assert result is not None
-        except Exception:
-            # If it raises, that's also acceptable error handling
-            pass
+        """OpenAI failures in normalization return None (bot falls back to parsed title)."""
+        import telegram_bot as tb
+
+        with patch.object(tb, "resolve_openai_api_key", return_value="sk-test"):
+            with patch("openai.OpenAI") as m_oa:
+                m_oa.return_value.chat.completions.create.side_effect = RuntimeError("API Error")
+                result = await tb._normalize_with_chatgpt("some show s1 e1")
+        assert result is None
     
+    @pytest.mark.skip(reason="send_tier_list_results was removed from telegram_bot")
     @pytest.mark.asyncio
     async def test_invalid_data_corrupted_csv(self, mock_update, mock_context, temp_dir):
         """Test invalid data - corrupted CSV files."""
-        from telegram_bot import send_tier_list_results
-        
-        # Create episode dir with corrupted CSV
-        episode_dir = temp_dir / "S01E01"
-        episode_dir.mkdir(parents=True, exist_ok=True)
-        
-        tier_file = episode_dir / "tier_1_hard_usable_words.csv"
-        tier_file.write_text("corrupted,csv,data\ninvalid,format", encoding='utf-8')
-        
-        # Should handle corrupted CSV gracefully
-        try:
-            await send_tier_list_results(mock_update, episode_dir, mock_context)
-            # Should either handle error or reply with error message
-            assert mock_update.message.reply_text.called
-        except Exception:
-            # If it raises, that's also acceptable
-            pass
     
     @pytest.mark.asyncio
     async def test_invalid_data_invalid_json(self, mock_update, mock_context, temp_dir):
@@ -542,22 +563,10 @@ class TestErrorHandling:
         # Should still reply (uses default values)
         assert mock_update.message.reply_text.called or mock_update.message.reply_document.called
     
+    @pytest.mark.skip(reason="send_tier_list_results was removed from telegram_bot")
     @pytest.mark.asyncio
     async def test_empty_tier_list(self, mock_update, mock_context, temp_dir):
         """Test invalid data - empty tier lists."""
-        from telegram_bot import send_tier_list_results
-        
-        # Create episode dir with empty tier file
-        episode_dir = temp_dir / "S01E01"
-        episode_dir.mkdir(parents=True, exist_ok=True)
-        
-        tier_file = episode_dir / "tier_1_hard_usable_words.csv"
-        tier_file.write_text("word,series_frequency\n", encoding='utf-8')  # Only header
-        
-        await send_tier_list_results(mock_update, episode_dir, mock_context)
-        
-        # Should handle empty list gracefully
-        assert mock_update.message.reply_text.called
 
 
 if __name__ == "__main__":

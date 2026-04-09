@@ -1,0 +1,53 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Fallout S2 E3/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.753258",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Fallout S2 E3",
+  "season": 1,
+  "episode": 1,
+  "word_count": 7,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most pairs are translated into plausible Russian equivalents and none are empty or left untranslated. 'cleric' → 'священник' is acceptable if the series uses the religious office sense, though in some contexts 'cleric' can be broader than 'priest'. 'relic' → 'реликвия', 'fusion' → 'термоядерный синтез', 'battalion' → 'батальон', and 'abomination' → 'мерзость' are all semantically correct. 'profligate' → 'распутник' captures the core idea of a morally dissolute person, though it is slightly narrower than the adjective 'profligate' and may miss the adjectival nuance. The main weak point is 'hoo' → 'ликующий возглас': this is not a direct lexical translation of the interjection and looks like an interpretive paraphrase rather than a stable dictionary equivalent, so it is less precise than the others.",
+    "issues": [
+      {
+        "word": "hoo",
+        "translation": "ликующий возглас",
+        "issue": "Imprecise paraphrase of an interjection; not a direct lexical equivalent and may be too interpretive for a vocabulary list."
+      },
+      {
+        "word": "profligate",
+        "translation": "распутник",
+        "issue": "Mostly correct, but slightly narrows the adjective to a noun meaning 'debauched person' rather than fully covering the source word's broader adjectival sense."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words. None of them are character names, place names, real personal names, or obvious non-English insertions. There are no invented proper nouns or obvious sci-fi terms masquerading as vocabulary items in this list.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 8,
+    "reasoning": "Most items are appropriately advanced or specialized vocabulary. 'cleric', 'relic', 'profligate', 'fusion', 'battalion', and 'abomination' are all reasonable C1/C2-level items for an advanced list, especially in a TV-dialogue context. The main concern is 'hoo', which is an interjection/exclamation rather than C-level vocabulary; it is more like a sound or discourse marker than advanced lexical content. Because the list is otherwise advanced, this is a minor but real mismatch.",
+    "not_c_level": [
+      {
+        "word": "hoo",
+        "estimated_level": "A1/A2",
+        "reason": "This is an interjection/exclamation, not advanced vocabulary; it is basic expressive language rather than C1/C2 lexical content."
+      }
+    ]
+  },
+  "overall_score": 8.7,
+  "summary": "The translation set is mostly accurate and uses appropriate Russian equivalents for advanced vocabulary. The main weakness is the inclusion of 'hoo', which is not really C-level vocabulary and is translated only approximately rather than as a stable lexical item.",
+  "tokens_used": {
+    "prompt": 1131,
+    "completion": 683,
+    "total": 1814
+  }
+}

@@ -13,6 +13,12 @@ from typing import Dict, List, Tuple, Optional, Set
 from openai import OpenAI
 import argparse
 
+# Dual-score gate after translation (see _translate_phrasal_batch rubric).
+# Keep only if idiomaticity is high AND literal word-for-word mapping is low.
+MIN_IDIOMATICITY_SCORE = 6
+MAX_LITERARITY_SCORE = 3  # literality 1 = transparent; must be <= this to keep
+
+
 # Common phrasal verb particles
 PHRASAL_PARTICLES = [
     'up', 'down', 'out', 'in', 'on', 'off', 'away', 'back', 'over', 'through',
@@ -164,9 +170,14 @@ def extract_phrasal_verbs(text: str) -> Tuple[Counter, Set[str]]:
                 'at',
                 'by',
             ]:
-                phrasal_verb = f"{word} {next_word} {word_after}"
-                if phrasal_verb not in _COMMON_PHRASAL_SET:
-                    dynamic_counter[phrasal_verb] += 1
+                bigram = f"{word} {next_word}"
+                # Avoid spurious 3-grams like "find out in" when "find out" is already lexicalized.
+                if bigram in _COMMON_PHRASAL_SET:
+                    pass
+                else:
+                    phrasal_verb = f"{word} {next_word} {word_after}"
+                    if phrasal_verb not in _COMMON_PHRASAL_SET:
+                        dynamic_counter[phrasal_verb] += 1
 
     merged = dict_counter + dynamic_counter
     filtered = Counter()
@@ -224,9 +235,17 @@ def verify_phrasal_verbs_with_chatgpt(
 
         prompt = f"""You are a linguist judging English multiword units for the TV series "{series_name}".
 
-Below is a numbered list of candidate PHRASES (2–3 words) taken from subtitles. Many are NOT real phrasal verbs: they may be random adjacency (e.g. "you in", "man in"), tokenizer garbage (e.g. "s up" from contractions), or ordinary grammar — not lexical phrasal verbs / idiomatic verb–particle combinations.
+Below is a numbered list of candidate PHRASES (2–3 words) taken from subtitles. Many are NOT real phrasal verbs: they may be random adjacency (e.g. "you in", "man in"), tokenizer garbage (e.g. "s up" from contractions), accidental merges across two constructions (e.g. "find out" + "in" as one unit), or ordinary grammar — not lexical phrasal verbs / idiomatic verb–particle combinations.
 
 Keep ONLY phrases that are genuine phrasal verbs or established verb–particle / verb–preposition idioms in English (e.g. "give up", "come on", "look for", "put up with").
+
+REJECT in particular:
+- Fragments that are not standard idioms (e.g. two idioms jammed with an extra preposition).
+- Readings where the first word is a NOUN, not a verb (e.g. animal "bear" + "in" in "a bear in a trap").
+- Candidates whose first word is an inflected/auxiliary form where the list should use the base lemma instead — exclude past-tense-only heads like "jumped off" unless you are certain it is a fixed lexical entry in that form (prefer to reject marginal cases).
+- Strings that are not a coherent phrasal-verb entry a learner would study (participial scraps, preposition piles).
+
+Prefer candidates whose first word is a verb in base/infinitive-lemma form when matching subtitle usage.
 
 CANDIDATES:
 {numbered}
@@ -278,151 +297,322 @@ def apply_verified_phrasals(counter: Counter, approved: Set[str]) -> Counter:
     return Counter({k: counter[k] for k in counter if k in approved})
 
 
-def translate_phrasal_verbs(phrasal_verbs: List[Tuple[str, int]], 
-                                   subtitle_text: str,
-                                   series_name: str,
-                                   api_key: str,
-                                   target_language: str = "Russian") -> Dict[str, str]:
-    """Translate phrasal verbs using ChatGPT with series context.
-    
-    Args:
-        phrasal_verbs: List of (phrasal_verb, frequency) tuples
-        subtitle_text: Subtitle text for context
-        series_name: Name of the series
-        api_key: OpenAI API key
-        target_language: Target language for translation
-        
-    Returns:
-        Dictionary mapping phrasal verb to translation
-    """
-    if not phrasal_verbs:
-        return {}
-    
-    translations = {}
-    client = OpenAI(api_key=api_key)
-    
-    # Process in batches
-    batch_size = 20
-    for batch_start in range(0, len(phrasal_verbs), batch_size):
-        batch = phrasal_verbs[batch_start:batch_start + batch_size]
-        pv_list = [pv for pv, _ in batch]
-        
-        # Get context from subtitles
-        context = subtitle_text[:3000] if len(subtitle_text) > 3000 else subtitle_text
-        
-        prompt = f"""You are translating phrasal verbs from the TV series "{series_name}".
+def _phrase_boundary_pattern(phrase: str):
+    """Regex for whole phrase as tokens (substring-safe)."""
+    parts = phrase.lower().split()
+    if not parts:
+        return re.compile(r"^$")
+    inner = r"\s+".join(re.escape(p) for p in parts)
+    return re.compile(rf"\b{inner}\b", re.IGNORECASE)
 
-PHASAL VERBS TO TRANSLATE:
-{', '.join(pv_list)}
 
-SUBTITLE CONTEXT:
+def _format_phrasal_lines_for_prompt(
+    pv_list: List[str],
+    examples: Optional[Dict[str, List[str]]],
+) -> str:
+    lines = []
+    ex = examples or {}
+    for pv in pv_list:
+        xs = ex.get(pv) or []
+        if xs:
+            for i, line in enumerate(xs[:2], start=1):
+                lines.append(f'  - "{pv}" (example {i}): {line[:400]}')
+        else:
+            lines.append(f'  - "{pv}" (no matched subtitle line)')
+    return "\n".join(lines)
+
+
+def _coerce_phrasality_score(raw: object) -> Optional[int]:
+    """Return integer 1–10 or None."""
+    if raw is None:
+        return None
+    if isinstance(raw, bool):
+        return None
+    if isinstance(raw, int):
+        return raw if 1 <= raw <= 10 else None
+    if isinstance(raw, float) and raw.is_integer():
+        n = int(raw)
+        return n if 1 <= n <= 10 else None
+    if isinstance(raw, str):
+        s = raw.strip()
+        if s.isdigit():
+            n = int(s)
+            return n if 1 <= n <= 10 else None
+    return None
+
+
+def _translate_phrasal_batch(
+    client: OpenAI,
+    pv_list: List[str],
+    subtitle_text: str,
+    series_name: str,
+    target_language: str,
+    examples: Optional[Dict[str, List[str]]],
+) -> Tuple[Dict[str, str], Dict[str, int], Dict[str, int], Dict[str, str]]:
+    """Returns translations, idiomaticity_scores, literality_scores, score_rationale."""
+    context = subtitle_text[:3000] if len(subtitle_text) > 3000 else subtitle_text
+    per_phrase = _format_phrasal_lines_for_prompt(pv_list, examples)
+    prompt = f"""You are translating multiword verb units from the TV series "{series_name}" for a **learner list of opaque phrasal / idiomatic verbs only**.
+
+PHRASES (with episode lines where each appears — use these to choose the correct sense):
+{per_phrase}
+
+GENERAL SUBTITLE CONTEXT (same episode):
 {context[:2000]}
 
-For each phrasal verb, provide a translation in {target_language} that:
-1. Is accurate and natural in {target_language}
-2. Reflects the meaning used in this series context
-3. Can be 1-3 words if needed for accuracy
+For EACH phrase listed above you must output:
 
-Return ONLY a JSON object with this structure:
+1. **translation** in {target_language}: accurate, natural, matches EXAMPLE line(s) when present; 1-3 words when possible.
+
+2. **idiomaticity_score** (integer 1-10): How **fixed / non-literal / idiomatic** the English unit is **in this context** as a verb construction worth memorizing as a chunk.
+   - **1-3:** Transparent grammar + preposition/particle (e.g. "believe in", "look at", "think about", "wait for", "depend on", "listen to") — the meaning follows from verb + preposition even if colloquial.
+   - **4-5:** Somewhat colloquial but still largely compositional.
+   - **6-8:** Clearly lexicalized or meaning not obvious from parts alone in this use.
+   - **9-10:** Strong opaque phrasal / particle verb (e.g. "give up" = surrender, "make up" = invent/reconcile, "keep up" = not fall behind).
+
+3. **literality_score** (integer 1-10): How **directly** the {target_language} gloss maps **word-for-word** to the English pieces (verb + particle/preposition).
+   - **1-3:** Clearly **not** word-for-word; translation is idiomatic or rephrased (good for this list).
+   - **4-6:** Partially compositional.
+   - **7-10:** Near **direct calque**: you could get the Russian by translating the verb and the preposition/particle separately (e.g. "believe" + "in" → "верить" + "в"). **These must get high literality** even if the English is a common "phrasal" textbook entry.
+
+**HARD RULE:** If the pair is essentially **verb + common preposition** and the translation is a **literal match** of those parts (like "believe in" → "верить в"), set **idiomaticity_score 1-3** and **literality_score 8-10**. Such items must NOT be recommended for an opaque-phrasal learner list.
+
+4. **score_rationale** (one short English phrase per key, max ~15 words): why you chose those two scores.
+
+Return ONLY JSON with this shape (exact keys for every phrase in the list, exact English spelling):
 {{
-    "translations": {{
-        "give up": "сдаваться",
-        "look for": "искать",
-        ...
-    }}
-}}
+    "translations": {{ "give up": "сдаваться", "believe in": "верить в" }},
+    "idiomaticity_scores": {{ "give up": 9, "believe in": 2 }},
+    "literality_scores": {{ "give up": 2, "believe in": 9 }},
+    "score_rationale": {{ "give up": "opaque particle sense", "believe in": "verb+prep calque" }}
+}}"""
 
-Return the JSON:"""
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You translate verb phrases and output strict JSON with keys: "
+                    "translations, idiomaticity_scores, literality_scores, score_rationale. "
+                    "All score values are integers 1-10. Rationale values are short English strings."
+                ),
+            },
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.3,
+        response_format={"type": "json_object"},
+    )
+    raw = response.choices[0].message.content
+    result = json.loads(raw) if raw else {}
+    trans_raw = result.get("translations") or {}
+    idiom_raw = result.get("idiomaticity_scores") or {}
+    lit_raw = result.get("literality_scores") or {}
+    rat_raw = result.get("score_rationale") or {}
 
+    translations: Dict[str, str] = {}
+    idiomaticity: Dict[str, int] = {}
+    literality: Dict[str, int] = {}
+    rationale: Dict[str, str] = {}
+    expected = set(pv_list)
+    for k in expected:
+        if k in trans_raw and trans_raw[k] is not None:
+            translations[str(k)] = str(trans_raw[k]).strip()
+        idi = _coerce_phrasality_score(idiom_raw.get(k))
+        if idi is not None:
+            idiomaticity[str(k)] = idi
+        lit = _coerce_phrasality_score(lit_raw.get(k))
+        if lit is not None:
+            literality[str(k)] = lit
+        r = rat_raw.get(k)
+        if isinstance(r, str) and r.strip():
+            rationale[str(k)] = r.strip()[:240]
+    return translations, idiomaticity, literality, rationale
+
+
+def translate_phrasal_verbs(
+    phrasal_verbs: List[Tuple[str, int]],
+    subtitle_text: str,
+    series_name: str,
+    api_key: str,
+    target_language: str = "Russian",
+    examples: Optional[Dict[str, List[str]]] = None,
+) -> Tuple[Dict[str, str], Dict[str, int], Dict[str, int], Dict[str, str]]:
+    """Translate and score each phrase (idiomaticity + literality + short rationale).
+
+    Caller keeps rows where idiomaticity >= MIN_IDIOMATICITY_SCORE and
+    literality <= MAX_LITERARITY_SCORE.
+    """
+    if not phrasal_verbs:
+        return {}, {}, {}, {}
+
+    translations: Dict[str, str] = {}
+    idiomaticity_scores: Dict[str, int] = {}
+    literality_scores: Dict[str, int] = {}
+    rationales: Dict[str, str] = {}
+    client = OpenAI(api_key=api_key)
+    batch_size = 20
+
+    for batch_start in range(0, len(phrasal_verbs), batch_size):
+        batch = phrasal_verbs[batch_start : batch_start + batch_size]
+        pv_list = [pv for pv, _ in batch]
         try:
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": f"You are a translator specializing in phrasal verbs. Always respond with valid JSON in {target_language}."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.3,
-                response_format={"type": "json_object"}
+            bt, bi, bl, br = _translate_phrasal_batch(
+                client, pv_list, subtitle_text, series_name, target_language, examples
             )
-            
-            result = json.loads(response.choices[0].message.content)
-            batch_translations = result.get("translations", {})
-            translations.update(batch_translations)
-            
-            print(f"Translated batch {batch_start//batch_size + 1}: {len(batch_translations)} phrasal verbs")
-            
+            translations.update(bt)
+            idiomaticity_scores.update(bi)
+            literality_scores.update(bl)
+            rationales.update(br)
+            print(
+                f"Translated batch {batch_start // batch_size + 1}: "
+                f"{len(bt)} phrases, {len(bi)} idiom / {len(bl)} lit scores"
+            )
         except Exception as e:
-            print(f"Error translating batch {batch_start//batch_size + 1}: {e}")
-            # Continue with next batch
-    
-    return translations
+            print(f"Error translating batch {batch_start // batch_size + 1}: {e}")
+
+    def _is_bad(val: str) -> bool:
+        t = (val or "").strip()
+        if not t:
+            return True
+        return t.upper() == "N/A" or t.lower() in ("none", "null")
+
+    expected = [pv for pv, _ in phrasal_verbs]
+    missing = [
+        pv
+        for pv in expected
+        if _is_bad(translations.get(pv, ""))
+        or pv not in idiomaticity_scores
+        or pv not in literality_scores
+    ]
+    if missing:
+        try:
+            rt, ri, rl, rr = _translate_phrasal_batch(
+                client,
+                missing,
+                subtitle_text,
+                series_name,
+                target_language,
+                examples,
+            )
+            for k, v in rt.items():
+                if not _is_bad(str(v)):
+                    translations[k] = str(v).strip()
+            idiomaticity_scores.update(ri)
+            literality_scores.update(rl)
+            rationales.update(rr)
+            ok_t = len([p for p in missing if not _is_bad(translations.get(p, ""))])
+            ok_i = len([p for p in missing if p in idiomaticity_scores])
+            ok_l = len([p for p in missing if p in literality_scores])
+            print(
+                f"Translation retry: {ok_t}/{len(missing)} glosses, "
+                f"{ok_i}/{len(missing)} idiom, {ok_l}/{len(missing)} literality"
+            )
+        except Exception as e:
+            print(f"Translation retry failed: {e}")
+
+    return translations, idiomaticity_scores, literality_scores, rationales
 
 
-def extract_examples_for_phrasal_verbs(subtitle_text: str, 
-                                       phrasal_verbs: List[str],
-                                       max_examples: int = 2) -> Dict[str, List[str]]:
+def extract_examples_for_phrasal_verbs(
+    subtitle_text: str,
+    phrasal_verbs: List[str],
+    max_examples: int = 2,
+) -> Dict[str, List[str]]:
     """Extract example sentences containing phrasal verbs.
-    
+
+    Prefers token-boundary matches so substrings like \"drop into\" inside
+    \"100-foot drop into the water\" are not treated as the phrasal verb.
+
     Args:
         subtitle_text: Subtitle text
         phrasal_verbs: List of phrasal verbs to find examples for
         max_examples: Maximum examples per phrasal verb
-        
+
     Returns:
         Dictionary mapping phrasal verb to list of example sentences
     """
-    examples = {}
-    
-    # Split text into sentences (rough approximation)
+    examples: Dict[str, List[str]] = {}
     sentences = re.split(r'[.!?]+', subtitle_text)
-    
+    cleaned = []
+    for sentence in sentences:
+        sent = sentence.strip()
+        if len(sent) > 10 and len(sent) < 200:
+            cleaned.append(sent)
+
     for pv in phrasal_verbs:
-        pv_examples = []
+        pv_examples: List[str] = []
         pv_lower = pv.lower()
-        
-        for sentence in sentences:
-            if pv_lower in sentence.lower():
-                # Clean up sentence
-                sentence = sentence.strip()
-                if len(sentence) > 10 and len(sentence) < 200:  # Reasonable length
-                    pv_examples.append(sentence)
-                    if len(pv_examples) >= max_examples:
-                        break
-        
+        pat = _phrase_boundary_pattern(pv)
+
+        for sent in cleaned:
+            if pat.search(sent):
+                if sent not in pv_examples:
+                    pv_examples.append(sent)
+                if len(pv_examples) >= max_examples:
+                    break
+
+        if len(pv_examples) < max_examples:
+            for sent in cleaned:
+                if pv_lower in sent.lower() and sent not in pv_examples:
+                    pv_examples.append(sent)
+                if len(pv_examples) >= max_examples:
+                    break
+
         examples[pv] = pv_examples[:max_examples]
-    
+
     return examples
 
 
-def save_phrasal_verbs(phrasal_verbs: Counter,
-                       translations: Dict[str, str],
-                       examples: Dict[str, List[str]],
-                       episode_dir: Path):
-    """Save phrasal verbs to CSV file.
-    
-    Args:
-        phrasal_verbs: Counter of phrasal verbs with frequencies
-        translations: Dictionary of phrasal verb -> translation
-        examples: Dictionary of phrasal verb -> list of example sentences
-        episode_dir: Directory to save the CSV file
-    """
+def save_phrasal_verbs(
+    phrasal_verbs: Counter,
+    translations: Dict[str, str],
+    examples: Dict[str, List[str]],
+    episode_dir: Path,
+    *,
+    idiomaticity_scores: Optional[Dict[str, int]] = None,
+    literality_scores: Optional[Dict[str, int]] = None,
+    score_rationales: Optional[Dict[str, str]] = None,
+):
+    """Save phrasal verbs CSV with idiomaticity, literality, and rationale columns."""
     episode_dir.mkdir(parents=True, exist_ok=True)
     csv_file = episode_dir / "phrasal_verbs.csv"
-    
-    # Sort by frequency (descending)
+
     sorted_pvs = sorted(phrasal_verbs.items(), key=lambda x: x[1], reverse=True)
-    
-    with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+    idiom = idiomaticity_scores or {}
+    lit = literality_scores or {}
+    rat = score_rationales or {}
+
+    with open(csv_file, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(['phrasal_verb', 'frequency', 'translation', 'example'])
-        
+        writer.writerow(
+            [
+                "phrasal_verb",
+                "frequency",
+                "translation",
+                "idiomaticity_score",
+                "literality_score",
+                "score_rationale",
+                "example",
+            ]
+        )
+
         for pv, freq in sorted_pvs:
-            translation = translations.get(pv, 'N/A')
+            translation = translations.get(pv, "N/A")
             pv_examples = examples.get(pv, [])
-            example = pv_examples[0] if pv_examples else 'N/A'
-            
-            writer.writerow([pv, freq, translation, example])
-    
+            example = pv_examples[0] if pv_examples else "N/A"
+            writer.writerow(
+                [
+                    pv,
+                    freq,
+                    translation,
+                    idiom.get(pv, ""),
+                    lit.get(pv, ""),
+                    rat.get(pv, ""),
+                    example,
+                ]
+            )
+
     print(f"Saved {len(sorted_pvs)} phrasal verbs to {csv_file}")
 
 
@@ -499,12 +689,67 @@ def extract_phrasal_verbs_from_episode(subtitle_path: Path,
     examples = extract_examples_for_phrasal_verbs(subtitle_text, pv_list)
 
     print("\nTranslating phrasal verbs...")
-    translations = translate_phrasal_verbs(
-        sorted_pvs, subtitle_text, series_name, api_key
+    translations, idiomaticity_scores, literality_scores, score_rationales = (
+        translate_phrasal_verbs(
+            sorted_pvs,
+            subtitle_text,
+            series_name,
+            api_key,
+            examples=examples,
+        )
     )
 
+    def _passes_dual_gate(k: str) -> bool:
+        idi = idiomaticity_scores.get(k)
+        lit = literality_scores.get(k)
+        if idi is None or lit is None:
+            return False
+        return idi >= MIN_IDIOMATICITY_SCORE and lit <= MAX_LITERARITY_SCORE
+
+    kept_keys = {k for k in verified if _passes_dual_gate(k)}
+    missing_idi = [k for k in verified if k not in idiomaticity_scores]
+    missing_lit = [k for k in verified if k not in literality_scores]
+    fail_idi = [
+        k
+        for k in verified
+        if k in idiomaticity_scores
+        and idiomaticity_scores[k] < MIN_IDIOMATICITY_SCORE
+    ]
+    fail_lit = [
+        k
+        for k in verified
+        if k in literality_scores and literality_scores[k] > MAX_LITERARITY_SCORE
+    ]
+    dropped = len(verified) - len(kept_keys)
+    print(
+        f"Dual-score filter (idiomaticity>={MIN_IDIOMATICITY_SCORE}, "
+        f"literality<={MAX_LITERARITY_SCORE}): "
+        f"kept {len(kept_keys)}, dropped {dropped} "
+        f"(missing idiom: {len(missing_idi)}, missing lit: {len(missing_lit)}, "
+        f"low idiom: {len(fail_idi)}, high lit: {len(fail_lit)})"
+    )
+
+    if not kept_keys:
+        print("No phrasal verbs left after dual-score filter")
+        return False
+
+    final_counter = Counter({k: verified[k] for k in kept_keys})
+    final_translations = {k: translations.get(k, "N/A") for k in kept_keys}
+    final_examples = {k: examples.get(k, []) for k in kept_keys}
+    final_idiom = {k: idiomaticity_scores[k] for k in kept_keys}
+    final_lit = {k: literality_scores[k] for k in kept_keys}
+    final_rat = {k: score_rationales.get(k, "") for k in kept_keys}
+
     print("\nSaving results...")
-    save_phrasal_verbs(verified, translations, examples, episode_dir)
+    save_phrasal_verbs(
+        final_counter,
+        final_translations,
+        final_examples,
+        episode_dir,
+        idiomaticity_scores=final_idiom,
+        literality_scores=final_lit,
+        score_rationales=final_rat,
+    )
     
     print(f"\n{'='*60}")
     print("PHRASAL VERB EXTRACTION COMPLETE")

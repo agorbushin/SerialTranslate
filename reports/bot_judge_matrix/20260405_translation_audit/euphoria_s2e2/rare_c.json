@@ -1,0 +1,48 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.751031",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_c",
+  "translation_csvs": [
+    "tier_4_rare_c_translations.csv"
+  ],
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "word_count": 1,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "The pair \"self\" → \"сам\" is not empty and is a real Russian word, so it is not a missing or transliterated translation. However, without a subtitle example, the exact sense in this episode cannot be fully verified. In English, \"self\" is usually a noun meaning \"the person as a whole\" or part of reflexive constructions, while \"сам\" is more often an emphatic pronoun/adverb meaning \"oneself\" or \"by oneself\". The translation is plausible but somewhat context-dependent and may be too generic if the episode uses \"self\" in a more specific psychological or philosophical sense.",
+    "issues": [
+      {
+        "word": "self",
+        "translation": "сам",
+        "issue": "Plausible but context-dependent; without an example, the exact sense cannot be confirmed, and \"сам\" may be too generic for some uses of \"self\"."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "The source list contains a genuine English vocabulary item: \"self\". It is not a character name, place name, proper noun, foreign word, or invented term. No source-word filtering violations are present.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 2,
+    "reasoning": "The list does not fit an advanced C-band vocabulary set. \"Self\" is a very common English word, typically basic to intermediate rather than C1/C2. Since the task is to highlight advanced rare vocabulary, this entry is a clear mismatch even though it is a legitimate English word.",
+    "not_c_level": [
+      {
+        "word": "self",
+        "estimated_level": "A2",
+        "reason": "Very common basic vocabulary; not an advanced C1/C2 item and therefore unsuitable for an advanced rare-word list."
+      }
+    ]
+  },
+  "overall_score": 6.0,
+  "summary": "The translation is acceptable but only partially verifiable because there is no subtitle example for context. The source word is valid English, but it is far too basic for an advanced vocabulary list, which is the main quality issue here.",
+  "tokens_used": {
+    "prompt": 937,
+    "completion": 489,
+    "total": 1426
+  }
+}

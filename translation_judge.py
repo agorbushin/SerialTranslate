@@ -1,32 +1,31 @@
 #!/usr/bin/env python3
-"""
+r"""
 LLM Judge for translation quality evaluation.
 
-Evaluates tier_1_translations.csv against three criteria:
+Evaluates translation CSVs (default tier_1_translations.csv) against three criteria:
   1. All words translated and correct within the series context
   2. No made-up words, character names, place names, or non-English entities in the source list
-  3. Words being translated are at C level English (CEFR C1/C2)
+  3. CEFR band appropriateness (depends on level_profile)
 
-Uses ChatGPT (GPT-4o by default) as the reasoning judge model.
-Does NOT modify any existing system files.
+Uses ChatGPT as the reasoning judge model. Does NOT modify any existing system files.
 
 Usage:
-    python translation_judge.py --translations-dir translations/Narcos\ S1\ E1/Season\ 1/1
-    python translation_judge.py --translations-dir translations/Narcos\ S1\ E1/Season\ 1/1 \
-        --subtitle Subtitle/Narcos/Season\ 1/narcos_s1_e1.srt \
-        --output judge_report.json
+    python translation_judge.py --translations-dir "translations/Narcos S1 E1/Season 1/1"
+    python translation_judge.py --translations-dir ... \\
+        --translations-csv tier_b1_translations.csv --translations-csv tier_b2_translations.csv \\
+        --level-profile frequent_b_merged
 """
 
 import argparse
 import csv
 import json
-import os
-import re
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
+
+from subtitle_text_utils import extract_word_examples_from_srt_path, get_subtitle_text as _get_subtitle_text
 
 JUDGE_MODEL = "gpt-5.4-mini"
 SUBTITLE_CONTEXT_CHARS = 4000
@@ -35,6 +34,18 @@ EXAMPLES_PER_WORD = 2
 
 TRANSLATIONS_CSV = "tier_1_translations.csv"
 TRANSLATION_INFO_JSON = "translation_info.json"
+
+# level_profile values for criterion 3 wording
+LEVEL_PROFILE_FREQUENT_C = "frequent_c"
+LEVEL_PROFILE_FREQUENT_B_MERGED = "frequent_b_merged"
+LEVEL_PROFILE_RARE_C = "rare_c"
+LEVEL_PROFILE_RARE_B = "rare_b"
+
+# When loading these CSVs together, prefix rows with [B1]/[B2] for the judge.
+_CSV_BAND_LABEL: Dict[str, str] = {
+    "tier_b1_translations.csv": "B1",
+    "tier_b2_translations.csv": "B2",
+}
 
 BASE_DIR = Path(__file__).resolve().parent
 SUBTITLE_BASE = BASE_DIR / "Subtitle"
@@ -45,110 +56,84 @@ SUBTITLE_BASE = BASE_DIR / "Subtitle"
 # ---------------------------------------------------------------------------
 
 def _load_api_key(api_key: Optional[str] = None) -> str:
-    if api_key and api_key.strip():
-        return api_key.strip()
-    key = os.environ.get("OPENAI_API_KEY", "")
-    if key and key.strip():
-        return key.strip()
-    try:
-        root = Path(__file__).resolve().parent
-        if str(root) not in sys.path:
-            sys.path.insert(0, str(root))
-        from telegram_bot import OPENAI_API_KEY as _k  # type: ignore
-        if _k and str(_k).strip():
-            return str(_k).strip()
-    except Exception:
-        pass
-    return ""
+    from env_config import resolve_openai_api_key
+
+    return resolve_openai_api_key(api_key)
 
 
 # ---------------------------------------------------------------------------
-# Subtitle helpers (standalone copies so judge has no dependency on translate_tier_translations)
+# Subtitle helpers (shared with translator via subtitle_text_utils)
 # ---------------------------------------------------------------------------
-
-def _get_subtitle_text(subtitle_path: Path) -> str:
-    """Extract clean plain text from an SRT file."""
-    if not subtitle_path.exists():
-        return ""
-    try:
-        content = subtitle_path.read_text(encoding="utf-8", errors="ignore")
-        content = re.sub(
-            r"\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}", "", content
-        )
-        content = re.sub(r"^\d+$", "", content, flags=re.MULTILINE)
-        content = re.sub(r"<[^>]+>", "", content)
-        content = re.sub(r"\[.*?\]", "", content)
-        return " ".join(content.split())
-    except Exception as e:
-        print(f"  Warning: could not read subtitle: {e}")
-        return ""
 
 
 def _extract_examples(
     subtitle_path: Path, words: List[str], max_per_word: int = EXAMPLES_PER_WORD
 ) -> Dict[str, List[str]]:
     """Return up to max_per_word subtitle lines per word (word-boundary match)."""
-    examples: Dict[str, List[str]] = {w: [] for w in words}
-    if not subtitle_path.exists():
-        return examples
-    try:
-        content = subtitle_path.read_text(encoding="utf-8", errors="ignore")
-        blocks = re.split(r"\n\s*\n", content)
-        for block in blocks:
-            lines = [ln.strip() for ln in block.split("\n") if ln.strip()]
-            text_lines = [
-                ln
-                for ln in lines
-                if not re.match(r"^\d+$", ln)
-                and not re.match(
-                    r"\d{2}:\d{2}:\d{2}[,.]\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}[,.]\d{3}", ln
-                )
-            ]
-            if not text_lines:
-                continue
-            subtitle_line = re.sub(r"<[^>]+>", "", " ".join(text_lines))
-            subtitle_line = re.sub(r"\[.*?\]", "", subtitle_line)
-            subtitle_line = " ".join(subtitle_line.split())
-            if len(subtitle_line) < 8:
-                continue
-            sub_lower = subtitle_line.lower()
-            for word in words:
-                if len(examples[word]) >= max_per_word:
-                    continue
-                if re.search(r"\b" + re.escape(word) + r"\b", sub_lower, re.IGNORECASE):
-                    short = subtitle_line[:MAX_EXAMPLE_LINE_CHARS]
-                    if short and short not in examples[word]:
-                        examples[word].append(short)
-    except Exception as e:
-        print(f"  Warning: could not extract examples: {e}")
-    return examples
+    return extract_word_examples_from_srt_path(
+        subtitle_path,
+        words,
+        max_per_word=max_per_word,
+        max_line_chars=MAX_EXAMPLE_LINE_CHARS,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Load translations
 # ---------------------------------------------------------------------------
 
-def load_translations(
+def _load_one_translation_csv(
     translations_dir: Path,
-) -> Tuple[List[Dict[str, str]], Dict[str, Any]]:
-    """Load word-translation pairs and episode info.
-
-    Returns:
-        (pairs, info) where pairs is list of {"word": ..., "translation_ru": ...}
-        and info is the translation_info.json dict (or empty dict if missing).
-    """
-    csv_path = translations_dir / TRANSLATIONS_CSV
+    basename: str,
+    *,
+    band_label: str = "",
+) -> List[Dict[str, str]]:
+    csv_path = translations_dir / basename
     if not csv_path.exists():
         raise FileNotFoundError(f"Translations CSV not found: {csv_path}")
-
-    pairs: List[Dict[str, str]] = []
+    out: List[Dict[str, str]] = []
     with open(csv_path, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
             word = (row.get("word") or "").strip()
             translation = (row.get("translation_ru") or "").strip()
             if word:
-                pairs.append({"word": word, "translation_ru": translation})
+                item: Dict[str, str] = {"word": word, "translation_ru": translation}
+                if band_label:
+                    item["band_label"] = band_label
+                out.append(item)
+    return out
+
+
+def load_translations(
+    translations_dir: Path,
+    *,
+    translation_csvs: Optional[Sequence[str]] = None,
+) -> Tuple[List[Dict[str, str]], Dict[str, Any]]:
+    """Load word-translation pairs and episode info.
+
+    Args:
+        translations_dir: Episode directory with CSVs and translation_info.json.
+        translation_csvs: Basenames to load (in order). Default: tier_1 only.
+            For merged Frequent B pass
+            ["tier_b1_translations.csv", "tier_b2_translations.csv"] — rows get band_label B1/B2.
+
+    Returns:
+        (pairs, info) where each pair has word, translation_ru, and optional band_label.
+    """
+    translations_dir = Path(translations_dir)
+    basenames = (
+        list(translation_csvs)
+        if translation_csvs is not None
+        else [TRANSLATIONS_CSV]
+    )
+    if not basenames:
+        raise FileNotFoundError("translation_csvs is empty.")
+
+    pairs: List[Dict[str, str]] = []
+    for bn in basenames:
+        label = _CSV_BAND_LABEL.get(bn, "")
+        pairs.extend(_load_one_translation_csv(translations_dir, bn, band_label=label))
 
     info_path = translations_dir / TRANSLATION_INFO_JSON
     info: Dict[str, Any] = {}
@@ -165,6 +150,50 @@ def load_translations(
 # Prompt builder
 # ---------------------------------------------------------------------------
 
+def _criterion_3_block(level_profile: str) -> str:
+    if level_profile == LEVEL_PROFILE_FREQUENT_C:
+        return """=== CRITERION 3: C-Level English Vocabulary (CEFR C1/C2) ===
+The purpose of this word list is to teach advanced (C-level) vocabulary to Russian speakers.
+For every source word, assess its CEFR difficulty:
+- Words SHOULD be C1 or C2 — advanced, specialized, or uncommon vocabulary.
+- Flag words that are too basic for a C-level learning list:
+  * A1/A2: extremely common words (e.g. "loved", "stopped", "fake", "tire", "flip")
+  * B1/B2: fairly common words that most intermediate learners would already know
+- Do NOT flag words that are legitimately difficult even if they look simple.
+Score 0–10 (10 = all words are genuinely C1/C2 level; 0 = list is full of basic vocabulary)."""
+
+    if level_profile == LEVEL_PROFILE_FREQUENT_B_MERGED:
+        return """=== CRITERION 3: B-Level English Vocabulary (CEFR B1 / B2) ===
+Each row is prefixed with [B1] or [B2] showing which sub-band it belongs to.
+- Rows marked [B1]: should be genuine B1-level vocabulary — not trivial A1/A2.
+- Rows marked [B2]: should be genuine B2-level vocabulary — not mostly A1/A2/B1-easy.
+- Flag words that are clearly the wrong band (e.g. [B2] row that is only A2; [B1] row that is C1 specialist jargon with no B1 justification).
+Score 0–10 (10 = band tags match actual difficulty; 0 = badly miscalibrated list)."""
+
+    if level_profile == LEVEL_PROFILE_RARE_C:
+        return """=== CRITERION 3: Advanced (C-band) words rare in this series ===
+This list is meant to highlight advanced English vocabulary that appears rarely in THIS episode/series.
+- Words should be genuine C1/C2-level English vocabulary (not basic A/B junk).
+- Flag entries that are too elementary for an "advanced rare" list, or that are mislabeled (e.g. ultra-common words).
+- The "rare in series" idea is contextual frequency; still enforce that items belong in an advanced learning band.
+Score 0–10 (10 = appropriate advanced band; 0 = list misfits the intended band)."""
+
+    if level_profile == LEVEL_PROFILE_RARE_B:
+        return """=== CRITERION 3: B-band words rare in this series ===
+This list is meant for B1/B2-level vocabulary that appears rarely in THIS episode/series.
+- Words should sit in the B1–B2 range — not mostly A1/A2 trivia, and not specialist C1/C2-only jargon unless context justifies it.
+- Flag clear band mismatches and entries that do not belong on a B-learner list.
+Score 0–10 (10 = band-appropriate; 0 = poorly calibrated)."""
+
+    # Fallback: same as frequent C
+    return _criterion_3_block(LEVEL_PROFILE_FREQUENT_C)
+
+
+def _pair_display_prefix(p: Dict[str, str]) -> str:
+    bl = (p.get("band_label") or "").strip()
+    return f"[{bl}] " if bl else ""
+
+
 def _build_prompt(
     pairs: List[Dict[str, str]],
     series_name: str,
@@ -172,13 +201,16 @@ def _build_prompt(
     episode: int,
     subtitle_context: str,
     examples: Dict[str, List[str]],
+    *,
+    level_profile: str = LEVEL_PROFILE_FREQUENT_C,
 ) -> str:
     # Build word list table
     word_lines = []
     for p in pairs:
         word = p["word"]
         tr = p["translation_ru"] or "(empty)"
-        word_lines.append(f'  "{word}" → "{tr}"')
+        prefix = _pair_display_prefix(p)
+        word_lines.append(f'  {prefix}"{word}" → "{tr}"')
     word_block = "\n".join(word_lines)
 
     # Build examples block
@@ -198,6 +230,8 @@ def _build_prompt(
         if len(subtitle_context) > SUBTITLE_CONTEXT_CHARS
         else subtitle_context
     )
+
+    crit3 = _criterion_3_block(level_profile)
 
     return f"""You are an expert evaluator of English vocabulary translation quality.
 Your task is to judge a list of English words and their Russian translations taken from a TV series episode.
@@ -241,17 +275,11 @@ For every SOURCE English word:
 These should have been filtered before translation. Identify any that slipped through.
 Score 0–10 (10 = no violations — all words are genuine English vocabulary; 0 = many violations).
 
-=== CRITERION 3: C-Level English Vocabulary (CEFR C1/C2) ===
-The purpose of this word list is to teach advanced (C-level) vocabulary to Russian speakers.
-For every source word, assess its CEFR difficulty:
-- Words SHOULD be C1 or C2 — advanced, specialized, or uncommon vocabulary.
-- Flag words that are too basic for a C-level learning list:
-  * A1/A2: extremely common words (e.g. "loved", "stopped", "fake", "tire", "flip")
-  * B1/B2: fairly common words that most intermediate learners would already know
-- Do NOT flag words that are legitimately difficult even if they look simple.
-Score 0–10 (10 = all words are genuinely C1/C2 level; 0 = list is full of basic vocabulary).
+{crit3}
 
 ---
+For criterion_3, always use the key "not_c_level" for words that fail the band check (use estimated_level like A1/A2/B1/B2/C1/C2 as appropriate, and reason explaining the mismatch).
+
 Return ONLY a valid JSON object with EXACTLY this structure (no markdown, no extra text):
 {{
   "criterion_1": {{
@@ -270,7 +298,7 @@ Return ONLY a valid JSON object with EXACTLY this structure (no markdown, no ext
     "score": <integer 0-10>,
     "reasoning": "<detailed reasoning>",
     "not_c_level": [
-      {{"word": "<english_word>", "estimated_level": "<A1/A2/B1/B2>", "reason": "<why too basic>"}}
+      {{"word": "<english_word>", "estimated_level": "<A1/A2/B1/B2/C1/C2>", "reason": "<why it fails criterion 3>"}}
     ]
   }},
   "overall_score": <float: average of 3 scores rounded to 1 decimal>,
@@ -288,16 +316,21 @@ def judge_translations(
     api_key: Optional[str] = None,
     model: str = JUDGE_MODEL,
     subtitle_base: Optional[Path] = None,
+    *,
+    translation_csvs: Optional[Sequence[str]] = None,
+    level_profile: str = LEVEL_PROFILE_FREQUENT_C,
 ) -> Dict[str, Any]:
     """
     Evaluate translations in translations_dir using an LLM judge.
 
     Args:
-        translations_dir: Directory containing tier_1_translations.csv and translation_info.json
+        translations_dir: Directory containing translation CSVs and translation_info.json
         subtitle_path:    Explicit subtitle file path (optional; inferred from info if omitted)
-        api_key:          OpenAI API key (falls back to OPENAI_API_KEY env / telegram_bot fallback)
+        api_key:          OpenAI API key (falls back to OPENAI_API_KEY env)
         model:            OpenAI model to use (default: gpt-4o)
         subtitle_base:    Base directory for subtitles when inferring path (default: Subtitle/)
+        translation_csvs: Optional list of CSV basenames (default: tier_1 only)
+        level_profile:    frequent_c | frequent_b_merged | rare_c | rare_b (criterion 3 wording)
 
     Returns:
         Dict with judgment results, including scores and reasoning per criterion.
@@ -305,15 +338,20 @@ def judge_translations(
         On error, includes "error" key with description.
     """
     translations_dir = Path(translations_dir).resolve()
+    csvs_list = list(translation_csvs) if translation_csvs is not None else None
     result: Dict[str, Any] = {
         "translations_dir": str(translations_dir),
         "judged_at": datetime.now().isoformat(),
         "model": model,
+        "level_profile": level_profile,
+        "translation_csvs": csvs_list or [TRANSLATIONS_CSV],
     }
 
     # --- Load translations ---
     try:
-        pairs, info = load_translations(translations_dir)
+        pairs, info = load_translations(
+            translations_dir, translation_csvs=translation_csvs
+        )
     except FileNotFoundError as e:
         result["error"] = str(e)
         return result
@@ -362,12 +400,20 @@ def judge_translations(
         print(f"  Warning: no subtitle found for {series_name} S{season}E{episode}; judge will use word list only.")
 
     # --- Build prompt ---
-    prompt = _build_prompt(pairs, series_name, season, episode, subtitle_context, examples)
+    prompt = _build_prompt(
+        pairs,
+        series_name,
+        season,
+        episode,
+        subtitle_context,
+        examples,
+        level_profile=level_profile,
+    )
 
     # --- Call OpenAI ---
     resolved_key = _load_api_key(api_key)
     if not resolved_key:
-        result["error"] = "OpenAI API key not set (OPENAI_API_KEY env or telegram_bot fallback)."
+        result["error"] = "OpenAI API key not set (OPENAI_API_KEY environment variable)."
         return result
 
     try:
@@ -462,7 +508,32 @@ def main() -> None:
         "--translations-dir",
         type=Path,
         required=True,
-        help="Directory containing tier_1_translations.csv and translation_info.json",
+        help="Directory containing translation CSVs and translation_info.json",
+    )
+    parser.add_argument(
+        "--translations-csv",
+        action="append",
+        default=None,
+        metavar="BASENAME",
+        help=(
+            "Translation CSV basename inside the dir (repeat for merged load). "
+            "Default: tier_1_translations.csv only."
+        ),
+    )
+    parser.add_argument(
+        "--level-profile",
+        type=str,
+        default=None,
+        choices=(
+            LEVEL_PROFILE_FREQUENT_C,
+            LEVEL_PROFILE_FREQUENT_B_MERGED,
+            LEVEL_PROFILE_RARE_C,
+            LEVEL_PROFILE_RARE_B,
+        ),
+        help=(
+            "CEFR framing for criterion 3. "
+            "Default: frequent_c for a single CSV; frequent_b_merged when multiple --translations-csv."
+        ),
     )
     parser.add_argument(
         "--subtitle",
@@ -508,12 +579,23 @@ def main() -> None:
             base / args.subtitle if not args.subtitle.is_absolute() else args.subtitle
         )
 
+    csvs = args.translations_csv
+    translation_csvs = csvs if csvs else None
+    if args.level_profile:
+        level_profile = args.level_profile
+    elif csvs and len(csvs) > 1:
+        level_profile = LEVEL_PROFILE_FREQUENT_B_MERGED
+    else:
+        level_profile = LEVEL_PROFILE_FREQUENT_C
+
     result = judge_translations(
         translations_dir=translations_dir,
         subtitle_path=subtitle_path,
         api_key=args.openai_api_key,
         model=args.model,
         subtitle_base=args.subtitle_base_dir,
+        translation_csvs=translation_csvs,
+        level_profile=level_profile,
     )
 
     output_text = json.dumps(result, ensure_ascii=False, indent=2)

@@ -1,0 +1,143 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S2 E2/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.756699",
+  "model": "gpt-5.4-mini",
+  "level_profile": "rare_b",
+  "translation_csvs": [
+    "tier_4_rare_b_translations.csv"
+  ],
+  "series": "Euphoria S2 E2",
+  "season": 1,
+  "episode": 1,
+  "word_count": 20,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 6,
+    "reasoning": "Most pairs are translated into valid Russian equivalents, and many are semantically correct at a general dictionary level: source→источник, article→статья, sex→секс, decision→решение, death→смерть, loss→потеря, recent→недавний, human→человек, act→поступок, beauty→красота, store→магазин, statement→утверждение. However, several translations are either too context-dependent or clearly wrong for the likely meaning in an episode subtitle list. 'least' is translated as 'по крайней мере', which means 'at least' rather than 'least'; 'effect'→'следствие' is only one possible sense and may be wrong if the subtitle meant 'effect' as 'impact'; 'figure'→'понять' is not a translation of the noun/verb 'figure' and is a mismatch; 'found'→'счёл' is an unusual past tense form and may not match the intended sense; 'though'→'правда' is not the usual equivalent for the conjunction/adverb 'though'; 'power'→'влияние' is only one sense and may be too narrow. 'control'→'контролировать себя' is a paraphrase rather than a direct lexical translation, and 'cell'→'мобильный телефон' is correct only if the subtitle context is clearly 'cell phone'.",
+    "issues": [
+      {
+        "word": "least",
+        "translation": "по крайней мере",
+        "issue": "Wrong phrase: this means 'at least', not the standalone word 'least'."
+      },
+      {
+        "word": "effect",
+        "translation": "следствие",
+        "issue": "Possible wrong sense; 'effect' usually means 'эффект/воздействие', while 'следствие' is 'consequence'."
+      },
+      {
+        "word": "figure",
+        "translation": "понять",
+        "issue": "Incorrect part of speech and meaning; 'figure' is not translated as 'понять'."
+      },
+      {
+        "word": "found",
+        "translation": "счёл",
+        "issue": "Likely wrong or overly specific sense; the translation does not clearly match the common meanings of 'found'."
+      },
+      {
+        "word": "though",
+        "translation": "правда",
+        "issue": "Wrong sense; 'though' is usually 'хотя/впрочем', not 'правда'."
+      },
+      {
+        "word": "power",
+        "translation": "влияние",
+        "issue": "Only one possible sense; may be too narrow if the context meant 'power' as 'сила/власть'."
+      },
+      {
+        "word": "control",
+        "translation": "контролировать себя",
+        "issue": "Paraphrase rather than direct translation; may be acceptable in context but is not a clean lexical equivalent."
+      },
+      {
+        "word": "cell",
+        "translation": "мобильный телефон",
+        "issue": "Correct only if the intended meaning is 'cell phone'; otherwise too specific."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary words. None of the entries are character names, place names, personal names, invented terms, or foreign words masquerading as English. The list is lexically valid as a vocabulary set.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list mixes some B1/B2 vocabulary with many very basic A1/A2 words. While words like source, decision, recent, effect, figure, statement, and loss can fit a learner list, entries such as sex, cell, death, human, act, beauty, store, control, and least are generally too elementary for a B1/B2-focused rare-vocabulary set. The calibration is therefore weak because a substantial portion of the list is not band-appropriate for the stated goal.",
+    "not_c_level": [
+      {
+        "word": "control",
+        "estimated_level": "A2",
+        "reason": "Common everyday verb; too basic for a B1/B2 rare-vocabulary list."
+      },
+      {
+        "word": "least",
+        "estimated_level": "A2",
+        "reason": "High-frequency basic word; not a good fit for a B1/B2 target list."
+      },
+      {
+        "word": "article",
+        "estimated_level": "A2",
+        "reason": "Common school-level vocabulary; too easy for this band."
+      },
+      {
+        "word": "sex",
+        "estimated_level": "A2",
+        "reason": "Basic common vocabulary, not band-appropriate as rare B1/B2 item."
+      },
+      {
+        "word": "cell",
+        "estimated_level": "A2",
+        "reason": "If meaning 'cell phone', this is still basic everyday vocabulary."
+      },
+      {
+        "word": "decision",
+        "estimated_level": "A2",
+        "reason": "Very common word; usually below the intended difficulty range."
+      },
+      {
+        "word": "death",
+        "estimated_level": "A2",
+        "reason": "Basic high-frequency vocabulary."
+      },
+      {
+        "word": "loss",
+        "estimated_level": "A2",
+        "reason": "Common everyday noun; not rare enough for a B1/B2 list."
+      },
+      {
+        "word": "human",
+        "estimated_level": "A2",
+        "reason": "Basic vocabulary; too easy for the stated band."
+      },
+      {
+        "word": "act",
+        "estimated_level": "A2",
+        "reason": "Very common word with multiple basic senses; not a strong B1/B2 target."
+      },
+      {
+        "word": "beauty",
+        "estimated_level": "A2",
+        "reason": "Common basic noun; not rare enough."
+      },
+      {
+        "word": "store",
+        "estimated_level": "A1",
+        "reason": "Elementary vocabulary."
+      },
+      {
+        "word": "statement",
+        "estimated_level": "B1",
+        "reason": "This one is acceptable, but the list overall is still dominated by lower-level items."
+      }
+    ]
+  },
+  "overall_score": 6.7,
+  "summary": "The translations are mostly valid at a broad dictionary level, but several entries are inaccurate or too context-dependent, especially least, figure, though, and found. The source list is linguistically clean, but the vocabulary set is poorly calibrated for a B1/B2 rare-word list because many items are basic A1/A2 words.",
+  "tokens_used": {
+    "prompt": 1298,
+    "completion": 1483,
+    "total": 2781
+  }
+}

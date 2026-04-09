@@ -1,0 +1,68 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Breaking Bad/Season 1/1",
+  "judged_at": "2026-04-05T22:56:06.765858",
+  "model": "gpt-5.4-mini",
+  "level_profile": "frequent_c",
+  "translation_csvs": [
+    "tier_1_translations.csv"
+  ],
+  "series": "Breaking Bad",
+  "season": 1,
+  "episode": 1,
+  "word_count": 8,
+  "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Breaking Bad/Season 1/breaking_bad_s1_e1.srt",
+  "criterion_1": {
+    "score": 8,
+    "reasoning": "Most translations are correct and context-appropriate. 'cholesterol' → 'холестерин', 'methamphetamine' → 'метамфетамин', 'phosphine' → 'фосфин', 'millilitre' → 'миллилитр', and 'phosphorus' → 'фосфор' are accurate. 'volumetric' → 'мерный' is acceptable in this lab context, though slightly generic; 'volumetric flask' is normally rendered as 'мерная колба', so the adjective alone is still understandable. The main issue is 'beaner' → 'мексикашка': this is a pejorative slang label, not a neutral translation, but it does capture the insulting sense in context. 'ese' → 'приятель' is also only partially correct: in the subtitle context it is a Chicano slang vocative, and 'приятель' conveys the address but loses the ethnic/slang flavor. Overall, the list is mostly complete and semantically aligned, with only mild contextual/style mismatches.",
+    "issues": [
+      {
+        "word": "beaner",
+        "translation": "мексикашка",
+        "issue": "Contextually the insult is captured, but the Russian rendering is a different slang slur and not a direct equivalent; it is harsh and culturally shifted."
+      },
+      {
+        "word": "ese",
+        "translation": "приятель",
+        "issue": "Meaning is only partially preserved: it conveys an informal address, but loses the specific Chicano slang nuance."
+      },
+      {
+        "word": "volumetric",
+        "translation": "мерный",
+        "issue": "Acceptable but somewhat generic; in this lab context the more precise equivalent would be tied to 'мерная колба' rather than the adjective alone."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "All source items are genuine English vocabulary items used in the episode. None of the listed words are character names, place names, or non-English insertions that should have been filtered out. Even 'beaner' and 'ese' are slang words in English usage within the dialogue context, not non-English source entries.",
+    "violations": []
+  },
+  "criterion_3": {
+    "score": 4,
+    "reasoning": "The list contains several specialized chemistry terms that are clearly C1/C2, but it also includes multiple items that are too basic for a C-level vocabulary list. 'cholesterol' and 'methamphetamine' are specialized and fit the goal, and 'volumetric', 'phosphine', and 'phosphorus' are also advanced/scientific. However, 'millilitre' is a fairly common measurement term, and 'beaner' and 'ese' are slang expressions rather than advanced academic vocabulary. This makes the list mixed rather than consistently C-level.",
+    "not_c_level": [
+      {
+        "word": "millilitre",
+        "estimated_level": "B1",
+        "reason": "A common measurement term that many intermediate learners already know; not sufficiently advanced for a C-level list."
+      },
+      {
+        "word": "beaner",
+        "estimated_level": "B2",
+        "reason": "Slang/pejorative term rather than advanced vocabulary; not appropriate as a C1/C2 target item."
+      },
+      {
+        "word": "ese",
+        "estimated_level": "B2",
+        "reason": "Informal slang vocative borrowed from Chicano speech; useful culturally, but not C-level vocabulary."
+      }
+    ]
+  },
+  "overall_score": 7.3,
+  "summary": "The translations are mostly accurate, with strong performance on the scientific terms. The main weaknesses are stylistic/slang mismatches for 'beaner' and 'ese', and the inclusion of some words that are too basic or slangy for a true C-level vocabulary list.",
+  "tokens_used": {
+    "prompt": 2304,
+    "completion": 865,
+    "total": 3169
+  }
+}

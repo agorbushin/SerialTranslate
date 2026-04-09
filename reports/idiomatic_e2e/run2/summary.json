@@ -1,0 +1,257 @@
+{
+  "run_label": "run2",
+  "episodes": [
+    {
+      "key": "game_of_thrones_s1e1",
+      "series": "Game of Thrones",
+      "subtitle": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Game of Thrones/Season 1/game_of_thrones_s1_e1.srt",
+      "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/game_of_thrones_s1e1",
+      "extract_ok": true,
+      "judge": {
+        "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/game_of_thrones_s1e1",
+        "judged_at": "2026-04-01T23:03:36.976649",
+        "model": "gpt-5.4-mini",
+        "judge_kind": "idiomatic_expressions",
+        "series": "Game of Thrones",
+        "season": 1,
+        "episode": 1,
+        "expression_count": 8,
+        "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Game of Thrones/Season 1/game_of_thrones_s1_e1.srt",
+        "criterion_1": {
+          "score": 4,
+          "reasoning": "Step 1: Several translations are present and broadly correct. \"winter is coming\" → \"зима близко\" matches the episode’s recurring motto and is contextually right. \"the hand of the king\" → \"рука короля\" is a standard title gloss and fits the dialogue. \"the rightful king\" → \"законный король\" is also accurate in context. \"the andals and the first men\" → \"Андалы и Первые Люди\" is correct as a proper ethnonymic phrase.\n\nStep 2: Some entries are only partially correct because the Russian gloss is too literal or awkward. \"king of the andals\" → \"король Андалов\" is understandable, but in the episode it is part of the fixed title \"King of the Andals and the first men\"; the gloss should preserve that full title-like usage rather than isolate a fragment. \"back to the wall\" → \"назад к стене\" is literal, but in the subtitle it is used as a directional command and not an idiom; the translation is not wrong linguistically, but it is not a good idiomatic gloss.\n\nStep 3: One entry is clearly wrong: \"gods be good\" → \"да будет так, надеюсь, я всегда буду служить законному королю\" is not a translation of the source at all. The source is a brief exclamation/plea, roughly \"Боги, помогите\" / \"Дай-то боги\" / \"Храни нас боги\" depending on context. The provided Russian string is a long unrelated sentence.\n\nStep 4: \"right royal prick\" → \"настоящий королевский мудак\" is semantically close and captures the insult, though \"right royal\" is an intensifier and the Russian is slightly stylized. Overall it is acceptable. The main completeness problem is that one gloss is unrelated, and a few others are overly literal or not well adapted to the episode context.",
+          "issues": [
+            {
+              "expression": "gods be good",
+              "translation": "да будет так, надеюсь, я всегда буду служить законному королю",
+              "issue": "Completely incorrect and unrelated to the source; the English is a short exclamation, not a full sentence about serving the king."
+            },
+            {
+              "expression": "back to the wall",
+              "translation": "назад к стене",
+              "issue": "Literal but not idiomatic; in context it is just a directional phrase, so this is not a good learner gloss for an expression list."
+            },
+            {
+              "expression": "king of the andals",
+              "translation": "король Андалов",
+              "issue": "Too fragmentary for the episode context; it appears inside a fixed royal title and should be glossed as part of the full formula."
+            }
+          ]
+        },
+        "criterion_2": {
+          "score": 3,
+          "reasoning": "Step 1: A few entries are genuine formulaic or episode-relevant units. \"winter is coming\" is a clear recurring motto and a strong formula. \"the hand of the king\" is a fixed title. \"the rightful king\" is a meaningful political formula in this episode. \"gods be good\" is a real exclamation, though the list’s translation is wrong.\n\nStep 2: Several entries are not really idioms or opaque formulae; they are transparent compositional phrases. \"king of the andals\" is just a title fragment, not a standalone idiom. \"the andals and the first men\" is a proper-noun coordination, not an idiom. \"back to the wall\" here is a literal directional phrase, not the idiom \"with one's back to the wall\" or a special formula.\n\nStep 3: \"right royal prick\" is a colloquial insult and somewhat formulaic, but it is not a stable idiom worth prioritizing as a learner unit compared with more established expressions. Overall, the list mixes a few strong formulae with multiple transparent or fragmentary strings, so it is mostly false positives as an idiom list.",
+          "invalid_expressions": [
+            {
+              "expression": "king of the andals",
+              "reason": "Not an idiom; it is only a fragment of a longer title and is fully compositional."
+            },
+            {
+              "expression": "the andals and the first men",
+              "reason": "A proper-noun coordination, not an idiomatic or formulaic expression in the usual sense."
+            },
+            {
+              "expression": "back to the wall",
+              "reason": "In the shown context it is literal direction, not the idiom 'with one's back to the wall' or a fixed formula."
+            },
+            {
+              "expression": "the hand of the king",
+              "reason": "A title, not an idiom; useful as terminology, but not an idiomatic expression."
+            },
+            {
+              "expression": "the rightful king",
+              "reason": "A transparent political phrase rather than a distinct idiom or opaque collocation."
+            }
+          ]
+        },
+        "overall_score": 3.5,
+        "summary": "The translation set contains a few good episode-specific formulas, but one gloss is badly wrong and several others are too literal or fragmentary. As an idiom list, it also overincludes transparent titles and compositional phrases that are not true idiomatic units.",
+        "improvement_suggestions": [
+          "Filter out transparent title fragments and proper-noun coordinations unless they function as fixed episode formulas.",
+          "Require each Russian gloss to be a direct, context-matched translation of the exact subtitle line, not a paraphrase or unrelated sentence.",
+          "Add an idiom-vs-title-vs-literal-phrase classifier before translation evaluation to reduce false positives."
+        ],
+        "tokens_used": {
+          "prompt": 2078,
+          "completion": 1257,
+          "total": 3335
+        }
+      },
+      "judge_report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/game_of_thrones_s1e1/idiomatic_judge_report.json"
+    },
+    {
+      "key": "euphoria_s1e4",
+      "series": "Euphoria S1 E4",
+      "subtitle": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Euphoria/Season 1/euphoria_s1_e4.srt",
+      "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/euphoria_s1e4",
+      "extract_ok": true,
+      "judge": {
+        "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/euphoria_s1e4",
+        "judged_at": "2026-04-01T23:04:00.932688",
+        "model": "gpt-5.4-mini",
+        "judge_kind": "idiomatic_expressions",
+        "series": "Euphoria S1 E4",
+        "season": 1,
+        "episode": 4,
+        "expression_count": 16,
+        "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Euphoria/Season 1/euphoria_s1_e4.srt",
+        "criterion_1": {
+          "score": 6,
+          "reasoning": "Step 1: Several translations are present and broadly correct in meaning, especially for clear formulaic items like \"oh my god\" → \"о боже мой\", \"i swear to god\" → \"клянусь богом\", \"no fucking way\" → \"да ну нахуй\", and \"a lot of shit\" → \"много дерьма\". Step 2: Some glosses are too literal or slightly off for the episode context. For example, \"that big of a deal\" is better rendered as \"настолько большая проблема/дело\" rather than the more awkward \"это такая большая проблема\"; \"is a big deal\" as \"это большая сделка\" is wrong because here it means \"это важно/это серьёзно\", not a business deal. Step 3: \"am i supposed to know\" is acceptable but the Russian should reflect the rhetorical complaint more naturally, e.g. \"откуда я должен знать?\" rather than a bare \"я должен знать?\". Step 4: \"dressed like a hooker\" is understandable, but \"шлюха\" is a strong, direct equivalent and may be acceptable only if the subtitle tone is preserved; still, it is contextually fine. Step 5: Some entries are incomplete or too generic: \"please don’t\" → \"пожалуйста, не\" is unfinished as a standalone gloss; \"don t even\" → \"даже не\" is also incomplete; \"i hadn t\" → \"я не\" is not a translation of the past perfect negation and is too vague. Step 6: A few items are missing from the subtitle examples, but the task is about the translation list itself; the main issue is that several glosses are either overly literal or not idiomatic Russian. Overall, the set is partially correct but not consistently learner-friendly or context-precise.",
+          "issues": [
+            {
+              "expression": "that big of a deal",
+              "translation": "это такая большая проблема",
+              "issue": "Understandable, but slightly awkward and not the most natural Russian for the rhetorical use in dialogue; better would be something like \"настолько большая проблема/дело\"."
+            },
+            {
+              "expression": "am i supposed to know",
+              "translation": "я должен знать?",
+              "issue": "Too literal and missing the rhetorical sense; in context it means \"откуда я должен знать?\" / \"я что, должен это знать?\"."
+            },
+            {
+              "expression": "wasn t really",
+              "translation": "на самом деле не было",
+              "issue": "Too generic and incomplete as a gloss; it needs the subject or a more natural Russian equivalent depending on context."
+            },
+            {
+              "expression": "is a big deal",
+              "translation": "это большая сделка",
+              "issue": "Wrong sense: \"deal\" here means \"важное дело/серьёзная проблема\", not a commercial deal."
+            },
+            {
+              "expression": "please don t",
+              "translation": "пожалуйста, не",
+              "issue": "Incomplete fragment rather than a usable translation; it needs the following verb or a fuller Russian imperative."
+            },
+            {
+              "expression": "don t even",
+              "translation": "даже не",
+              "issue": "Incomplete and too fragmentary; as a formula it usually needs continuation or a pragmatic equivalent."
+            },
+            {
+              "expression": "i hadn t",
+              "translation": "я не",
+              "issue": "Incorrectly reduced; it does not convey past perfect negation and is too vague to be a usable gloss."
+            }
+          ]
+        },
+        "criterion_2": {
+          "score": 4,
+          "reasoning": "Step 1: Some entries are genuine formulaic units worth studying, such as \"oh my god\", \"i swear to god\", \"no fucking way\", and \"i m sorry\". Step 2: However, a large portion of the list consists of transparent grammatical fragments or ordinary compositional chunks rather than idioms. Step 3: Items like \"am i supposed to know\", \"wasn t really\", \"i hadn t\", and \"please don t\" are not idioms; they are routine syntax patterns. Step 4: \"that big of a deal\" and \"is a big deal\" are common collocations, but not especially idiomatic or opaque; they are more like reusable conversational phrases. Step 5: \"whatever the fuck\" is a strong discourse formula and acceptable, but \"dressed like a hooker\" is not an idiom, just a descriptive insult. Step 6: \"don t even\" can be a formulaic truncation in speech, but it is still borderline and context-dependent; \"a lot of shit\" is transparent slang, not an idiom. Overall, the list mixes a few valid formulaic expressions with many false positives from ordinary grammar and slang.",
+          "invalid_expressions": [
+            {
+              "expression": "that big of a deal",
+              "reason": "Common conversational phrase, but not a strong idiom or opaque formula; mostly transparent grammar."
+            },
+            {
+              "expression": "am i supposed to know",
+              "reason": "Routine question pattern, not an idiom; it is ordinary compositional English."
+            },
+            {
+              "expression": "wasn t really",
+              "reason": "Incomplete grammatical fragment, not a formulaic expression worth isolating."
+            },
+            {
+              "expression": "i m telling you",
+              "reason": "Very common discourse marker, but mostly transparent and not idiomatic enough for an idiom list."
+            },
+            {
+              "expression": "please don t",
+              "reason": "Plain polite imperative fragment, not an idiom or fixed formula."
+            },
+            {
+              "expression": "is a big deal",
+              "reason": "Transparent collocation; useful phrase, but not idiomatic in the strict sense."
+            },
+            {
+              "expression": "don t even",
+              "reason": "Truncated speech fragment; formulaic in dialogue, but not a stable idiom."
+            },
+            {
+              "expression": "i hadn t",
+              "reason": "Pure grammar fragment, not an idiom or formula."
+            },
+            {
+              "expression": "a lot of shit",
+              "reason": "Slangy but compositional; not an idiom or opaque collocation."
+            },
+            {
+              "expression": "dressed like a hooker",
+              "reason": "Insulting description, not an idiom or formulaic expression."
+            }
+          ]
+        },
+        "overall_score": 5.0,
+        "summary": "The translations are mixed: several high-frequency exclamations and swear-formulas are fine, but a number of glosses are too literal, incomplete, or semantically off. The extraction list also contains many transparent grammar chunks and ordinary slang phrases that are not strong idioms, so it is only partially suitable for learner study.",
+        "improvement_suggestions": [
+          "Filter out plain grammatical fragments and transparent collocations unless they recur as fixed discourse formulas with clear pragmatic value.",
+          "Require each Russian gloss to be a complete, natural learner-facing equivalent in the episode context, not a literal word-for-word fragment.",
+          "Add an automatic check for idiom-likeness: keep exclamations, discourse markers, and opaque slang formulas; reject routine syntax patterns like \"I hadn't\" or \"please don't\"."
+        ],
+        "tokens_used": {
+          "prompt": 2242,
+          "completion": 1603,
+          "total": 3845
+        }
+      },
+      "judge_report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/euphoria_s1e4/idiomatic_judge_report.json"
+    },
+    {
+      "key": "fallout_s2e3",
+      "series": "Fallout S2 E3",
+      "subtitle": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Fallout/Season 2/fallout_s2_e3.srt",
+      "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/fallout_s2e3",
+      "extract_ok": true,
+      "judge": {
+        "output_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/fallout_s2e3",
+        "judged_at": "2026-04-01T23:04:19.485101",
+        "model": "gpt-5.4-mini",
+        "judge_kind": "idiomatic_expressions",
+        "series": "Fallout S2 E3",
+        "season": 2,
+        "episode": 3,
+        "expression_count": 6,
+        "subtitle_used": "/Users/arseniygorbushin/Documents/SerialTranslate/Subtitle/Fallout/Season 2/fallout_s2_e3.srt",
+        "criterion_1": {
+          "score": 9,
+          "reasoning": "Step 1: Check whether each Russian gloss is present and usable. All six entries have non-empty Russian translations, and none are left in English or marked as missing. Step 2: Check contextual fit in this episode. \"нужно быть готовым\" matches the imperative \"Gotta be ready.\"; \"как кошки с собаками\" fits the repeated conflict comparison; \"иерархия командования\" is a good rendering of \"chain of command\" in a military context; \"плохой парень\" is acceptable for the moral framing in \"the bad guy\"; \"ну, вы знаете, как это\" matches the discourse formula \"Well you know how it is around here\"; and \"до войны\" correctly renders the temporal phrase \"before the war.\" Step 3: Note minor nuance issues. \"плохой парень\" is slightly colloquial and can sound more like a literal 'bad guy' than the broader moral label 'the bad one / villain', but it is still acceptable in context. Overall the translations are complete and contextually correct.",
+          "issues": [
+            {
+              "expression": "the bad guy",
+              "translation": "плохой парень",
+              "issue": "Slightly colloquial and a bit literal; in context it means 'the villain / the bad one', though the gloss is still acceptable."
+            }
+          ]
+        },
+        "criterion_2": {
+          "score": 5,
+          "reasoning": "Step 1: Identify which items are genuinely idiomatic or formulaic. \"like cats and dogs\" is a real idiom; \"chain of command\" is a fixed institutional collocation worth learning; \"the bad guy\" is a common formulaic label; \"well you know how it\" is a discourse fragment of a formula; and \"before the war\" is a recurring episode/world-building phrase but not an idiom. Step 2: Flag transparent or weakly idiomatic items. \"gotta be ready\" is just a contracted obligation statement, not an idiom. \"before the war\" is a plain temporal phrase, not a formulaic expression in the idiom sense. Step 3: Judge the list as a whole. Several entries are useful learner chunks, but at least two are clear false positives for an idiom list, so the set is only partially valid as idiomatic/formulaic material.",
+          "invalid_expressions": [
+            {
+              "expression": "gotta be ready",
+              "reason": "Transparent contracted grammar ('have got to be ready'), not an idiom or special formula."
+            },
+            {
+              "expression": "before the war",
+              "reason": "Plain compositional time phrase, not a fixed idiom or notable formulaic unit."
+            }
+          ]
+        },
+        "overall_score": 7.0,
+        "summary": "The Russian translations are generally accurate and well matched to the episode context. The main weakness is the inclusion of a few transparent phrases that do not really qualify as idioms or strong formulaic units.",
+        "improvement_suggestions": [
+          "Tighten extraction rules to exclude transparent grammatical chunks and ordinary time phrases unless they recur as episode-specific catchphrases.",
+          "Add a filter that prioritizes opaque or semi-opaque collocations and discourse formulas, and down-ranks contracted obligation patterns like 'gotta be ready'."
+        ],
+        "tokens_used": {
+          "prompt": 1872,
+          "completion": 726,
+          "total": 2598
+        }
+      },
+      "judge_report_path": "/Users/arseniygorbushin/Documents/SerialTranslate/reports/idiomatic_e2e/run2/fallout_s2e3/idiomatic_judge_report.json"
+    }
+  ],
+  "mean_overall_score": 5.17
+}

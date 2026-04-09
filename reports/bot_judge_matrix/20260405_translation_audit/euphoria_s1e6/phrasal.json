@@ -1,0 +1,54 @@
+{
+  "translations_dir": "/Users/arseniygorbushin/Documents/SerialTranslate/translations/Euphoria S1 E6/Season 1/1",
+  "judged_at": "2026-04-06T02:53:53.756112",
+  "model": "gpt-5.4-mini",
+  "judge_kind": "phrasal_verbs",
+  "series": "Euphoria S1 E6",
+  "season": 1,
+  "episode": 1,
+  "phrasal_count": 9,
+  "subtitle_used": null,
+  "criterion_1": {
+    "score": 2,
+    "reasoning": "Step 1: Most entries have a Russian gloss present and not empty, so the list is not failing on formatting. Step 2: However, the subtitle search found no matching lines for any of the listed phrasal verbs in the provided episode context, so there is no evidence that these glosses were validated against actual usage in this episode. Step 3: Several translations are semantically too broad or potentially wrong for the intended phrasal meaning: 'come on' → 'давай' is acceptable in many contexts but can be too generic; 'fuck up' → 'провалиться' is not the usual direct equivalent for the phrasal verb and is likely the wrong sense; 'hooked up with' → 'переспал с' is narrower than the English phrase, which can mean had sex but also simply made out or got together depending on context; 'hooked up' → 'переспал' has the same issue; 'ran into' → 'встретил' is acceptable but slightly incomplete because it usually means 'bumped into/met by chance'. Step 4: Because the episode evidence is absent and several glosses are either overly generic or sense-mismatched, the overall translation quality is poor but not entirely absent.",
+    "issues": [
+      {
+        "phrasal_verb": "come on",
+        "translation": "давай",
+        "issue": "Present and plausible, but context-dependent and somewhat generic; can miss the force of encouragement, disbelief, or urging."
+      },
+      {
+        "phrasal_verb": "fuck up",
+        "translation": "провалиться",
+        "issue": "Likely wrong sense for the phrasal verb; 'fuck up' usually means 'испортить', 'облажаться', or 'провалить', not simply 'провалиться'."
+      },
+      {
+        "phrasal_verb": "hooked up with",
+        "translation": "переспал с",
+        "issue": "Too narrow; 'hook up with' can mean have sex, make out, or get together, depending on context."
+      },
+      {
+        "phrasal_verb": "hooked up",
+        "translation": "переспал",
+        "issue": "Too narrow and missing the possibility of non-sexual or less explicit meanings; also lacks the preposition when the source is used transitively with 'with'."
+      },
+      {
+        "phrasal_verb": "ran into",
+        "translation": "встретил",
+        "issue": "Mostly correct, but slightly incomplete because the idiom specifically means 'met/bumped into by chance'."
+      }
+    ]
+  },
+  "criterion_2": {
+    "score": 10,
+    "reasoning": "Step 1: Every source string is a genuine English phrasal verb or established verb-particle/verb-preposition idiom. Step 2: 'run away', 'come on', 'blacked out', 'hooked up with', 'fuck up', 'whine about', 'fuck off', 'hooked up', and 'ran into' are all standard lexical items in English, not accidental word adjacency. Step 3: Some are informal or vulgar, but that does not make them invalid; they remain real idiomatic multiword verbs. Step 4: Therefore, all entries pass the phrasal-idiom validity criterion.",
+    "invalid_phrasals": []
+  },
+  "overall_score": 6.0,
+  "summary": "The source phrases are all genuine phrasal-type idioms, so criterion 2 is strong. Criterion 1 is weaker because the episode evidence is missing and several Russian glosses are too broad or slightly off in sense, especially 'fuck up' and the 'hooked up' entries.",
+  "tokens_used": {
+    "prompt": 1026,
+    "completion": 829,
+    "total": 1855
+  }
+}
