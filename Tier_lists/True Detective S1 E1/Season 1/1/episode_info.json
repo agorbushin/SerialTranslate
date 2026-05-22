@@ -4,7 +4,7 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "true_detective_s1_e1.srt",
-  "analysis_date": "2026-03-29T20:40:15.872151",
+  "analysis_date": "2026-05-22T11:38:46.258004",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 91495139,
@@ -12,13 +12,15 @@
     "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 11,
+    "tier_1_hard_usable": 14,
     "tier_2_random": 244,
     "tier_3_common": 23,
     "tier_4_rare_in_series": 8,
     "tier_5_filtered": 159,
     "tier_b1_words": 0,
-    "tier_b2_words": 15
+    "tier_b2_words": 16,
+    "tier_4_rare_c_words": 0,
+    "tier_4_rare_b_words": 29
   },
-  "excluded_names_fantasy_count": 57
+  "excluded_names_fantasy_count": 55
 }

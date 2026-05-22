@@ -4,7 +4,7 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "euphoria_s1_e3.srt",
-  "analysis_date": "2026-03-31T19:07:15.067890",
+  "analysis_date": "2026-05-22T11:31:23.219275",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 112534153,
@@ -18,7 +18,9 @@
     "tier_4_rare_in_series": 7,
     "tier_5_filtered": 149,
     "tier_b1_words": 2,
-    "tier_b2_words": 12
+    "tier_b2_words": 12,
+    "tier_4_rare_c_words": 1,
+    "tier_4_rare_b_words": 20
   },
   "excluded_names_fantasy_count": 36
 }

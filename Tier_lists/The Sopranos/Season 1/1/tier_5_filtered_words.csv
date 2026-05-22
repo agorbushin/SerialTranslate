@@ -6,6 +6,7 @@ duck,12,11897882,Vocabulary level below C (A2),A2
 mother,12,66782465,Oxford 3000,A1
 birthday,9,33891046,Oxford 3000,A1
 feeling,8,37845806,Easy word (easy_words.csv),B1
+garbage,8,6609450,Vocabulary level below C (A2),A2
 came,7,73311488,"High English frequency (73,311,488 > 20,000,000)",A2
 told,7,57248600,"High English frequency (57,248,600 > 20,000,000)",A2
 brother,7,56375413,Oxford 3000,A1
@@ -32,7 +33,7 @@ depressed,5,3358586,Oxford 3000,B1
 attack,4,55851080,Oxford 3000,B1
 maybe,4,51946944,Oxford 3000,A2
 build,4,83635409,Oxford 3000,A2
-trying,4,57462639,"High English frequency (57,462,639 > 20,000,000)",A2
+trying,4,57462639,"High English frequency (57,462,639 > 20,000,000)",B2
 fly,4,33412987,Oxford 3000,A1
 tower,4,28125182,Oxford 3000,B1
 happened,4,24951096,"High English frequency (24,951,096 > 20,000,000)",A2

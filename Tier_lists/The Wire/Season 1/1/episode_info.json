@@ -4,7 +4,7 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "the_wire_s1_e1.srt",
-  "analysis_date": "2026-03-31T17:13:15.973469",
+  "analysis_date": "2026-05-22T11:36:45.147197",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 100092676,
@@ -12,13 +12,15 @@
     "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 4,
-    "tier_2_random": 208,
+    "tier_1_hard_usable": 3,
+    "tier_2_random": 209,
     "tier_3_common": 16,
     "tier_4_rare_in_series": 9,
     "tier_5_filtered": 170,
     "tier_b1_words": 1,
-    "tier_b2_words": 26
+    "tier_b2_words": 27,
+    "tier_4_rare_c_words": 3,
+    "tier_4_rare_b_words": 22
   },
   "excluded_names_fantasy_count": 79
 }

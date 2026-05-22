@@ -253,6 +253,7 @@ wherever,2,6763200,Oxford 3000,B1
 hunt,2,15062955,Oxford 3000,B1
 middle,2,70231951,Oxford 3000,B2
 crowd,2,13848480,Oxford 3000,A2
+doorbell,2,543116,Vocabulary level below C (A2),A2
 mad,2,16741838,Oxford 3000,A2
 prison,2,18807326,Oxford 3000,B1
 lif,2,43191570,"High English frequency (43,191,570 > 20,000,000)",C1
@@ -279,7 +280,7 @@ photograph,2,30801033,Oxford 3000,A2
 prove,2,16046788,Oxford 3000,B1
 suppose,2,11981451,Oxford 3000,C1
 dinner,2,27843687,Oxford 3000,A1
-chinese,2,56057597,"High English frequency (56,057,597 > 20,000,000)",A2
+chinese,2,56057597,"High English frequency (56,057,597 > 20,000,000)",B2
 mother,2,66782465,Oxford 3000,A1
 goodnight,2,1078842,Vocabulary level below C (A2),A2
 shoulder,2,16893624,Oxford 3000,B1

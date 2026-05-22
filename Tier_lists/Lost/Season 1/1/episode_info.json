@@ -1,0 +1,26 @@
+{
+  "series": "Lost",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 1,
+  "subtitle_file": "lost_s1_e1.srt",
+  "analysis_date": "2026-05-22T11:40:32.757396",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 133226982,
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 7,
+    "tier_2_random": 78,
+    "tier_3_common": 12,
+    "tier_4_rare_in_series": 1,
+    "tier_5_filtered": 74,
+    "tier_b1_words": 0,
+    "tier_b2_words": 6,
+    "tier_4_rare_c_words": 0,
+    "tier_4_rare_b_words": 5
+  },
+  "excluded_names_fantasy_count": 18
+}

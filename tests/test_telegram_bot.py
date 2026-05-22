@@ -569,5 +569,44 @@ class TestErrorHandling:
         """Test invalid data - empty tier lists."""
 
 
+class TestWordListExamples:
+    """Word tier lists show subtitle examples like phrasal verbs."""
+
+    def test_format_word_list_includes_example(self):
+        from telegram_bot import _format_word_list
+
+        text = _format_word_list(
+            "Test Show",
+            1,
+            1,
+            [("beating", "избиение", "Stop the beating right now.")],
+        )
+        assert "beating" in text
+        assert "избиение" in text
+        assert "Stop the beating" in text
+
+    def test_load_translation_pairs_reads_example_en(self, temp_dir):
+        from telegram_bot import _load_translation_pairs_csv
+
+        p = temp_dir / "tier_1_translations.csv"
+        with open(p, "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["word", "translation_ru", "example_en"])
+            w.writerow(["maid", "служанка", "The maid left early."])
+        rows = _load_translation_pairs_csv(p)
+        assert rows == [("maid", "служанка", "The maid left early.")]
+
+    def test_fill_missing_word_examples_from_srt(self, temp_dir):
+        from telegram_bot import _fill_missing_word_examples
+
+        srt = temp_dir / "ep.srt"
+        srt.write_text(
+            "1\n00:00:00,000 --> 00:00:01,000\nThe maid left early.\n\n",
+            encoding="utf-8",
+        )
+        rows = _fill_missing_word_examples([("maid", "служанка", "")], srt)
+        assert rows[0][2] == "The maid left early."
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

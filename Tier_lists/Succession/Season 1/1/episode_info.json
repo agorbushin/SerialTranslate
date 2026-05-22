@@ -4,7 +4,7 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "succession_s1_e1.srt",
-  "analysis_date": "2026-03-31T17:18:55.358616",
+  "analysis_date": "2026-05-22T11:35:24.852148",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 94459595,
@@ -12,13 +12,15 @@
     "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 7,
-    "tier_2_random": 234,
+    "tier_1_hard_usable": 6,
+    "tier_2_random": 231,
     "tier_3_common": 22,
     "tier_4_rare_in_series": 5,
-    "tier_5_filtered": 175,
+    "tier_5_filtered": 173,
     "tier_b1_words": 2,
-    "tier_b2_words": 29
+    "tier_b2_words": 28,
+    "tier_4_rare_c_words": 1,
+    "tier_4_rare_b_words": 34
   },
-  "excluded_names_fantasy_count": 52
+  "excluded_names_fantasy_count": 58
 }

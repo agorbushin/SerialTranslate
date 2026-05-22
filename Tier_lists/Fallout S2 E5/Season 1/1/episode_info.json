@@ -4,7 +4,7 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "fallout_s2_e5.srt",
-  "analysis_date": "2026-03-31T19:01:15.219590",
+  "analysis_date": "2026-05-22T11:31:55.247471",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 111229798,
@@ -12,13 +12,15 @@
     "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 7,
-    "tier_2_random": 201,
-    "tier_3_common": 16,
-    "tier_4_rare_in_series": 5,
-    "tier_5_filtered": 106,
+    "tier_1_hard_usable": 8,
+    "tier_2_random": 198,
+    "tier_3_common": 15,
+    "tier_4_rare_in_series": 7,
+    "tier_5_filtered": 105,
     "tier_b1_words": 2,
-    "tier_b2_words": 13
+    "tier_b2_words": 14,
+    "tier_4_rare_c_words": 0,
+    "tier_4_rare_b_words": 23
   },
-  "excluded_names_fantasy_count": 40
+  "excluded_names_fantasy_count": 46
 }

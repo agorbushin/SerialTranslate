@@ -4,7 +4,7 @@
   "season_number": 1,
   "episode_number": 1,
   "subtitle_file": "black_mirror_s1_e1.srt",
-  "analysis_date": "2026-03-31T17:17:51.244035",
+  "analysis_date": "2026-05-22T11:30:41.640377",
   "thresholds": {
     "series_threshold": 2,
     "english_threshold": 91495139,
@@ -12,13 +12,15 @@
     "min_episode_count": 2
   },
   "word_counts": {
-    "tier_1_hard_usable": 7,
-    "tier_2_random": 245,
+    "tier_1_hard_usable": 12,
+    "tier_2_random": 249,
     "tier_3_common": 17,
     "tier_4_rare_in_series": 5,
-    "tier_5_filtered": 95,
+    "tier_5_filtered": 98,
     "tier_b1_words": 1,
-    "tier_b2_words": 13
+    "tier_b2_words": 15,
+    "tier_4_rare_c_words": 1,
+    "tier_4_rare_b_words": 38
   },
-  "excluded_names_fantasy_count": 64
+  "excluded_names_fantasy_count": 52
 }

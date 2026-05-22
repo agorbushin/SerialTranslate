@@ -1,5 +1,10 @@
 word,series_frequency,english_frequency,filter_reason,vocabulary_level
+lord,30,52474647,Oxford 3000,N/A
+father,17,54388623,Oxford 3000,A1
 brother,12,56375413,Oxford 3000,A1
+queen,12,39224762,Oxford 3000,A2
+son,10,71254769,Oxford 3000,A1
+iron,10,35668530,Oxford 3000,B1
 battle,9,36341684,Oxford 3000,B1
 sea,9,61532852,Oxford 3000,A1
 blood,8,61544877,Oxford 3000,A2
@@ -112,6 +117,7 @@ perhap,2,42450144,Oxford 3000,N/A
 burn,2,23062858,Oxford 3000,B1
 brave,2,5221356,Oxford 3000,B1
 protect,2,42331974,Oxford 3000,B1
+fart,2,1348303,Vocabulary level below C (A2),A2
 farm,2,57843397,Oxford 3000,A1
 grew,2,10698645,Vocabulary level below C (A2),A2
 ghost,2,17436367,Oxford 3000,B1
@@ -126,6 +132,7 @@ capture,2,21465152,Oxford 3000,B2
 wife,2,47510357,Oxford 3000,A1
 paid,2,60294928,"High English frequency (60,294,928 > 20,000,000)",A2
 jewelry,2,72648785,"High English frequency (72,648,785 > 20,000,000)",B2
+touched,2,5080398,Vocabulary level below C (A2),A2
 twice,2,19945569,Oxford 3000,A2
 moment,2,47882449,Oxford 3000,A2
 finger,2,23127249,Oxford 3000,A2

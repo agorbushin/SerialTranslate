@@ -4,14 +4,16 @@
 
 **Subtitle**: `fallout_s2_e5.srt`
 
-**Analysis**: 2026-03-31 19:01
+**Analysis**: 2026-05-22 11:31
 
 ## Word counts
 
-- Tier 1 (Hard Usable): 7
-- Tier 2 (Random): 201
-- Tier 3 (Common): 16
-- Tier 4 (Rare in Series): 5
-- Tier 5 (Filtered): 106
+- Tier 1 (Hard Usable): 8
+- Tier 2 (Random): 198
+- Tier 3 (Common): 15
+- Tier 4 (Rare in Series): 7
+- Rare in series (C1–C2): 0
+- Rare in series (B1–B2): 23
+- Tier 5 (Filtered): 105
 - Tier B1 (Intermediate): 2
-- Tier B2 (Upper-Intermediate): 13
+- Tier B2 (Upper-Intermediate): 14

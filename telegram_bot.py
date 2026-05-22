@@ -703,7 +703,7 @@ async def _handle_message_movie(
         # Case A: translations already exist
         if translations_dir is not None:
             latency["branch"] = "cache_hit_translations"
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"🎬 Processing: {label}\n"
                 f"✅ Found existing translations.\n\n"
                 f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
@@ -730,7 +730,7 @@ async def _handle_message_movie(
         # Case B: tier list exists but no translations
         if episode_dir is not None:
             latency["branch"] = "tier_exists_translate_only"
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"🎬 Processing: {label}\n"
                 f"✅ Found existing hard words list.\n\n"
                 "⏳ Translating words…",
@@ -738,7 +738,7 @@ async def _handle_message_movie(
                 reply_markup=keyboard_discovery(context),
             )
             if subtitle_path is None:
-                await status_msg.edit_text(
+                await update.message.reply_text(
                     f"🎬 Processing: {label}\n"
                     "⏳ Subtitle file missing, downloading…",
                     parse_mode="Markdown",
@@ -754,7 +754,7 @@ async def _handle_message_movie(
                 )
                 latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
                 if not subtitle_path:
-                    await status_msg.edit_text(
+                    await update.message.reply_text(
                         f"❌ **Subtitle download failed** for {label}.\n\n"
                         "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
                         parse_mode="Markdown",
@@ -775,7 +775,7 @@ async def _handle_message_movie(
             latency["translator_metrics"] = translator_metrics
             if not ok or not out_dir:
                 reason = (trans_err or "Translation failed.").strip()
-                await status_msg.edit_text(
+                await update.message.reply_text(
                     f"❌ **Translation failed.**\n\n{_md1(reason)}",
                     parse_mode="Markdown",
                     reply_markup=keyboard_discovery(context),
@@ -784,7 +784,7 @@ async def _handle_message_movie(
                 latency["error"] = reason
                 return
             rel = out_dir.relative_to(BASE_DIR)
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"✅ {label}\n\n"
                 f"📁 C-level words translated and saved to: `{rel}/`",
                 parse_mode="Markdown",
@@ -809,7 +809,7 @@ async def _handle_message_movie(
 
         # Case C: nothing exists — download, analyze, translate
         latency["branch"] = "full_pipeline"
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"🎬 Processing: {label}\n\n"
             "⏳ Downloading subtitle…",
             parse_mode="Markdown",
@@ -825,7 +825,7 @@ async def _handle_message_movie(
         )
         latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
         if not subtitle_path:
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"❌ **Subtitle download failed** for {label}.\n\n"
                 "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
                 parse_mode="Markdown",
@@ -835,7 +835,7 @@ async def _handle_message_movie(
             latency["error"] = "subtitle_download_failed"
             return
 
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"🎬 Processing: {label}\n"
             f"✅ Subtitle downloaded.\n\n"
             "⏳ Building the hard-word list from the subtitle…",
@@ -853,7 +853,7 @@ async def _handle_message_movie(
         latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
         latency["analyze_metrics"] = analyze_metrics
         if not episode_dir:
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
                 "The file may be invalid or empty.",
                 parse_mode="Markdown",
@@ -863,7 +863,7 @@ async def _handle_message_movie(
             latency["error"] = "tier_list_build_failed"
             return
 
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"🎬 Processing: {label}\n"
             f"✅ C-level list ready.\n\n"
             "⏳ Translating words…",
@@ -884,7 +884,7 @@ async def _handle_message_movie(
         latency["translator_metrics"] = translator_metrics
         if not ok or not out_dir:
             reason = (trans_err or "Translation failed.").strip()
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"❌ **Translation failed.**\n\n{_md1(reason)}",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
@@ -894,7 +894,7 @@ async def _handle_message_movie(
             return
 
         rel = out_dir.relative_to(BASE_DIR)
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"✅ {label}\n\n"
             f"📁 C-level words translated and saved to: `{rel}/`",
             parse_mode="Markdown",
@@ -917,7 +917,7 @@ async def _handle_message_movie(
         latency["status"] = "success"
 
     except asyncio.TimeoutError:
-        await status_msg.edit_text(
+        await update.message.reply_text(
             "❌ **Request timed out** (download/analysis/translation took too long).",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -925,7 +925,7 @@ async def _handle_message_movie(
         latency["status"] = "timeout"
         latency["error"] = "request_timeout"
     except Exception as e:
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"❌ **Error:** {_md1(str(e)[:150])}",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -988,7 +988,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     # If simple parse likely failed (e.g. "ep 2 season 2" left in series name), ask ChatGPT
     if _simple_parse_likely_failed(raw, series_name, season, episode):
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"🔍 Processing request for: *{_md1(raw)}*\n\n"
             "⏳ Normalizing with ChatGPT…",
             parse_mode="Markdown",
@@ -1004,14 +1004,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 "season": season,
                 "episode": episode,
             }
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
                 "⏳ Looking for a saved word list or translations…",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
             )
     else:
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"🔍 Processing request for: *{_md1(raw)}*\n\n"
             "⏳ Checking series title…",
             parse_mode="Markdown",
@@ -1025,7 +1025,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             "season": season,
             "episode": episode,
         }
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
             "⏳ Looking for a saved word list or translations…",
             parse_mode="Markdown",
@@ -1050,7 +1050,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Case A: translations already exist — send word list in chat
         if translations_dir is not None:
             latency["branch"] = "cache_hit_translations"
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
                 f"✅ Found existing translations.\n\n"
                 f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
@@ -1075,7 +1075,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Case B: tier list exists but no translations — translate only
         if episode_dir is not None:
             latency["branch"] = "tier_exists_translate_only"
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
                 f"✅ Found existing hard words list.\n\n"
                 "⏳ Translating words…",
@@ -1084,7 +1084,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             )
             if subtitle_path is None:
                 # Try to get subtitle path from episode_info and download if missing
-                await status_msg.edit_text(
+                await update.message.reply_text(
                     f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
                     "⏳ Subtitle file missing, downloading…",
                     parse_mode="Markdown",
@@ -1100,7 +1100,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 )
                 latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
                 if not subtitle_path:
-                    await status_msg.edit_text(
+                    await update.message.reply_text(
                         f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
                         "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
                         parse_mode="Markdown",
@@ -1121,7 +1121,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             latency["translator_metrics"] = translator_metrics
             if not ok or not out_dir:
                 reason = (trans_err or "Translation failed.").strip()
-                await status_msg.edit_text(
+                await update.message.reply_text(
                     f"❌ **Translation failed.**\n\n{_md1(reason)}\n\n💡 Use /next or **Next series** to try another title.",
                     parse_mode="Markdown",
                     reply_markup=keyboard_discovery(context),
@@ -1130,7 +1130,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 latency["error"] = reason
                 return
             rel = out_dir.relative_to(BASE_DIR)
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
                 f"📁 C-level words translated and saved to: `{rel}/`",
                 parse_mode="Markdown",
@@ -1153,7 +1153,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
         # Case C: nothing exists — download, analyze, translate
         latency["branch"] = "full_pipeline"
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
             "⏳ Downloading subtitle…",
             parse_mode="Markdown",
@@ -1169,7 +1169,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         )
         latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
         if not subtitle_path:
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
                 "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
                 parse_mode="Markdown",
@@ -1179,7 +1179,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             latency["error"] = "subtitle_download_failed"
             return
 
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
             f"✅ Subtitle downloaded.\n\n"
             "⏳ Building the hard-word list from the subtitle…",
@@ -1194,7 +1194,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
         latency["analyze_metrics"] = analyze_metrics
         if not episode_dir:
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
                 "The file may be invalid or empty.",
                 parse_mode="Markdown",
@@ -1204,7 +1204,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             latency["error"] = "tier_list_build_failed"
             return
 
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
             f"✅ C-level list ready.\n\n"
             "⏳ Translating words…",
@@ -1225,7 +1225,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         latency["translator_metrics"] = translator_metrics
         if not ok or not out_dir:
             reason = (trans_err or "Translation failed.").strip()
-            await status_msg.edit_text(
+            await update.message.reply_text(
                 f"❌ **Translation failed.**\n\n{_md1(reason)}",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
@@ -1235,7 +1235,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             return
 
         rel = out_dir.relative_to(BASE_DIR)
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
             f"📁 C-level words translated and saved to: `{rel}/`",
             parse_mode="Markdown",
@@ -1256,7 +1256,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         latency["status"] = "success"
 
     except asyncio.TimeoutError:
-        await status_msg.edit_text(
+        await update.message.reply_text(
             "❌ **Request timed out** (download/analysis/translation took too long).",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -1264,7 +1264,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         latency["status"] = "timeout"
         latency["error"] = "request_timeout"
     except Exception as e:
-        await status_msg.edit_text(
+        await update.message.reply_text(
             f"❌ **Error:** {_md1(str(e)[:150])}",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -1277,11 +1277,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await _write_latency_async(latency)
 
 
-def _load_translation_pairs_csv(csv_path: Path) -> List[Tuple[str, str]]:
-    """Load word → translation_ru from a translations CSV. Skips empty / placeholder cells."""
+def _load_translation_pairs_csv(csv_path: Path) -> List[Tuple[str, str, str]]:
+    """Load word → translation_ru (+ optional example_en) from a translations CSV."""
     if not csv_path.exists():
         return []
-    out: List[Tuple[str, str]] = []
+    out: List[Tuple[str, str, str]] = []
     empty_values = {"", "—", "n/a", "na", "[translation failed]"}
     try:
         with open(csv_path, "r", encoding="utf-8") as f:
@@ -1294,10 +1294,47 @@ def _load_translation_pairs_csv(csv_path: Path) -> List[Tuple[str, str]]:
                 t_lower = t.lower()
                 if t_lower in empty_values or not t:
                     continue
-                out.append((w, t))
+                ex = (row.get("example_en") or "").strip()
+                out.append((w, t, ex))
     except Exception:
         pass
     return out
+
+
+def _fill_missing_word_examples(
+    rows: List[Tuple[str, str, str]],
+    subtitle_path: Optional[Path],
+) -> List[Tuple[str, str, str]]:
+    """Attach subtitle dialogue lines for words missing example_en (legacy CSVs)."""
+    need = [w for w, _t, ex in rows if not ex or ex.upper() == "N/A"]
+    if not need or subtitle_path is None or not subtitle_path.is_file():
+        return rows
+    from subtitle_text_utils import extract_word_examples_from_srt_path
+
+    ex_map = extract_word_examples_from_srt_path(subtitle_path, need, max_per_word=1)
+    filled: List[Tuple[str, str, str]] = []
+    for w, t, ex in rows:
+        if ex and ex.upper() != "N/A":
+            filled.append((w, t, ex))
+            continue
+        lines = ex_map.get(w, [])
+        filled.append((w, t, lines[0] if lines else ""))
+    return filled
+
+
+def _word_list_example_suffix(example: str, *, max_len: int = 180) -> str:
+    """Italic example line under a word entry (same style as phrasal verbs)."""
+    ex = (example or "").strip()
+    if not ex or ex.upper() == "N/A":
+        return ""
+    short = ex[:max_len] + ("…" if len(ex) > max_len else "")
+    return f"\n   _{short}_"
+
+
+def _format_word_entry_line(index: int, word: str, translation: str, example: str = "") -> str:
+    line = f"{index}. *{_md1(word)}* → {_md1(translation)}"
+    line += _word_list_example_suffix(example)
+    return line
 
 
 def _load_translations_list(translations_dir: Path) -> List[Tuple[str, str]]:
@@ -1318,8 +1355,8 @@ def _format_b_level_list(
     series_name: str,
     season: int,
     episode: int,
-    b1: List[Tuple[str, str]],
-    b2: List[Tuple[str, str]],
+    b1: List[Tuple[str, str, str]],
+    b2: List[Tuple[str, str, str]],
     *,
     is_movie: bool = False,
     year: int = 0,
@@ -1330,20 +1367,22 @@ def _format_b_level_list(
         title = f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
     else:
         title = f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
-    merged: List[Tuple[str, str]] = []
+    merged: List[Tuple[str, str, str]] = []
     seen = set()
-    for w, t in [*b1, *b2]:
+    for w, t, ex in [*b1, *b2]:
         key = (w.strip().lower(), t.strip().lower())
         if key in seen:
             continue
         seen.add(key)
-        merged.append((w, t))
+        merged.append((w, t, ex))
     n = len(merged)
     header = f"📗 *B-level words* — {title}\n\n📊 *B-level words: {n}*\n\n"
     if not merged:
         return header + "_No words._"
     show = merged[:max_lines_per_band]
-    lines = [f"{i}. *{_md1(w)}* → {_md1(t)}" for i, (w, t) in enumerate(show, 1)]
+    lines = [
+        _format_word_entry_line(i, w, t, ex) for i, (w, t, ex) in enumerate(show, 1)
+    ]
     body = "\n".join(lines)
     if n > max_lines_per_band:
         body += f"\n\n… and {n - max_lines_per_band} more."
@@ -1354,7 +1393,7 @@ def _format_word_list(
     series_name: str,
     season: int,
     episode: int,
-    pairs: List[Tuple[str, str]],
+    pairs: List[Tuple[str, str, str]],
     max_lines: int = 25,
     *,
     is_movie: bool = False,
@@ -1369,7 +1408,9 @@ def _format_word_list(
     if not pairs:
         return header + "_No words._"
     show = pairs[:max_lines]
-    lines = [f"{i}. *{_md1(w)}* → {_md1(t)}" for i, (w, t) in enumerate(show, 1)]
+    lines = [
+        _format_word_entry_line(i, w, t, ex) for i, (w, t, ex) in enumerate(show, 1)
+    ]
     body = "\n".join(lines)
     if n > max_lines:
         body += f"\n\n… and {n - max_lines} more words."
@@ -1380,7 +1421,7 @@ def _format_rare_in_series_full_list(
     series_name: str,
     season: int,
     episode: int,
-    pairs: List[Tuple[str, str]],
+    pairs: List[Tuple[str, str, str]],
     *,
     is_movie: bool = False,
     year: int = 0,
@@ -1395,7 +1436,9 @@ def _format_rare_in_series_full_list(
         header = f"📋 *{label}* — *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n📊 *{n} words*\n\n"
     if not pairs:
         return header + "_No words._"
-    lines = [f"{i}. *{_md1(w)}* → {_md1(t)}" for i, (w, t) in enumerate(pairs, 1)]
+    lines = [
+        _format_word_entry_line(i, w, t, ex) for i, (w, t, ex) in enumerate(pairs, 1)
+    ]
     return header + "\n".join(lines)
 
 
@@ -1418,6 +1461,43 @@ def _split_message_chunks(text: str, max_len: int = 4096) -> List[str]:
         chunks.append(text[start:end])
         start = end
     return chunks
+
+
+def _chat_message(update: Update, *, query=None):
+    """Message object to reply on — callback queries use the message that held the button."""
+    return query.message if query else update.message
+
+
+async def _reply_bot_message(
+    update: Update,
+    *,
+    query=None,
+    text: str,
+    reply_markup: Optional[InlineKeyboardMarkup] = None,
+    parse_mode: str = "Markdown",
+) -> None:
+    """Send bot text as a new chat message (append to history, never edit prior messages)."""
+    await _chat_message(update, query=query).reply_text(
+        text, parse_mode=parse_mode, reply_markup=reply_markup
+    )
+
+
+async def _reply_bot_chunks(
+    update: Update,
+    *,
+    query=None,
+    chunks: List[str],
+    reply_markup: Optional[InlineKeyboardMarkup] = None,
+    parse_mode: str = "Markdown",
+) -> None:
+    """Send chunked bot text as new messages; keyboard on the last chunk only."""
+    msg = _chat_message(update, query=query)
+    for i, part in enumerate(chunks):
+        await msg.reply_text(
+            part,
+            parse_mode=parse_mode,
+            reply_markup=reply_markup if i == len(chunks) - 1 else None,
+        )
 
 
 def _get_translations_header(
@@ -1461,6 +1541,10 @@ async def _send_translations_list(
 ) -> None:
     """Load tier_1 translations and send frequent C-level list (chunked). Supports callback via query=."""
     pairs = _load_translations_list(translations_dir)
+    sp = _subtitle_path_for_loaded_title(
+        series_name, season, episode, is_movie=is_movie, year=year
+    )
+    pairs = _fill_missing_word_examples(pairs, sp)
     latency_suffix = (
         f"\n⏱ *Latency:* {latency_ms / 1000:.2f}s"
         if isinstance(latency_ms, int) and latency_ms >= 0
@@ -1471,32 +1555,17 @@ async def _send_translations_list(
     if not pairs:
         header = f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "") if is_movie else f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
         body = f"{header}\n\n📁 Saved to: {rel}{latency_suffix}\n\n_No words in CSV._"
-        if query:
-            await query.edit_message_text(body, parse_mode="Markdown", reply_markup=kb)
-        else:
-            await update.message.reply_text(body, parse_mode="Markdown", reply_markup=kb)
+        await _reply_bot_message(update, query=query, text=body, reply_markup=kb)
         return
     text = _format_word_list(series_name, season, episode, pairs, is_movie=is_movie, year=year)
     if latency_suffix:
         text += f"\n\n{latency_suffix}"
     max_len = 4096
-    if query:
-        if len(text) <= max_len:
-            await query.edit_message_text(text, parse_mode="Markdown", reply_markup=kb)
-        else:
-            parts = _split_message_chunks(text, max_len=max_len)
-            await query.edit_message_text(parts[0], parse_mode="Markdown", reply_markup=kb)
-            for part in parts[1:]:
-                await query.message.reply_text(part, parse_mode="Markdown")
-        return
     if len(text) <= max_len:
-        await update.message.reply_text(text, parse_mode="Markdown", reply_markup=kb)
+        await _reply_bot_message(update, query=query, text=text, reply_markup=kb)
     else:
         parts = _split_message_chunks(text, max_len=max_len)
-        for i, part in enumerate(parts):
-            await update.message.reply_text(
-                part, parse_mode="Markdown", reply_markup=kb if i == len(parts) - 1 else None
-            )
+        await _reply_bot_chunks(update, query=query, chunks=parts, reply_markup=kb)
 
 
 async def send_frequent_c_words(
@@ -1513,19 +1582,13 @@ async def send_frequent_c_words(
             "Send a title first, then tap **Frequent C**."
         )
         kbd = keyboard_discovery(context)
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kbd)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kbd)
+        await _reply_bot_message(update, query=query, text=msg, reply_markup=kbd)
         return
     translations_dir = Path(last_dir).resolve()
     if not translations_dir.exists():
         msg = f"❌ Translations folder not found: `{_rel_path(last_dir)}/`"
         kbd = keyboard_discovery(context)
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kbd)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kbd)
+        await _reply_bot_message(update, query=query, text=msg, reply_markup=kbd)
         return
     series_name, season, episode, is_movie, year = _get_translations_header(
         translations_dir, context
@@ -1615,26 +1678,23 @@ async def _send_rare_series_full_list(
     if not last_dir:
         msg = f"❌ No episode or movie loaded yet.\n\n{not_loaded_hint}"
         kb = keyboard_discovery(context)
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb)
+        await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
         return
 
     translations_dir = Path(last_dir).resolve()
     if not translations_dir.exists():
         msg = f"❌ Translations folder not found: `{_rel_path(last_dir)}/`"
         kb = keyboard_discovery(context)
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb)
+        await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
         return
 
     series_name, season, episode, is_movie, year = _get_translations_header(
         translations_dir, context
     )
     pairs = _load_translation_pairs_csv(translations_dir / translations_csv)
+    sp = _subtitle_path_for_loaded_title(
+        series_name, season, episode, is_movie=is_movie, year=year
+    )
     if not pairs:
         episode_dir_str = context.user_data.get("last_episode_dir")
         header = (
@@ -1650,29 +1710,22 @@ async def _send_rare_series_full_list(
                 "_Could not locate the tier list folder to translate rare words._ "
                 f"{missing_episode_hint}"
             )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
+            await _reply_bot_message(
+                update, query=query, text=msg, reply_markup=kb_loaded
+            )
             return
 
         episode_dir = Path(episode_dir_str).resolve()
         if not load_tier_words(episode_dir, tier_words_csv):
             msg = f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n{empty_tier_msg}"
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
+            await _reply_bot_message(
+                update, query=query, text=msg, reply_markup=kb_loaded
+            )
             return
 
-        if query:
-            await query.edit_message_text(
-                progress, parse_mode="Markdown", reply_markup=kb_loaded
-            )
-        else:
-            await update.message.reply_text(
-                progress, parse_mode="Markdown", reply_markup=kb_loaded
-            )
+        await _reply_bot_message(
+            update, query=query, text=progress, reply_markup=kb_loaded
+        )
 
         sp = _subtitle_path_for_loaded_title(
             series_name, season, episode, is_movie=is_movie, year=year
@@ -1695,19 +1748,17 @@ async def _send_rare_series_full_list(
                 f"{header}\n\n❌ **Timed out** translating the rare-in-series {timeout_band} list.\n\n"
                 f"Try {retry_button} again."
             )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
+            await _reply_bot_message(
+                update, query=query, text=msg, reply_markup=kb_loaded
+            )
             return
 
         if not ok:
             reason = (trans_err or "Translation failed.").strip()
             msg = f"{header}\n\n❌ **Rare list translation failed.**\n\n{_md1(reason)}"
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
+            await _reply_bot_message(
+                update, query=query, text=msg, reply_markup=kb_loaded
+            )
             return
 
         pairs = _load_translation_pairs_csv(translations_dir / translations_csv)
@@ -1716,28 +1767,18 @@ async def _send_rare_series_full_list(
                 f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n"
                 "_Rare list translation produced no usable rows._"
             )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_loaded)
+            await _reply_bot_message(
+                update, query=query, text=msg, reply_markup=kb_loaded
+            )
             return
 
+    pairs = _fill_missing_word_examples(pairs, sp)
     full_text = _format_rare_in_series_full_list(
         series_name, season, episode, pairs, is_movie=is_movie, year=year, band=format_band
     )
     chunks = _split_message_chunks(full_text)
     kb = keyboard_loaded(context)
-
-    if query:
-        await query.edit_message_text(chunks[0], parse_mode="Markdown", reply_markup=kb)
-        for part in chunks[1:]:
-            await query.message.reply_text(part, parse_mode="Markdown")
-    else:
-        for i, part in enumerate(chunks):
-            await update.message.reply_text(
-                part, parse_mode="Markdown",
-                reply_markup=kb if i == len(chunks) - 1 else None,
-            )
+    await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
 
 
 async def send_rare_c_series_full_list(
@@ -1784,26 +1825,25 @@ async def send_b_level_words(
             "Send a title first, then tap **Frequent B**."
         )
         kb = keyboard_discovery(context)
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb)
+        await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
         return
 
     translations_dir = Path(last_dir).resolve()
     if not translations_dir.exists():
         msg = f"❌ Translations folder not found: `{_rel_path(last_dir)}/`"
         kb = keyboard_discovery(context)
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb)
+        await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
         return
 
     b1, b2 = _load_b_level_pairs(translations_dir)
     series_name, season, episode, is_movie, year = _get_translations_header(
         translations_dir, context
     )
+    sp = _subtitle_path_for_loaded_title(
+        series_name, season, episode, is_movie=is_movie, year=year
+    )
+    b1 = _fill_missing_word_examples(b1, sp)
+    b2 = _fill_missing_word_examples(b2, sp)
     kb = keyboard_loaded(context)
 
     if not b1 and not b2:
@@ -1817,28 +1857,14 @@ async def send_b_level_words(
             else f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
         )
         msg = f"📗 *B-level words* — {title}\n\n_No B-level translations in this folder yet._{hint}"
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb)
+        await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
         return
 
     full_text = _format_b_level_list(
         series_name, season, episode, b1, b2, is_movie=is_movie, year=year
     )
     chunks = _split_message_chunks(full_text)
-
-    if query:
-        await query.edit_message_text(chunks[0], parse_mode="Markdown", reply_markup=kb)
-        for part in chunks[1:]:
-            await query.message.reply_text(part, parse_mode="Markdown")
-    else:
-        for i, part in enumerate(chunks):
-            await update.message.reply_text(
-                part,
-                parse_mode="Markdown",
-                reply_markup=kb if i == len(chunks) - 1 else None,
-            )
+    await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
 
 
 def _read_translation_info_json(translations_dir: Path) -> Optional[Dict[str, Any]]:
@@ -2117,19 +2143,17 @@ async def send_phrasal_verbs(
             "❌ No episode or movie loaded yet.\n\n"
             "Send a title first, then tap **Phrasal verbs** or use /phrasal."
         )
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
+        await _reply_bot_message(
+            update, query=query, text=msg, reply_markup=kb_empty
+        )
         return
 
     translations_dir = Path(last_dir).resolve()
     if not translations_dir.exists():
         msg = f"❌ Translations folder not found: `{_rel_path(last_dir)}/`"
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
+        await _reply_bot_message(
+            update, query=query, text=msg, reply_markup=kb_empty
+        )
         return
 
     kb_after = _keyboard_with_list_extras(context, translations_dir)
@@ -2139,7 +2163,6 @@ async def send_phrasal_verbs(
     )
     csv_path = translations_dir / PHRASAL_VERBS_CSV
     loop = asyncio.get_running_loop()
-    status_message = None
 
     if not csv_path.exists():
         if not OPENAI_API_KEY.strip():
@@ -2147,10 +2170,9 @@ async def send_phrasal_verbs(
                 "❌ *OPENAI_API_KEY* is not set.\n\n"
                 "Set it to extract and translate phrasal verbs and idioms."
             )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_after)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_after)
+            await _reply_bot_message(
+                update, query=query, text=msg, reply_markup=kb_after
+            )
             return
 
         subtitle_path = _resolve_subtitle_for_phrasal(translations_dir, context)
@@ -2159,22 +2181,16 @@ async def send_phrasal_verbs(
                 "❌ Could not find the subtitle file for this title.\n\n"
                 "Ensure subtitles exist under `Subtitle/` for this episode or movie."
             )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_after)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_after)
+            await _reply_bot_message(
+                update, query=query, text=msg, reply_markup=kb_after
+            )
             return
 
         sn = _series_name_for_phrasal(translations_dir, context)
         loading = "🔤 *Phrasal verbs*\n\n⏳ Extracting and translating…"
-        if query:
-            await query.edit_message_text(
-                loading, parse_mode="Markdown", reply_markup=kb_after
-            )
-        else:
-            status_message = await update.message.reply_text(
-                loading, parse_mode="Markdown", reply_markup=kb_after
-            )
+        await _reply_bot_message(
+            update, query=query, text=loading, reply_markup=kb_after
+        )
 
         ok = await loop.run_in_executor(
             None,
@@ -2187,13 +2203,9 @@ async def send_phrasal_verbs(
                 "❌ Could not build a phrasal verb list (no matches or read error).\n\n"
                 f"📁 `{_rel_path(str(translations_dir))}/`"
             )
-            if query:
-                await query.edit_message_text(err, parse_mode="Markdown", reply_markup=kb_after)
-            else:
-                if status_message is not None:
-                    await status_message.edit_text(
-                        err, parse_mode="Markdown", reply_markup=kb_after
-                    )
+            await _reply_bot_message(
+                update, query=query, text=err, reply_markup=kb_after
+            )
             return
 
     rows = _load_phrasal_rows(translations_dir)
@@ -2227,23 +2239,7 @@ async def send_phrasal_verbs(
         )
 
     chunks = _split_message_chunks(full_text)
-
-    if query:
-        await query.edit_message_text(chunks[0], parse_mode="Markdown", reply_markup=kb)
-        for part in chunks[1:]:
-            await query.message.reply_text(part, parse_mode="Markdown")
-    else:
-        if status_message is not None:
-            await status_message.edit_text(chunks[0], parse_mode="Markdown", reply_markup=kb)
-            for part in chunks[1:]:
-                await update.message.reply_text(part, parse_mode="Markdown")
-        else:
-            for i, part in enumerate(chunks):
-                await update.message.reply_text(
-                    part,
-                    parse_mode="Markdown",
-                    reply_markup=kb if i == len(chunks) - 1 else None,
-                )
+    await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
 
 
 async def _send_idioms_disabled_placeholder(
@@ -2266,14 +2262,9 @@ async def _send_idioms_disabled_placeholder(
             kb = kb_empty
     else:
         kb = kb_empty
-    if query:
-        await query.edit_message_text(
-            _IDIOMS_WIP_MESSAGE, parse_mode="Markdown", reply_markup=kb
-        )
-    else:
-        await update.message.reply_text(
-            _IDIOMS_WIP_MESSAGE, parse_mode="Markdown", reply_markup=kb
-        )
+    await _reply_bot_message(
+        update, query=query, text=_IDIOMS_WIP_MESSAGE, reply_markup=kb
+    )
 
 
 async def send_idiomatic_expressions(
@@ -2296,19 +2287,17 @@ async def send_idiomatic_expressions(
             "❌ No episode or movie loaded yet.\n\n"
             "Send a title first, then tap **Idioms** or use /idioms."
         )
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
+        await _reply_bot_message(
+            update, query=query, text=msg, reply_markup=kb_empty
+        )
         return
 
     translations_dir = Path(last_dir).resolve()
     if not translations_dir.exists():
         msg = f"❌ Translations folder not found: `{_rel_path(last_dir)}/`"
-        if query:
-            await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
-        else:
-            await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_empty)
+        await _reply_bot_message(
+            update, query=query, text=msg, reply_markup=kb_empty
+        )
         return
 
     kb_after = _keyboard_with_list_extras(context, translations_dir)
@@ -2318,7 +2307,6 @@ async def send_idiomatic_expressions(
     )
     csv_path = translations_dir / IDIOMATIC_EXPRESSIONS_CSV
     loop = asyncio.get_running_loop()
-    status_message = None
 
     if not csv_path.exists():
         if not OPENAI_API_KEY.strip():
@@ -2326,10 +2314,9 @@ async def send_idiomatic_expressions(
                 "❌ *OPENAI_API_KEY* is not set.\n\n"
                 "Set it to extract and translate idioms."
             )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_after)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_after)
+            await _reply_bot_message(
+                update, query=query, text=msg, reply_markup=kb_after
+            )
             return
 
         subtitle_path = _resolve_subtitle_for_phrasal(translations_dir, context)
@@ -2338,22 +2325,16 @@ async def send_idiomatic_expressions(
                 "❌ Could not find the subtitle file for this title.\n\n"
                 "Ensure subtitles exist under `Subtitle/` for this episode or movie."
             )
-            if query:
-                await query.edit_message_text(msg, parse_mode="Markdown", reply_markup=kb_after)
-            else:
-                await update.message.reply_text(msg, parse_mode="Markdown", reply_markup=kb_after)
+            await _reply_bot_message(
+                update, query=query, text=msg, reply_markup=kb_after
+            )
             return
 
         sn = _series_name_for_phrasal(translations_dir, context)
         loading = "💬 *Idioms*\n\n⏳ Extracting repeated expressions and translating…"
-        if query:
-            await query.edit_message_text(
-                loading, parse_mode="Markdown", reply_markup=kb_after
-            )
-        else:
-            status_message = await update.message.reply_text(
-                loading, parse_mode="Markdown", reply_markup=kb_after
-            )
+        await _reply_bot_message(
+            update, query=query, text=loading, reply_markup=kb_after
+        )
 
         ok = await loop.run_in_executor(
             None,
@@ -2371,13 +2352,9 @@ async def send_idiomatic_expressions(
                 "❌ Could not build an idiom list (no repeated matches or read error).\n\n"
                 f"📁 `{_rel_path(str(translations_dir))}/`"
             )
-            if query:
-                await query.edit_message_text(err, parse_mode="Markdown", reply_markup=kb_after)
-            else:
-                if status_message is not None:
-                    await status_message.edit_text(
-                        err, parse_mode="Markdown", reply_markup=kb_after
-                    )
+            await _reply_bot_message(
+                update, query=query, text=err, reply_markup=kb_after
+            )
             return
 
     rows = _load_idiom_rows(translations_dir)
@@ -2411,23 +2388,7 @@ async def send_idiomatic_expressions(
         )
 
     chunks = _split_message_chunks(full_text)
-
-    if query:
-        await query.edit_message_text(chunks[0], parse_mode="Markdown", reply_markup=kb)
-        for part in chunks[1:]:
-            await query.message.reply_text(part, parse_mode="Markdown")
-    else:
-        if status_message is not None:
-            await status_message.edit_text(chunks[0], parse_mode="Markdown", reply_markup=kb)
-            for part in chunks[1:]:
-                await update.message.reply_text(part, parse_mode="Markdown")
-        else:
-            for i, part in enumerate(chunks):
-                await update.message.reply_text(
-                    part,
-                    parse_mode="Markdown",
-                    reply_markup=kb if i == len(chunks) - 1 else None,
-                )
+    await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
 
 
 # Registered in main() as /phrasal; keep name so main() stays unchanged.
@@ -2471,9 +2432,12 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     elif data == "next_movie":
         await next_movie(wrapped, context)
     else:
-        await query.edit_message_text(
-            "Unknown action.",
+        await _reply_bot_message(
+            wrapped,
+            query=query,
+            text="Unknown action.",
             reply_markup=keyboard_discovery(context),
+            parse_mode=None,
         )
 
 

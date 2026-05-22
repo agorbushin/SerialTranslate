@@ -54,7 +54,7 @@ hang,3,13364783,Oxford 3000,B1
 perhap,3,42450144,Oxford 3000,N/A
 deep,3,53536903,Oxford 3000,A2
 happened,3,24951096,"High English frequency (24,951,096 > 20,000,000)",A2
-behavior,3,37145825,"High English frequency (37,145,825 > 20,000,000)",A2
+behavior,3,37145825,"High English frequency (37,145,825 > 20,000,000)",B2
 maybe,3,51946944,Oxford 3000,A2
 shoot,3,15221977,Easy word (easy_words.csv),B1
 mama,3,5042818,Vocabulary level below C (A2),A2
@@ -99,7 +99,7 @@ alive,2,16064787,Easy word (easy_words.csv),B1
 perfect,2,60242920,Oxford 3000,A2
 bad,2,95146098,Oxford 3000,A1
 telling,2,14181895,Vocabulary level below C (A2),A2
-loop,2,26611843,"High English frequency (26,611,843 > 20,000,000)",A2
+loop,2,26611843,"High English frequency (26,611,843 > 20,000,000)",B2
 waiting,2,30170505,"High English frequency (30,170,505 > 20,000,000)",A2
 creature,2,11281733,Oxford 3000,B1
 cold,2,42009560,Oxford 3000,A1
@@ -141,7 +141,7 @@ minor,2,33085047,Oxford 3000,B2
 remaining,2,21111544,"High English frequency (21,111,544 > 20,000,000)",B2
 simply,2,62012991,Oxford 3000,B2
 embarrassed,2,1549509,Oxford 3000,B1
-managed,2,30602103,"High English frequency (30,602,103 > 20,000,000)",A2
+managed,2,30602103,"High English frequency (30,602,103 > 20,000,000)",B2
 worry,2,16187062,Oxford 3000,A2
 leave,2,70957750,Oxford 3000,A1
 speech,2,37706832,Oxford 3000,B1

@@ -687,12 +687,17 @@ def run(
     def _write_translation_csv(filename: str, wlist: List[str], trans: Dict[str, str]) -> None:
         if not wlist:
             return
+        tier_examples = extract_examples_from_subtitle(
+            subtitle_content, wlist, max_per_word=1
+        )
         path = out_dir / filename
         with open(path, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
-            writer.writerow(["word", "translation_ru"])
+            writer.writerow(["word", "translation_ru", "example_en"])
             for w in wlist:
-                writer.writerow([w, trans.get(w, "")])
+                ex_lines = tier_examples.get(w, [])
+                example_en = ex_lines[0] if ex_lines else ""
+                writer.writerow([w, trans.get(w, ""), example_en])
 
     if TIER_ID_TIER_1 in requested_tier_ids:
         _write_translation_csv(

@@ -33,6 +33,16 @@ except ImportError:
 
 PIPELINE_FINGERPRINT_VERSION = 2
 FINGERPRINT_FILENAME = ".pipeline_fingerprint.json"
+TIER_4_RARE_B_WORDS_CSV = "tier_4_rare_b_words.csv"
+TIER_4_RARE_C_WORDS_CSV = "tier_4_rare_c_words.csv"
+
+
+def _rare_tier_outputs_complete(episode_dir: Path) -> bool:
+    """True when post-split rare-in-series word lists exist (added after early tier caches)."""
+    return (
+        (episode_dir / TIER_4_RARE_B_WORDS_CSV).is_file()
+        and (episode_dir / TIER_4_RARE_C_WORDS_CSV).is_file()
+    )
 
 _preload_lock = threading.Lock()
 _preload_cache: Dict[str, Tuple[Set[str], Set[str], Set[str], Dict[str, int], Dict[str, str]]] = {}
@@ -803,6 +813,8 @@ def _try_skip_fresh_pipeline(
         or stored.get("path_suffix") != current["path_suffix"]
     ):
         return None
+    if not _rare_tier_outputs_complete(output_episode_dir):
+        return None
     return output_episode_dir
 
 
@@ -834,8 +846,8 @@ def run_pipeline(
     If openai_api_key is set, character names and fantasy entities are excluded from tier CSVs.
 
     handoff_out: if provided, sets key "subtitle_raw" (decoded SRT text) for reuse in translate.
-    skip_if_outputs_fresh: when True, skip work if tier_1 exists and .pipeline_fingerprint.json
-    matches subtitle file mtime/size/suffix (PIPELINE_FINGERPRINT_VERSION).
+    skip_if_outputs_fresh: when True, skip work if tier_1 exists, rare B/C CSVs exist, and
+    .pipeline_fingerprint.json matches subtitle file mtime/size/suffix (PIPELINE_FINGERPRINT_VERSION).
     """
     import time
     t0 = time.perf_counter()

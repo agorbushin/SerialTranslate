@@ -9,16 +9,12 @@ Usage:
 import os
 from datetime import datetime
 
+import env_config  # noqa: F401 — load .env before reading token
+
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
-
-try:
-    from telegram_bot import TELEGRAM_BOT_TOKEN as DEFAULT_BOT_TOKEN
-except Exception:
-    DEFAULT_BOT_TOKEN = ""
-
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", DEFAULT_BOT_TOKEN).strip()
+TELEGRAM_BOT_TOKEN = (os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip()
 
 
 async def on_post_init(app: Application) -> None:

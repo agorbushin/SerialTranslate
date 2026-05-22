@@ -24,6 +24,45 @@ def test_parse_srt_file_with_content_matches_parse_srt_file(tmp_path: Path) -> N
 def test_try_skip_fresh_pipeline_when_fingerprint_matches(tmp_path: Path) -> None:
     from subtitle_analyzer import (
         FINGERPRINT_FILENAME,
+        TIER_4_RARE_B_WORDS_CSV,
+        TIER_4_RARE_C_WORDS_CSV,
+        _subtitle_source_fingerprint,
+        _try_skip_fresh_pipeline,
+    )
+
+    srt = tmp_path / "Sample_Show_S01E01.srt"
+    srt.write_text("subtitle body", encoding="utf-8")
+    tier_root = tmp_path / "Tier_lists"
+    ep = tier_root / "Sample Show" / "Season 1" / "1"
+    ep.mkdir(parents=True)
+    (ep / "tier_1_hard_usable_words.csv").write_text(
+        "word,series_frequency,english_frequency,vocabulary_level\n"
+        "wibble,1,100,C1\n",
+        encoding="utf-8",
+    )
+    (ep / TIER_4_RARE_B_WORDS_CSV).write_text(
+        "word,series_frequency,english_frequency,vocabulary_level\n",
+        encoding="utf-8",
+    )
+    (ep / TIER_4_RARE_C_WORDS_CSV).write_text(
+        "word,series_frequency,english_frequency,vocabulary_level\n",
+        encoding="utf-8",
+    )
+    fp = _subtitle_source_fingerprint(srt)
+    (ep / FINGERPRINT_FILENAME).write_text(
+        json.dumps(fp, indent=2), encoding="utf-8"
+    )
+    out = _try_skip_fresh_pipeline(
+        srt, tier_root, False, None, None, None, None
+    )
+    assert out == ep.resolve()
+
+
+def test_try_skip_fresh_pipeline_requires_rare_tier_csvs(tmp_path: Path) -> None:
+    from subtitle_analyzer import (
+        FINGERPRINT_FILENAME,
+        TIER_4_RARE_B_WORDS_CSV,
+        TIER_4_RARE_C_WORDS_CSV,
         _subtitle_source_fingerprint,
         _try_skip_fresh_pipeline,
     )
@@ -42,10 +81,22 @@ def test_try_skip_fresh_pipeline_when_fingerprint_matches(tmp_path: Path) -> Non
     (ep / FINGERPRINT_FILENAME).write_text(
         json.dumps(fp, indent=2), encoding="utf-8"
     )
-    out = _try_skip_fresh_pipeline(
-        srt, tier_root, False, None, None, None, None
+    assert (
+        _try_skip_fresh_pipeline(srt, tier_root, False, None, None, None, None)
+        is None
     )
-    assert out == ep.resolve()
+    (ep / TIER_4_RARE_B_WORDS_CSV).write_text(
+        "word,series_frequency,english_frequency,vocabulary_level\n",
+        encoding="utf-8",
+    )
+    (ep / TIER_4_RARE_C_WORDS_CSV).write_text(
+        "word,series_frequency,english_frequency,vocabulary_level\n",
+        encoding="utf-8",
+    )
+    assert (
+        _try_skip_fresh_pipeline(srt, tier_root, False, None, None, None, None)
+        == ep.resolve()
+    )
 
 
 def test_get_preloaded_bundle_cache_hit(project_root: Path) -> None:

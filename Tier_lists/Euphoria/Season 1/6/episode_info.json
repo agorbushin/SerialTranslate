@@ -1,0 +1,26 @@
+{
+  "series": "Euphoria",
+  "season": "Season 1",
+  "season_number": 1,
+  "episode_number": 6,
+  "subtitle_file": "euphoria_s1_e6.srt",
+  "analysis_date": "2026-05-22T10:22:46.331513",
+  "thresholds": {
+    "series_threshold": 2,
+    "english_threshold": 94257521,
+    "max_english_freq": 20000000,
+    "min_episode_count": 2
+  },
+  "word_counts": {
+    "tier_1_hard_usable": 8,
+    "tier_2_random": 171,
+    "tier_3_common": 19,
+    "tier_4_rare_in_series": 6,
+    "tier_5_filtered": 138,
+    "tier_b1_words": 2,
+    "tier_b2_words": 24,
+    "tier_4_rare_c_words": 0,
+    "tier_4_rare_b_words": 12
+  },
+  "excluded_names_fantasy_count": 42
+}

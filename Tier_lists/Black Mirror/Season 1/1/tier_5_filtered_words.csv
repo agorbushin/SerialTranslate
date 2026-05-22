@@ -1,4 +1,7 @@
 word,series_frequency,english_frequency,filter_reason,vocabulary_level
+princess,17,15602441,Oxford 3000,B1
+prime,14,39210803,Oxford 3000,C2
+minister,13,52107215,Oxford 3000,B2
 pig,11,11253390,Oxford 3000,A1
 demand,8,56701899,Oxford 3000,B1
 nothing,7,73363579,Oxford 3000,A2
@@ -10,6 +13,7 @@ running,4,72955000,Oxford 3000,A2
 viewer,4,15069216,Oxford 3000,B2
 sorry,4,35595812,Oxford 3000,A1
 police,4,64560602,Oxford 3000,A2
+jesus,4,34929061,"High English frequency (34,929,061 > 20,000,000)",A2
 happened,3,24951096,"High English frequency (24,951,096 > 20,000,000)",A2
 held,3,76140043,"High English frequency (76,140,043 > 20,000,000)",A2
 afternoon,3,19441492,Oxford 3000,A1
@@ -19,6 +23,7 @@ sexual,3,33634355,Oxford 3000,B2
 seen,3,78381896,"High English frequency (78,381,896 > 20,000,000)",A2
 coverage,3,44227160,"High English frequency (44,227,160 > 20,000,000)",C1
 tone,3,30770657,Oxford 3000,B2
+tom,3,49170897,"High English frequency (49,170,897 > 20,000,000)",A2
 onto,3,26411439,Oxford 3000,B1
 camera,3,89324930,Oxford 3000,A1
 visual,3,51525778,Oxford 3000,B2
@@ -61,13 +66,11 @@ nation,2,75879357,Oxford 3000,B2
 anyone,2,74326492,Oxford 3000,A2
 bear,2,54908230,Oxford 3000,A2
 insane,2,4121922,Easy word (easy_words.csv),C1
-lying,2,8260845,Vocabulary level below C (A2),A2
 anything,2,75999346,Oxford 3000,A1
 palace,2,15634703,Oxford 3000,B1
 hold,2,82741121,Oxford 3000,A2
 behind,2,53892722,Oxford 3000,A1
 trust,2,61432231,Oxford 3000,B1
-postcode,2,4972620,Vocabulary level below C (A2),A2
 closed,2,41782645,Oxford 3000,A1
 rod,2,17351135,Vocabulary level below C (A2),A2
 outcome,2,28207033,Oxford 3000,C1
@@ -80,7 +83,7 @@ prepared,2,32502271,Oxford 3000,B1
 stupid,2,14144754,Oxford 3000,B1
 illegal,2,21317270,Oxford 3000,B2
 mood,2,13305891,Oxford 3000,B1
-released,2,52546300,"High English frequency (52,546,300 > 20,000,000)",B2
+released,2,52546300,"High English frequency (52,546,300 > 20,000,000)",A2
 crew,2,25430159,Oxford 3000,B1
 stay,2,86241601,Oxford 3000,A1
 safe,2,64247128,Oxford 3000,A1
