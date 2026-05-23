@@ -459,9 +459,9 @@ class TestMessageHandling:
                 with patch("telegram_bot._send_translations_list", new_callable=AsyncMock):
                     await handle_message(mock_update, mock_context)
 
-        assert mock_context.user_data.get("last_episode_dir") == str(sample_episode_dir)
+        assert Path(mock_context.user_data.get("last_episode_dir")).resolve() == sample_episode_dir.resolve()
         assert mock_context.user_data.get("last_series_name") == "Test Series"
-        assert mock_context.user_data.get("last_translations_dir") == str(trans_dir)
+        assert Path(mock_context.user_data.get("last_translations_dir")).resolve() == trans_dir.resolve()
     
     @pytest.mark.asyncio
     async def test_context_persistence(self, mock_update, mock_context, sample_episode_dir):
@@ -597,15 +597,87 @@ class TestWordListExamples:
         assert rows == [("maid", "служанка", "The maid left early.")]
 
     def test_fill_missing_word_examples_from_srt(self, temp_dir):
-        from telegram_bot import _fill_missing_word_examples
+        from telegram_bot import _attach_subtitle_examples
 
         srt = temp_dir / "ep.srt"
         srt.write_text(
             "1\n00:00:00,000 --> 00:00:01,000\nThe maid left early.\n\n",
             encoding="utf-8",
         )
-        rows = _fill_missing_word_examples([("maid", "служанка", "")], srt)
+        rows = _attach_subtitle_examples([("maid", "служанка", "")], srt)
         assert rows[0][2] == "The maid left early."
+
+    def test_attach_subtitle_examples_prefers_srt_over_stale_csv(self, temp_dir):
+        from telegram_bot import _attach_subtitle_examples
+
+        srt = temp_dir / "ep.srt"
+        srt.write_text(
+            "1\n00:00:00,000 --> 00:00:01,000\nThe maid left early.\n\n",
+            encoding="utf-8",
+        )
+        rows = _attach_subtitle_examples(
+            [("maid", "служанка", "old csv line")], srt
+        )
+        assert rows[0][2] == "The maid left early."
+
+
+class TestEpisodeDirResolution:
+    def test_resolve_episode_dir_from_translation_info(self, temp_dir, monkeypatch):
+        import json
+        import telegram_bot as tb
+
+        monkeypatch.setattr(tb, "BASE_DIR", temp_dir)
+        monkeypatch.setattr(tb, "TIERLIST_BASE", temp_dir / "Tier_lists")
+        monkeypatch.setattr(tb, "TRANSLATIONS_BASE", temp_dir / "translations")
+
+        tier_dir = temp_dir / "Tier_lists" / "Euphoria" / "Season 1" / "6"
+        tier_dir.mkdir(parents=True)
+        (tier_dir / "tier_1_hard_usable_words.csv").write_text(
+            "word,series_frequency,english_frequency,vocabulary_level\nx,1,2,C1\n",
+            encoding="utf-8",
+        )
+        (tier_dir / "episode_info.json").write_text(
+            json.dumps(
+                {
+                    "series": "Euphoria",
+                    "season_number": 1,
+                    "episode_number": 6,
+                    "subtitle_file": "euphoria_s1_e6.srt",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        trans_dir = temp_dir / "translations" / "Euphoria S1 E6" / "Season 1" / "1"
+        trans_dir.mkdir(parents=True)
+        (trans_dir / "translation_info.json").write_text(
+            json.dumps(
+                {
+                    "series": "Euphoria S1 E6",
+                    "season_number": 1,
+                    "episode_number": 1,
+                    "source_subtitle": "euphoria_s1_e6.srt",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        ctx = Mock()
+        ctx.user_data = {}
+        resolved = tb._resolve_episode_dir(trans_dir, ctx)
+        assert resolved == tier_dir.resolve()
+
+    @pytest.mark.asyncio
+    async def test_reply_bot_message_falls_back_without_markdown(self, mock_update):
+        from telegram.error import BadRequest
+        import telegram_bot as tb
+
+        mock_update.message.reply_text = AsyncMock(
+            side_effect=[BadRequest("parse error"), None]
+        )
+        await tb._reply_bot_message(mock_update, text="*bold* word", parse_mode="Markdown")
+        assert mock_update.message.reply_text.call_count == 2
+        assert mock_update.message.reply_text.call_args_list[1][1]["parse_mode"] is None
 
 
 if __name__ == "__main__":

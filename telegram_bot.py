@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Collection, Dict, List, Literal, Optional, Tuple
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.error import BadRequest
 from telegram.helpers import escape_markdown
 from telegram.ext import (
     Application,
@@ -721,9 +722,12 @@ async def _handle_message_movie(
                 year=year,
                 latency_ms=_ms_since(req_started),
             )
-            context.user_data["last_episode_dir"] = str(episode_dir) if episode_dir else ""
-            context.user_data["last_series_name"] = movie_name
-            context.user_data["last_translations_dir"] = str(translations_dir)
+            _persist_loaded_title_context(
+                context,
+                translations_dir=translations_dir,
+                series_name=movie_name,
+                episode_dir=episode_dir,
+            )
             latency["status"] = "success"
             return
 
@@ -801,9 +805,12 @@ async def _handle_message_movie(
                 year=year,
                 latency_ms=_ms_since(req_started),
             )
-            context.user_data["last_episode_dir"] = str(episode_dir)
-            context.user_data["last_series_name"] = movie_name
-            context.user_data["last_translations_dir"] = str(out_dir)
+            _persist_loaded_title_context(
+                context,
+                translations_dir=out_dir,
+                series_name=movie_name,
+                episode_dir=episode_dir,
+            )
             latency["status"] = "success"
             return
 
@@ -911,9 +918,12 @@ async def _handle_message_movie(
             year=year,
             latency_ms=_ms_since(req_started),
         )
-        context.user_data["last_episode_dir"] = str(episode_dir)
-        context.user_data["last_series_name"] = movie_name
-        context.user_data["last_translations_dir"] = str(out_dir)
+        _persist_loaded_title_context(
+            context,
+            translations_dir=out_dir,
+            series_name=movie_name,
+            episode_dir=episode_dir,
+        )
         latency["status"] = "success"
 
     except asyncio.TimeoutError:
@@ -1066,9 +1076,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 episode,
                 latency_ms=_ms_since(req_started),
             )
-            context.user_data["last_episode_dir"] = str(episode_dir) if episode_dir else ""
-            context.user_data["last_series_name"] = series_name
-            context.user_data["last_translations_dir"] = str(translations_dir)
+            _persist_loaded_title_context(
+                context,
+                translations_dir=translations_dir,
+                series_name=series_name,
+                episode_dir=episode_dir,
+            )
             latency["status"] = "success"
             return
 
@@ -1145,9 +1158,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 episode,
                 latency_ms=_ms_since(req_started),
             )
-            context.user_data["last_episode_dir"] = str(episode_dir)
-            context.user_data["last_series_name"] = series_name
-            context.user_data["last_translations_dir"] = str(out_dir)
+            _persist_loaded_title_context(
+                context,
+                translations_dir=out_dir,
+                series_name=series_name,
+                episode_dir=episode_dir,
+            )
             latency["status"] = "success"
             return
 
@@ -1250,9 +1266,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             episode,
             latency_ms=_ms_since(req_started),
         )
-        context.user_data["last_episode_dir"] = str(episode_dir)
-        context.user_data["last_series_name"] = series_name
-        context.user_data["last_translations_dir"] = str(out_dir)
+        _persist_loaded_title_context(
+            context,
+            translations_dir=out_dir,
+            series_name=series_name,
+            episode_dir=episode_dir,
+        )
         latency["status"] = "success"
 
     except asyncio.TimeoutError:
@@ -1301,25 +1320,35 @@ def _load_translation_pairs_csv(csv_path: Path) -> List[Tuple[str, str, str]]:
     return out
 
 
+def _attach_subtitle_examples(
+    rows: List[Tuple[str, str, str]],
+    subtitle_path: Optional[Path],
+) -> List[Tuple[str, str, str]]:
+    """Attach one subtitle dialogue line per word when an .srt is available."""
+    if not rows or subtitle_path is None or not subtitle_path.is_file():
+        return rows
+    from subtitle_text_utils import extract_word_examples_from_srt_path
+
+    words = [w for w, _t, _ex in rows]
+    ex_map = extract_word_examples_from_srt_path(subtitle_path, words, max_per_word=1)
+    filled: List[Tuple[str, str, str]] = []
+    for w, t, ex in rows:
+        lines = ex_map.get(w, [])
+        if lines:
+            filled.append((w, t, lines[0]))
+        elif ex and ex.upper() != "N/A":
+            filled.append((w, t, ex))
+        else:
+            filled.append((w, t, ""))
+    return filled
+
+
 def _fill_missing_word_examples(
     rows: List[Tuple[str, str, str]],
     subtitle_path: Optional[Path],
 ) -> List[Tuple[str, str, str]]:
-    """Attach subtitle dialogue lines for words missing example_en (legacy CSVs)."""
-    need = [w for w, _t, ex in rows if not ex or ex.upper() == "N/A"]
-    if not need or subtitle_path is None or not subtitle_path.is_file():
-        return rows
-    from subtitle_text_utils import extract_word_examples_from_srt_path
-
-    ex_map = extract_word_examples_from_srt_path(subtitle_path, need, max_per_word=1)
-    filled: List[Tuple[str, str, str]] = []
-    for w, t, ex in rows:
-        if ex and ex.upper() != "N/A":
-            filled.append((w, t, ex))
-            continue
-        lines = ex_map.get(w, [])
-        filled.append((w, t, lines[0] if lines else ""))
-    return filled
+    """Back-compat alias: always prefer subtitle examples when possible."""
+    return _attach_subtitle_examples(rows, subtitle_path)
 
 
 def _word_list_example_suffix(example: str, *, max_len: int = 180) -> str:
@@ -1477,9 +1506,14 @@ async def _reply_bot_message(
     parse_mode: str = "Markdown",
 ) -> None:
     """Send bot text as a new chat message (append to history, never edit prior messages)."""
-    await _chat_message(update, query=query).reply_text(
-        text, parse_mode=parse_mode, reply_markup=reply_markup
-    )
+    msg = _chat_message(update, query=query)
+    try:
+        await msg.reply_text(text, parse_mode=parse_mode, reply_markup=reply_markup)
+        return
+    except BadRequest:
+        if parse_mode is None:
+            raise
+    await msg.reply_text(text, parse_mode=None, reply_markup=reply_markup)
 
 
 async def _reply_bot_chunks(
@@ -1491,13 +1525,101 @@ async def _reply_bot_chunks(
     parse_mode: str = "Markdown",
 ) -> None:
     """Send chunked bot text as new messages; keyboard on the last chunk only."""
+    if not chunks:
+        return
     msg = _chat_message(update, query=query)
+    last = len(chunks) - 1
     for i, part in enumerate(chunks):
-        await msg.reply_text(
-            part,
-            parse_mode=parse_mode,
-            reply_markup=reply_markup if i == len(chunks) - 1 else None,
-        )
+        markup = reply_markup if i == last else None
+        try:
+            await msg.reply_text(part, parse_mode=parse_mode, reply_markup=markup)
+        except BadRequest:
+            if parse_mode is None:
+                raise
+            await msg.reply_text(part, parse_mode=None, reply_markup=markup)
+
+
+def _tier_episode_dir_ready(episode_dir: Path) -> bool:
+    return (episode_dir / "tier_1_hard_usable_words.csv").is_file()
+
+
+def _resolve_episode_dir(
+    translations_dir: Path,
+    context: ContextTypes.DEFAULT_TYPE,
+    *,
+    episode_dir_hint: Optional[Path] = None,
+) -> Optional[Path]:
+    """
+    Locate Tier_lists episode folder for a loaded translations dir.
+    Handles cache hits where translations exist but last_episode_dir was empty or path mismatched.
+    """
+    from download_subtitles import get_tierlist_episode_dir, get_tierlist_movie_dir
+
+    if episode_dir_hint is not None:
+        hinted = Path(episode_dir_hint).resolve()
+        if _tier_episode_dir_ready(hinted):
+            return hinted
+
+    led = (context.user_data.get("last_episode_dir") or "").strip()
+    if led:
+        cached = Path(led).resolve()
+        if _tier_episode_dir_ready(cached):
+            return cached
+
+    ti = _read_translation_info_json(translations_dir)
+    if ti:
+        series = str(ti.get("series") or context.user_data.get("last_series_name") or "").strip()
+        if series:
+            if ti.get("is_movie"):
+                yr = int(ti.get("year", 0))
+                candidate = get_tierlist_movie_dir(TIERLIST_BASE, series, yr)
+            else:
+                candidate = get_tierlist_episode_dir(
+                    TIERLIST_BASE,
+                    series,
+                    int(ti.get("season_number", 1)),
+                    int(ti.get("episode_number", 1)),
+                )
+            if _tier_episode_dir_ready(candidate):
+                return candidate.resolve()
+
+    try:
+        mirrored = (TIERLIST_BASE / translations_dir.resolve().relative_to(TRANSLATIONS_BASE.resolve())).resolve()
+        if _tier_episode_dir_ready(mirrored):
+            return mirrored
+    except ValueError:
+        pass
+
+    sub_name = (ti or {}).get("source_subtitle") or ""
+    if sub_name:
+        for info_path in TIERLIST_BASE.rglob("episode_info.json"):
+            try:
+                data = json.loads(info_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                continue
+            if data.get("subtitle_file") != sub_name:
+                continue
+            parent = info_path.parent.resolve()
+            if _tier_episode_dir_ready(parent):
+                return parent
+    return None
+
+
+def _persist_loaded_title_context(
+    context: ContextTypes.DEFAULT_TYPE,
+    *,
+    translations_dir: Path,
+    series_name: str,
+    episode_dir: Optional[Path] = None,
+) -> Optional[Path]:
+    """Store last_translations_dir and a reliable last_episode_dir for list buttons."""
+    resolved = _resolve_episode_dir(
+        translations_dir, context, episode_dir_hint=episode_dir
+    )
+    context.user_data["last_translations_dir"] = str(translations_dir.resolve())
+    context.user_data["last_series_name"] = series_name
+    context.user_data["last_episode_dir"] = str(resolved) if resolved else ""
+    return resolved
 
 
 def _get_translations_header(
@@ -1540,11 +1662,18 @@ async def _send_translations_list(
     query=None,
 ) -> None:
     """Load tier_1 translations and send frequent C-level list (chunked). Supports callback via query=."""
+    episode_dir = _resolve_episode_dir(translations_dir, context)
     pairs = _load_translations_list(translations_dir)
     sp = _subtitle_path_for_loaded_title(
-        series_name, season, episode, is_movie=is_movie, year=year
+        series_name,
+        season,
+        episode,
+        is_movie=is_movie,
+        year=year,
+        episode_dir=episode_dir,
+        translations_dir=translations_dir,
     )
-    pairs = _fill_missing_word_examples(pairs, sp)
+    pairs = _attach_subtitle_examples(pairs, sp)
     latency_suffix = (
         f"\n⏱ *Latency:* {latency_ms / 1000:.2f}s"
         if isinstance(latency_ms, int) and latency_ms >= 0
@@ -1621,9 +1750,28 @@ def _subtitle_path_for_loaded_title(
     *,
     is_movie: bool,
     year: int,
+    episode_dir: Optional[Path] = None,
+    translations_dir: Optional[Path] = None,
 ) -> Optional[Path]:
     """Resolved .srt path for the loaded title, or None if missing."""
     from download_subtitles import get_movie_subtitle_path, get_subtitle_path
+    from translate_tier_translations import load_episode_info, resolve_subtitle_path
+
+    if episode_dir is not None:
+        ei = load_episode_info(episode_dir)
+        if ei:
+            p = resolve_subtitle_path(episode_dir, ei, SUBTITLE_BASE, None)
+            if p and p.is_file():
+                return p
+
+    if translations_dir is not None:
+        ti = _read_translation_info_json(translations_dir)
+        if ti:
+            ep = _episode_info_from_translation_info(ti)
+            if ep.get("subtitle_file"):
+                p = resolve_subtitle_path(translations_dir, ep, SUBTITLE_BASE, None)
+                if p and p.is_file():
+                    return p
 
     if is_movie:
         p = get_movie_subtitle_path(SUBTITLE_BASE, series_name, year)
@@ -1691,12 +1839,18 @@ async def _send_rare_series_full_list(
     series_name, season, episode, is_movie, year = _get_translations_header(
         translations_dir, context
     )
+    episode_dir = _resolve_episode_dir(translations_dir, context)
     pairs = _load_translation_pairs_csv(translations_dir / translations_csv)
     sp = _subtitle_path_for_loaded_title(
-        series_name, season, episode, is_movie=is_movie, year=year
+        series_name,
+        season,
+        episode,
+        is_movie=is_movie,
+        year=year,
+        episode_dir=episode_dir,
+        translations_dir=translations_dir,
     )
     if not pairs:
-        episode_dir_str = context.user_data.get("last_episode_dir")
         header = (
             f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
             if is_movie
@@ -1704,7 +1858,7 @@ async def _send_rare_series_full_list(
         )
         kb_loaded = keyboard_loaded(context)
 
-        if not episode_dir_str:
+        if episode_dir is None:
             msg = (
                 f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n"
                 "_Could not locate the tier list folder to translate rare words._ "
@@ -1715,7 +1869,7 @@ async def _send_rare_series_full_list(
             )
             return
 
-        episode_dir = Path(episode_dir_str).resolve()
+        episode_dir = episode_dir.resolve()
         if not load_tier_words(episode_dir, tier_words_csv):
             msg = f"{header}\n\n📁 `{_rel_path(last_dir)}/`\n\n{empty_tier_msg}"
             await _reply_bot_message(
@@ -1728,18 +1882,23 @@ async def _send_rare_series_full_list(
         )
 
         sp = _subtitle_path_for_loaded_title(
-            series_name, season, episode, is_movie=is_movie, year=year
+            series_name,
+            season,
+            episode,
+            is_movie=is_movie,
+            year=year,
+            episode_dir=episode_dir,
+            translations_dir=translations_dir,
         )
         loop = asyncio.get_running_loop()
         timeout = 600.0
         tid = tier_id
+        ed = episode_dir
         try:
             ok, _out_dir, trans_err, _metrics = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
-                    lambda ed=episode_dir, p=sp: _do_translate(
-                        ed, p, tier_ids=frozenset({tid})
-                    ),
+                    lambda ed=ed, p=sp, t=tid: _do_translate(ed, p, tier_ids=frozenset({t})),
                 ),
                 timeout=timeout,
             )
@@ -1772,7 +1931,7 @@ async def _send_rare_series_full_list(
             )
             return
 
-    pairs = _fill_missing_word_examples(pairs, sp)
+    pairs = _attach_subtitle_examples(pairs, sp)
     full_text = _format_rare_in_series_full_list(
         series_name, season, episode, pairs, is_movie=is_movie, year=year, band=format_band
     )
@@ -1835,28 +1994,101 @@ async def send_b_level_words(
         await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
         return
 
-    b1, b2 = _load_b_level_pairs(translations_dir)
     series_name, season, episode, is_movie, year = _get_translations_header(
         translations_dir, context
     )
+    episode_dir = _resolve_episode_dir(translations_dir, context)
+    b1, b2 = _load_b_level_pairs(translations_dir)
     sp = _subtitle_path_for_loaded_title(
-        series_name, season, episode, is_movie=is_movie, year=year
+        series_name,
+        season,
+        episode,
+        is_movie=is_movie,
+        year=year,
+        episode_dir=episode_dir,
+        translations_dir=translations_dir,
     )
-    b1 = _fill_missing_word_examples(b1, sp)
-    b2 = _fill_missing_word_examples(b2, sp)
     kb = keyboard_loaded(context)
+    title = (
+        f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
+        if is_movie
+        else f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
+    )
 
     if not b1 and not b2:
-        hint = (
-            "\n\n_If this title has B-level words in tier output, re-run translation "
-            "to generate the B-level translation file._"
+        from translate_tier_translations import (
+            TIER_B1_CSV,
+            TIER_B2_CSV,
+            TIER_ID_B1,
+            TIER_ID_B2,
+            load_tier_words,
         )
-        title = (
-            f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
-            if is_movie
-            else f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
+
+        has_b_words = episode_dir is not None and bool(
+            load_tier_words(episode_dir, TIER_B1_CSV)
+            or load_tier_words(episode_dir, TIER_B2_CSV)
         )
-        msg = f"📗 *B-level words* — {title}\n\n_No B-level translations in this folder yet._{hint}"
+        if has_b_words and episode_dir is not None:
+            await _reply_bot_message(
+                update,
+                query=query,
+                text=f"📗 *B-level words* — {title}\n\n⏳ Translating B-level list…",
+                reply_markup=kb,
+            )
+            loop = asyncio.get_running_loop()
+            ed = episode_dir.resolve()
+            try:
+                ok, _out_dir, trans_err, _metrics = await asyncio.wait_for(
+                    loop.run_in_executor(
+                        None,
+                        lambda: _do_translate(
+                            ed,
+                            sp,
+                            tier_ids=frozenset({TIER_ID_B1, TIER_ID_B2}),
+                        ),
+                    ),
+                    timeout=600.0,
+                )
+            except asyncio.TimeoutError:
+                await _reply_bot_message(
+                    update,
+                    query=query,
+                    text=f"{title}\n\n❌ **Timed out** translating B-level words.",
+                    reply_markup=kb,
+                )
+                return
+            if not ok:
+                reason = (trans_err or "Translation failed.").strip()
+                await _reply_bot_message(
+                    update,
+                    query=query,
+                    text=f"{title}\n\n❌ **B-level translation failed.**\n\n{_md1(reason)}",
+                    reply_markup=kb,
+                )
+                return
+            b1, b2 = _load_b_level_pairs(translations_dir)
+        else:
+            hint = (
+                "\n\n_If this title has B-level words in tier output, re-run translation "
+                "to generate the B-level translation file._"
+            )
+            if episode_dir is None:
+                hint = (
+                    "\n\n_Could not find the tier list folder for this title. "
+                    "Send the episode name again, then tap **Frequent B**._"
+                )
+            msg = f"📗 *B-level words* — {title}\n\n_No B-level translations in this folder yet._{hint}"
+            await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
+            return
+
+    b1 = _attach_subtitle_examples(b1, sp)
+    b2 = _attach_subtitle_examples(b2, sp)
+
+    if not b1 and not b2:
+        msg = (
+            f"📗 *B-level words* — {title}\n\n"
+            "_B-level translation produced no usable rows._"
+        )
         await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
         return
 
@@ -2411,33 +2643,47 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     wrapped = WrappedUpdate(query.message)
 
-    if data == "frequent_c_words":
-        await send_frequent_c_words(wrapped, context, query=query)
-    elif data == "rare_c_series":
-        await send_rare_c_series_full_list(wrapped, context, query=query)
-    elif data == "rare_b_series":
-        await send_rare_b_series_full_list(wrapped, context, query=query)
-    elif data == "b_level_words":
-        await send_b_level_words(wrapped, context, query=query)
-    elif data == "phrasal_verbs":
-        await send_phrasal_verbs(wrapped, context, query=query)
-    elif data == "phrasal_verbs_all":
-        await send_phrasal_verbs(wrapped, context, query=query, show_all=True)
-    elif data == "idiomatic_expressions":
-        await send_idiomatic_expressions(wrapped, context, query=query)
-    elif data == "idiomatic_expressions_all":
-        await send_idiomatic_expressions(wrapped, context, query=query, show_all=True)
-    elif data == "next_series":
-        await next_series(wrapped, context)
-    elif data == "next_movie":
-        await next_movie(wrapped, context)
-    else:
+    try:
+        if data == "frequent_c_words":
+            await send_frequent_c_words(wrapped, context, query=query)
+        elif data == "rare_c_series":
+            await send_rare_c_series_full_list(wrapped, context, query=query)
+        elif data == "rare_b_series":
+            await send_rare_b_series_full_list(wrapped, context, query=query)
+        elif data == "b_level_words":
+            await send_b_level_words(wrapped, context, query=query)
+        elif data == "phrasal_verbs":
+            await send_phrasal_verbs(wrapped, context, query=query)
+        elif data == "phrasal_verbs_all":
+            await send_phrasal_verbs(wrapped, context, query=query, show_all=True)
+        elif data == "idiomatic_expressions":
+            await send_idiomatic_expressions(wrapped, context, query=query)
+        elif data == "idiomatic_expressions_all":
+            await send_idiomatic_expressions(wrapped, context, query=query, show_all=True)
+        elif data == "next_series":
+            await next_series(wrapped, context)
+        elif data == "next_movie":
+            await next_movie(wrapped, context)
+        else:
+            await _reply_bot_message(
+                wrapped,
+                query=query,
+                text="Unknown action.",
+                reply_markup=keyboard_discovery(context),
+                parse_mode=None,
+            )
+    except Exception as e:
+        print(f"button_callback error ({data}): {e}", flush=True)
+        kb = keyboard_loaded(context) if context.user_data.get("last_translations_dir") else keyboard_discovery(context)
         await _reply_bot_message(
             wrapped,
             query=query,
-            text="Unknown action.",
-            reply_markup=keyboard_discovery(context),
-            parse_mode=None,
+            text=(
+                "❌ **Could not show that list.**\n\n"
+                f"{_md1(str(e)[:200])}\n\n"
+                "Try sending the title again, or tap the button once more."
+            ),
+            reply_markup=kb,
         )
 
 

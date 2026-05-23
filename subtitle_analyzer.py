@@ -32,6 +32,7 @@ except ImportError:
     HAS_PANDAS = False
 
 PIPELINE_FINGERPRINT_VERSION = 2
+DEFAULT_MIN_EPISODE_COUNT = 3
 FINGERPRINT_FILENAME = ".pipeline_fingerprint.json"
 TIER_4_RARE_B_WORDS_CSV = "tier_4_rare_b_words.csv"
 TIER_4_RARE_C_WORDS_CSV = "tier_4_rare_c_words.csv"
@@ -334,7 +335,7 @@ def categorize_words(
     vocabulary_levels: Optional[Dict[str, str]] = None,
     series_threshold: Optional[int] = None,
     english_threshold: Optional[int] = None,
-    min_episode_count: Optional[int] = 2,
+    min_episode_count: Optional[int] = DEFAULT_MIN_EPISODE_COUNT,
 ) -> Dict[str, List[Tuple]]:
     """Categorize words into 5 tiers. Returns dict of tier_key -> list of (word, series_count, english_count, ...).
     If min_episode_count is set and > 0, low-English learner quadrants with fewer episode mentions go to tier_2_random.
@@ -830,7 +831,7 @@ def run_pipeline(
     freq_path: Optional[Path] = None,
     filters_dir: Optional[Path] = None,
     max_english_freq: int = 20_000_000,
-    min_episode_count: int = 2,
+    min_episode_count: int = DEFAULT_MIN_EPISODE_COUNT,
     min_length: int = 3,
     save_debug_csv: bool = False,
     debug_output_dir: Optional[Path] = None,
@@ -1124,7 +1125,7 @@ def main() -> None:
     parser.add_argument(
         "--min-episode-count",
         type=int,
-        default=2,
+        default=DEFAULT_MIN_EPISODE_COUNT,
         help="Min mentions in this episode for learner-tier paths (B/C/A); 0 disables",
     )
     parser.add_argument("--min-length", type=int, default=3, help="Min word length")

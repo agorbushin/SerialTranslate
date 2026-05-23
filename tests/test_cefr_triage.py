@@ -37,9 +37,9 @@ def test_build_effective_vocabulary_levels():
     assert eff["other"] == "A2"
 
 
-def test_min_episode_count_routes_single_mention_to_tier2():
-    # One word, threshold 1: high series; low english -> would_be_tier1 but count 1 < min_episode_count 2
-    series_freqs = Counter({"lonely": 1})
+def test_min_episode_count_routes_fewer_than_three_mentions_to_tier2():
+    # High series, low english -> learner tier, but count < min_episode_count (default 3)
+    series_freqs = Counter({"lonely": 2})
     english_freqs = {"lonely": 100}
     tiers = categorize_words(
         series_freqs,
@@ -50,11 +50,29 @@ def test_min_episode_count_routes_single_mention_to_tier2():
         vocabulary_levels={"lonely": "C1"},
         series_threshold=1,
         english_threshold=1_000_000,
-        min_episode_count=2,
+        min_episode_count=3,
     )
     words_t2 = [t[0] for t in tiers["tier_2_random"]]
     assert "lonely" in words_t2
     assert all(t[0] != "lonely" for t in tiers["tier_1_hard_usable"])
+
+
+def test_min_episode_count_three_mentions_in_frequent_tier():
+    series_freqs = Counter({"often": 3})
+    english_freqs = {"often": 100}
+    tiers = categorize_words(
+        series_freqs,
+        english_freqs,
+        max_english_freq=20_000_000,
+        oxford_filter=set(),
+        easy_words_filter=set(),
+        vocabulary_levels={"often": "C1"},
+        series_threshold=1,
+        english_threshold=1_000_000,
+        min_episode_count=3,
+    )
+    words_t1 = [t[0] for t in tiers["tier_1_hard_usable"]]
+    assert "often" in words_t1
 
 
 def test_min_episode_count_disabled():
