@@ -1569,12 +1569,12 @@ def _register_word_buttons(
     context: ContextTypes.DEFAULT_TYPE,
     rows: List[Tuple[str, str, str]],
 ) -> Dict[str, Tuple[str, str, str]]:
-    mapping = context.user_data.setdefault("dict_word_tokens", {})
+    token_map = _bot_data_dict(context).setdefault("dict_word_tokens", {})
     out: Dict[str, Tuple[str, str, str]] = {}
-    for w, t, ex in rows:
-        token = hashlib.sha1(f"{w}|{t}|{ex}".encode("utf-8")).hexdigest()[:16]
-        payload = (w, t, ex)
-        mapping[token] = payload
+    for word, translation, example in rows:
+        token = hashlib.sha1(_dict_entry_key(word, translation).encode("utf-8")).hexdigest()[:16]
+        payload = (word, translation, example)
+        token_map[token] = payload
         out[token] = payload
     return out
 
@@ -1583,29 +1583,64 @@ def _word_toggle_keyboard(
     context: ContextTypes.DEFAULT_TYPE,
     rows: List[Tuple[str, str, str]],
     saved_keys: Collection[str],
-) -> Optional[InlineKeyboardMarkup]:
-    if not rows:
-        return None
-    mapping = _register_word_buttons(context, rows)
+) -> InlineKeyboardMarkup:
+    token_rows = _register_word_buttons(context, rows)
     saved = set(saved_keys)
-    btn_rows: List[List[InlineKeyboardButton]] = []
-    current: List[InlineKeyboardButton] = []
-    for token, (word, translation, _example) in mapping.items():
-        is_saved = _dict_entry_key(word, translation) in saved
-        prefix = "📚" if is_saved else "➕"
-        current.append(
+    buttons: List[List[InlineKeyboardButton]] = []
+    line: List[InlineKeyboardButton] = []
+    for token, (word, translation, _example) in token_rows.items():
+        prefix = "📚" if _dict_entry_key(word, translation) in saved else "➕"
+        line.append(
             InlineKeyboardButton(
-                f"{prefix} {word[:28]}",
+                f"{prefix} {word[:24]}",
                 callback_data=f"dict_toggle:{token}",
             )
         )
-        if len(current) == 2:
-            btn_rows.append(current)
-            current = []
-    if current:
-        btn_rows.append(current)
-    btn_rows.append([InlineKeyboardButton("📚 My words", callback_data="show_my_words")])
-    return InlineKeyboardMarkup(btn_rows)
+        if len(line) == 2:
+            buttons.append(line)
+            line = []
+    if line:
+        buttons.append(line)
+    buttons.extend(keyboard_loaded(context).inline_keyboard)
+    return InlineKeyboardMarkup(buttons)
+
+
+def _bot_data_dict(context: ContextTypes.DEFAULT_TYPE) -> Dict[str, Any]:
+    bd = getattr(context, "bot_data", None)
+    if isinstance(bd, dict):
+        return bd
+    try:
+        context.bot_data = {}
+        return context.bot_data
+    except Exception:
+        return {}
+
+
+def _view_key(chat_id: int, message_id: int) -> str:
+    return f"{chat_id}:{message_id}"
+
+
+def _store_word_view(
+    context: ContextTypes.DEFAULT_TYPE,
+    *,
+    chat_id: int,
+    message_id: int,
+    view: Dict[str, Any],
+) -> None:
+    views = _bot_data_dict(context).setdefault("word_list_views", {})
+    views[_view_key(chat_id, message_id)] = view
+
+
+def _load_word_view(
+    context: ContextTypes.DEFAULT_TYPE,
+    *,
+    chat_id: int,
+    message_id: int,
+) -> Optional[Dict[str, Any]]:
+    views = _bot_data_dict(context).get("word_list_views", {})
+    if not isinstance(views, dict):
+        return None
+    return views.get(_view_key(chat_id, message_id))
 
 
 def _split_message_chunks(text: str, max_len: int = 4096) -> List[str]:
@@ -1641,16 +1676,15 @@ async def _reply_bot_message(
     text: str,
     reply_markup: Optional[InlineKeyboardMarkup] = None,
     parse_mode: str = "Markdown",
-) -> None:
+) -> Any:
     """Send bot text as a new chat message (append to history, never edit prior messages)."""
     msg = _chat_message(update, query=query)
     try:
-        await msg.reply_text(text, parse_mode=parse_mode, reply_markup=reply_markup)
-        return
+        return await msg.reply_text(text, parse_mode=parse_mode, reply_markup=reply_markup)
     except BadRequest:
         if parse_mode is None:
             raise
-    await msg.reply_text(text, parse_mode=None, reply_markup=reply_markup)
+    return await msg.reply_text(text, parse_mode=None, reply_markup=reply_markup)
 
 
 async def _reply_bot_chunks(
@@ -1840,19 +1874,27 @@ async def _send_translations_list(
         text += f"\n\n{latency_suffix}"
     max_len = 4096
     if len(text) <= max_len:
-        await _reply_bot_message(update, query=query, text=text, reply_markup=kb)
+        shown_rows = pairs[:25]
+        word_kb = _word_toggle_keyboard(context, shown_rows, saved_keys)
+        sent = await _reply_bot_message(update, query=query, text=text, reply_markup=word_kb)
+        if sent and hasattr(sent, "chat_id") and hasattr(sent, "message_id"):
+            _store_word_view(
+                context,
+                chat_id=int(sent.chat_id),
+                message_id=int(sent.message_id),
+                view={
+                    "kind": "frequent_c",
+                    "series_name": series_name,
+                    "season": season,
+                    "episode": episode,
+                    "is_movie": is_movie,
+                    "year": year,
+                    "rows": shown_rows,
+                },
+            )
     else:
         parts = _split_message_chunks(text, max_len=max_len)
         await _reply_bot_chunks(update, query=query, chunks=parts, reply_markup=kb)
-    toggle_kb = _word_toggle_keyboard(context, pairs[:25], saved_keys)
-    if toggle_kb is not None:
-        await _reply_bot_message(
-            update,
-            query=query,
-            text="Нажми на слово, чтобы добавить/удалить его из личного словаря:",
-            reply_markup=toggle_kb,
-            parse_mode=None,
-        )
 
 
 async def send_frequent_c_words(
@@ -2105,17 +2147,29 @@ async def _send_rare_series_full_list(
         saved_keys=saved_keys,
     )
     chunks = _split_message_chunks(full_text)
-    kb = keyboard_loaded(context)
-    await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
-    toggle_kb = _word_toggle_keyboard(context, pairs[:40], saved_keys)
-    if toggle_kb is not None:
-        await _reply_bot_message(
-            update,
-            query=query,
-            text="Нажми на слово, чтобы добавить/удалить его из личного словаря:",
-            reply_markup=toggle_kb,
-            parse_mode=None,
-        )
+    if len(chunks) == 1:
+        shown_rows = pairs[:40]
+        word_kb = _word_toggle_keyboard(context, shown_rows, saved_keys)
+        sent = await _reply_bot_message(update, query=query, text=chunks[0], reply_markup=word_kb)
+        if sent and hasattr(sent, "chat_id") and hasattr(sent, "message_id"):
+            _store_word_view(
+                context,
+                chat_id=int(sent.chat_id),
+                message_id=int(sent.message_id),
+                view={
+                    "kind": f"rare_{format_band}",
+                    "series_name": series_name,
+                    "season": season,
+                    "episode": episode,
+                    "is_movie": is_movie,
+                    "year": year,
+                    "rows": shown_rows,
+                    "band": format_band,
+                },
+            )
+    else:
+        kb = keyboard_loaded(context)
+        await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
 
 
 async def send_rare_c_series_full_list(
@@ -2285,16 +2339,27 @@ async def send_b_level_words(
         saved_keys=saved_keys,
     )
     chunks = _split_message_chunks(full_text)
-    await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
-    toggle_kb = _word_toggle_keyboard(context, [*b1, *b2][:40], saved_keys)
-    if toggle_kb is not None:
-        await _reply_bot_message(
-            update,
-            query=query,
-            text="Нажми на слово, чтобы добавить/удалить его из личного словаря:",
-            reply_markup=toggle_kb,
-            parse_mode=None,
-        )
+    if len(chunks) == 1:
+        shown_rows = [*b1, *b2][:40]
+        word_kb = _word_toggle_keyboard(context, shown_rows, saved_keys)
+        sent = await _reply_bot_message(update, query=query, text=chunks[0], reply_markup=word_kb)
+        if sent and hasattr(sent, "chat_id") and hasattr(sent, "message_id"):
+            _store_word_view(
+                context,
+                chat_id=int(sent.chat_id),
+                message_id=int(sent.message_id),
+                view={
+                    "kind": "b_level",
+                    "series_name": series_name,
+                    "season": season,
+                    "episode": episode,
+                    "is_movie": is_movie,
+                    "year": year,
+                    "rows": shown_rows,
+                },
+            )
+    else:
+        await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
 
 
 def _read_translation_info_json(translations_dir: Path) -> Optional[Dict[str, Any]]:
@@ -2873,6 +2938,48 @@ async def show_my_words(
         )
 
 
+def _render_word_view_text(view: Dict[str, Any], saved_keys: Collection[str]) -> str:
+    kind = view.get("kind", "")
+    rows = view.get("rows", [])
+    series_name = view.get("series_name", "Unknown")
+    season = int(view.get("season", 0))
+    episode = int(view.get("episode", 0))
+    is_movie = bool(view.get("is_movie", False))
+    year = int(view.get("year", 0))
+    if kind == "b_level":
+        return _format_b_level_list(
+            series_name,
+            season,
+            episode,
+            rows,
+            [],
+            is_movie=is_movie,
+            year=year,
+            saved_keys=saved_keys,
+        )
+    if kind.startswith("rare_"):
+        return _format_rare_in_series_full_list(
+            series_name,
+            season,
+            episode,
+            rows,
+            is_movie=is_movie,
+            year=year,
+            band=view.get("band", "c"),
+            saved_keys=saved_keys,
+        )
+    return _format_word_list(
+        series_name,
+        season,
+        episode,
+        rows,
+        is_movie=is_movie,
+        year=year,
+        max_lines=max(1, len(rows)),
+        saved_keys=saved_keys,
+    )
+
+
 # Registered in main() as /phrasal; keep name so main() stays unchanged.
 send_phrasal_placeholder = send_phrasal_verbs
 send_idioms_placeholder = send_idiomatic_expressions
@@ -2910,28 +3017,18 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             await send_idiomatic_expressions(wrapped, context, query=query)
         elif data == "idiomatic_expressions_all":
             await send_idiomatic_expressions(wrapped, context, query=query, show_all=True)
-        elif data == "show_my_words":
-            await show_my_words(wrapped, context, query=query)
         elif data.startswith("dict_toggle:"):
             token = data.split(":", 1)[1]
-            payload = context.user_data.get("dict_word_tokens", {}).get(token)
+            payload = _bot_data_dict(context).get("dict_word_tokens", {}).get(token)
             uid = _safe_user_id(update, query=query)
             if not payload or uid is None:
-                await _reply_bot_message(
-                    wrapped,
-                    query=query,
-                    text="Не удалось изменить словарь: слово не найдено. Пожалуйста, открой список заново.",
-                    reply_markup=keyboard_loaded(context),
-                    parse_mode=None,
-                )
+                await query.answer("Слово не найдено. Откройте список заново.", show_alert=False)
                 return
             word, translation, example = payload
             words_map = _get_user_dictionary(uid)
             key = _dict_entry_key(word, translation)
             if key in words_map:
                 words_map.pop(key, None)
-                _set_user_dictionary(uid, words_map)
-                action = "удалено из"
             else:
                 words_map[key] = {
                     "word": word,
@@ -2939,14 +3036,27 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
                     "example": example or "",
                     "saved_at": datetime.now().isoformat(),
                 }
-                _set_user_dictionary(uid, words_map)
-                action = "добавлено в"
-            await _reply_bot_message(
-                wrapped,
-                query=query,
-                text=f"✅ *{_md1(word)}* — {action} личный словарь.",
-                reply_markup=keyboard_loaded(context),
+            _set_user_dictionary(uid, words_map)
+            if not query.message:
+                return
+            view = _load_word_view(
+                context,
+                chat_id=int(query.message.chat_id),
+                message_id=int(query.message.message_id),
             )
+            if not view:
+                await query.answer("Список устарел, откройте заново.", show_alert=False)
+                return
+            saved_keys = set(_get_user_dictionary(uid).keys())
+            text = _render_word_view_text(view, saved_keys)
+            rows = view.get("rows", [])
+            kb = _word_toggle_keyboard(context, rows, saved_keys)
+            try:
+                await query.edit_message_text(text=text, parse_mode="Markdown", reply_markup=kb)
+            except BadRequest:
+                await query.edit_message_text(text=text, parse_mode=None, reply_markup=kb)
+        elif data == "show_my_words":
+            await show_my_words(wrapped, context, query=query)
         elif data == "next_series":
             await next_series(wrapped, context)
         elif data == "next_movie":

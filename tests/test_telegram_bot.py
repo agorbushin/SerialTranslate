@@ -646,6 +646,52 @@ class TestMyWordsFeature:
         text = mock_update.message.reply_text.call_args[0][0]
         assert "Личный словарь пока пуст" in text
 
+    def test_word_toggle_keyboard_builds_buttons(self, mock_context):
+        from telegram_bot import _word_toggle_keyboard
+
+        kb = _word_toggle_keyboard(
+            mock_context,
+            [("maid", "служанка", "")],
+            saved_keys=set(),
+        )
+        assert kb.inline_keyboard
+
+    @pytest.mark.asyncio
+    async def test_dict_toggle_edits_current_message(self, mock_context, mock_callback_query):
+        import telegram_bot as tb
+
+        token = "abc123token"
+        mock_callback_query.data = f"dict_toggle:{token}"
+        mock_callback_query.message.chat_id = 555
+        mock_callback_query.message.message_id = 42
+        mock_callback_query.edit_message_text = AsyncMock()
+        mock_callback_query.message.reply_text = AsyncMock()
+
+        update = Mock(spec=Update)
+        update.callback_query = mock_callback_query
+
+        mock_context.bot_data = {
+            "dict_word_tokens": {token: ("maid", "служанка", "The maid left early.")},
+            "word_list_views": {
+                "555:42": {
+                    "kind": "frequent_c",
+                    "series_name": "Test Show",
+                    "season": 1,
+                    "episode": 1,
+                    "is_movie": False,
+                    "year": 0,
+                    "rows": [("maid", "служанка", "The maid left early.")],
+                }
+            },
+        }
+        with patch.object(tb, "_safe_user_id", return_value=12345):
+            with patch.object(tb, "_get_user_dictionary", return_value={}):
+                with patch.object(tb, "_set_user_dictionary", return_value=None):
+                    await tb.button_callback(update, mock_context)
+
+        assert mock_callback_query.edit_message_text.called
+        assert not mock_callback_query.message.reply_text.called
+
 
 class TestEpisodeDirResolution:
     def test_resolve_episode_dir_from_translation_info(self, temp_dir, monkeypatch):
