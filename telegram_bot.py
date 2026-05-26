@@ -1791,7 +1791,7 @@ def _format_b_level_list(
         seen.add(key)
         merged.append((w, t, ex))
     n = len(merged)
-    header = f"📗 *B-level words* — {title}\n\n📊 *B-level words: {n}*\n\n"
+    header = f"📗 *Frequent B-level words* — {title}\n\n📊 *B-level words: {n}*\n\n"
     if not merged:
         return header + "_No words._"
     show = merged[:max_lines_per_band]
@@ -1832,9 +1832,10 @@ def _format_word_list(
     """Format header + numbered word list. If pairs > max_lines, show first max_lines and '... and N more'."""
     n = len(pairs)
     if is_movie:
-        header = f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "") + f"\n\n📊 *C-level words: {n}*\n\n"
+        title = f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
     else:
-        header = f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n📊 *C-level words: {n}*\n\n"
+        title = f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
+    header = f"📗 *Frequent C-level words* — {title}\n\n📊 *C-level words: {n}*\n\n"
     if not pairs:
         return header + "_No words._"
     show = pairs[:max_lines]
@@ -1874,11 +1875,12 @@ def _format_rare_in_series_full_list(
 ) -> str:
     """Full numbered list for rare-in-series translations (C-level vs B-level band)."""
     n = len(pairs)
-    label = "Rare in series (C1–C2)" if band == "c" else "Rare in series (B1–B2)"
+    list_label = "Rare C-level words" if band == "c" else "Rare B-level words"
     if is_movie:
-        header = f"📋 *{label}* — *{_md1(series_name)}*" + (f" ({year})" if year else "") + f"\n\n📊 *{n} words*\n\n"
+        title = f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
     else:
-        header = f"📋 *{label}* — *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n📊 *{n} words*\n\n"
+        title = f"📺 *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}"
+    header = f"📉 *{list_label}* — {title}\n\n📊 *{n} words*\n\n"
     if not pairs:
         return header + "_No words._"
     saved = set(saved_keys or [])
@@ -2589,7 +2591,7 @@ async def send_b_level_words(
             await _reply_bot_message(
                 update,
                 query=query,
-                text=f"📗 *B-level words* — {title}\n\n⏳ Translating B-level list…",
+                text=f"📗 *Frequent B-level words* — {title}\n\n⏳ Translating B-level list…",
                 reply_markup=kb,
             )
             loop = asyncio.get_running_loop()
@@ -2634,7 +2636,7 @@ async def send_b_level_words(
                     "\n\n_Could not find the tier list folder for this title. "
                     "Send the episode name again, then tap **Frequent B**._"
                 )
-            msg = f"📗 *B-level words* — {title}\n\n_No B-level translations in this folder yet._{hint}"
+            msg = f"📗 *Frequent B-level words* — {title}\n\n_No B-level translations in this folder yet._{hint}"
             await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
             return
 
@@ -2643,7 +2645,7 @@ async def send_b_level_words(
 
     if not b1 and not b2:
         msg = (
-            f"📗 *B-level words* — {title}\n\n"
+            f"📗 *Frequent B-level words* — {title}\n\n"
             "_B-level translation produced no usable rows._"
         )
         await _reply_bot_message(update, query=query, text=msg, reply_markup=kb)
