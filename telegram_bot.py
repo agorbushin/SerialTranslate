@@ -31,10 +31,10 @@ from telegram.ext import (
 from env_config import get_openai_api_key, get_opensubtitles_api_key, resolve_openai_api_key
 from title_resolution import (
     ResolvedTitle,
+    detect_media_intent,
     new_pending_token,
     pending_to_dict,
-    resolve_movie_async,
-    resolve_tv_async,
+    resolve_input_async,
 )
 from translation_modes import DEFAULT_TRANSLATION_MODE
 
@@ -411,12 +411,7 @@ def _raw_looks_like_tv_season_episode(text: str) -> bool:
 
 def _should_auto_route_movie_from_series_mode(raw: str) -> bool:
     """Title + trailing year (movie-shaped) while mode is still series — use movie pipeline."""
-    _, year = _parse_movie_input(raw)
-    if year <= 0:
-        return False
-    if _raw_looks_like_tv_season_episode(raw):
-        return False
-    return True
+    return detect_media_intent(raw, "series") == "movie"
 
 
 def _parse_movie_input(text: str) -> Tuple[str, int]:
@@ -808,13 +803,14 @@ def _title_confirmation_keyboard(token: str, pending: Dict[str, Any]) -> InlineK
     alts = pending.get("alternatives") or []
     for i, alt in enumerate(alts[:2]):
         title = alt.get("canonical_title") or "?"
-        yr = alt.get("year") or 0
-        if pending.get("media_type") == "movie":
-            label = f"{title} ({yr})" if yr else title
+        alt_mt = alt.get("media_type") or pending.get("media_type")
+        if alt_mt == "movie":
+            yr = int(alt.get("year") or 0)
+            label = f"🎬 {title} ({yr})" if yr else f"🎬 {title}"
         else:
-            label = f"{title} S{alt.get('season', 1)}E{alt.get('episode', 1)}"
+            label = f"📺 {title} S{alt.get('season', 1)}E{alt.get('episode', 1)}"
         rows.append(
-            [InlineKeyboardButton(f"📌 {label[:40]}", callback_data=f"title_pick:{token}:{i}")]
+            [InlineKeyboardButton(label[:42], callback_data=f"title_pick:{token}:{i}")]
         )
     rows.append(
         [InlineKeyboardButton("↩️ Keep what I typed", callback_data=f"title_keep:{token}")]
@@ -825,7 +821,9 @@ def _title_confirmation_keyboard(token: str, pending: Dict[str, Any]) -> InlineK
 
 def _title_confirmation_text(pending: Dict[str, Any], resolved: ResolvedTitle) -> str:
     raw = pending.get("raw") or ""
-    mt = pending.get("media_type") or resolved.media_type
+    mt = resolved.media_type if resolved.media_type in ("movie", "tv") else (
+        pending.get("media_type") or "movie"
+    )
     issue = pending.get("issue") or resolved.issue or ""
     if mt == "movie":
         up = pending.get("user_parsed") or {}
@@ -1516,7 +1514,9 @@ async def _handle_message_movie(
     )
 
     phase_started = time.perf_counter()
-    resolved = await resolve_movie_async(movie_name, year, raw_input=raw)
+    resolved = await resolve_input_async(
+        raw, mode="movie", movie_name=movie_name, year=year
+    )
     latency["phase_timings_ms"]["resolve_title"] = _ms_since(phase_started)
     latency["title_resolution"] = {
         "confidence": resolved.confidence,
@@ -1572,7 +1572,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await _handle_message_movie(update, context, raw)
         return
 
-    if _should_auto_route_movie_from_series_mode(raw):
+    if detect_media_intent(raw, mode) == "movie":
         await _handle_message_movie(update, context, raw)
         return
 
@@ -1605,7 +1605,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             }
 
     phase_started = time.perf_counter()
-    resolved = await resolve_tv_async(series_name, season, episode, raw_input=raw)
+    resolved = await resolve_input_async(
+        raw,
+        mode="series",
+        series_name=series_name,
+        season=season,
+        episode=episode,
+    )
     latency["phase_timings_ms"]["resolve_title"] = _ms_since(phase_started)
     latency["title_resolution"] = {
         "confidence": resolved.confidence,

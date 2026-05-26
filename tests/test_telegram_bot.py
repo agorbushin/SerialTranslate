@@ -343,7 +343,7 @@ class TestMessageHandling:
         for series_name in test_cases:
             mock_update.message.text = series_name
             with patch(
-                "telegram_bot.resolve_tv_async",
+                "telegram_bot.resolve_input_async",
                 new_callable=AsyncMock,
                 return_value=high,
             ):
@@ -364,7 +364,7 @@ class TestMessageHandling:
 
         mock_update.message.text = "Fallout S02E01"
         with patch(
-            "telegram_bot.resolve_tv_async",
+            "telegram_bot.resolve_input_async",
             new_callable=AsyncMock,
             return_value=ResolvedTitle(
                 media_type="tv",
@@ -467,7 +467,7 @@ class TestMessageHandling:
         from title_resolution import ResolvedTitle
 
         with patch(
-            "telegram_bot.resolve_tv_async",
+            "telegram_bot.resolve_input_async",
             new_callable=AsyncMock,
             return_value=ResolvedTitle(
                 media_type="tv",
@@ -505,7 +505,7 @@ class TestMessageHandling:
             imdb_id="tt1375666",
         )
         with patch(
-            "telegram_bot.resolve_movie_async",
+            "telegram_bot.resolve_input_async",
             new_callable=AsyncMock,
             return_value=high,
         ):
@@ -536,7 +536,7 @@ class TestMessageHandling:
             user_parsed={"media_type": "movie", "movie_name": "Inception", "year": 2000},
         )
         with patch(
-            "telegram_bot.resolve_movie_async",
+            "telegram_bot.resolve_input_async",
             new_callable=AsyncMock,
             return_value=low,
         ):

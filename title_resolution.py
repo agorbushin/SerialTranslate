@@ -21,6 +21,11 @@ OPENAI_HTTP_TIMEOUT_SEC = 45.0
 
 Confidence = Literal["high", "low"]
 MediaType = Literal["movie", "tv"]
+MediaIntent = Literal["movie", "tv", "ambiguous"]
+
+_TRAILING_YEAR_RE = re.compile(
+    r"(?:^|[\s,;])(?:\(?(19\d{2}|20\d{2})\)?)\s*$"
+)
 
 _TITLE_SCORE_HIGH = 0.88
 _TITLE_SCORE_MIN = 0.70
@@ -38,6 +43,60 @@ def _title_similarity(a: str, b: str) -> float:
     if not na or not nb:
         return 0.0
     return SequenceMatcher(None, na, nb).ratio()
+
+
+def _raw_has_tv_episode_cues(text: str) -> bool:
+    t = (text or "").strip()
+    if not t:
+        return False
+    if re.search(r"\b[sS](?:eason)?\s*\d+\s*[eE](?:p(?:isode)?)?\s*\d+", t):
+        return True
+    if re.search(r"\b[eE](?:p(?:isode)?)?\s*\d+\s*[sS](?:eason)?\s*\d+", t):
+        return True
+    if re.search(r"\b[Ss]\s*\d+\s*[Ee]\s*\d+", t):
+        return True
+    if re.search(r"\b(?:season|episode)\s+\d+", t, re.I):
+        return True
+    return False
+
+
+def _extract_trailing_year(text: str) -> int:
+    m = _TRAILING_YEAR_RE.search((text or "").strip())
+    if not m:
+        return 0
+    try:
+        return int(m.group(1))
+    except ValueError:
+        return 0
+
+
+def _strip_trailing_year(text: str) -> Tuple[str, int]:
+    raw = (text or "").strip()
+    m = _TRAILING_YEAR_RE.search(raw)
+    if not m:
+        return raw, 0
+    name = raw[: m.start()].strip(" .,;()")
+    try:
+        year = int(m.group(1))
+    except ValueError:
+        year = 0
+    return (re.sub(r"\s+", " ", name).strip() or raw), year
+
+
+def detect_media_intent(raw: str, user_mode: str = "series") -> MediaIntent:
+    """
+    Infer whether input is movie-shaped, TV-shaped, or ambiguous (bare title).
+    Movie: explicit /movie mode, or trailing release year without S/E cues.
+    TV: season/episode patterns in text.
+    """
+    text = (raw or "").strip()
+    if user_mode == "movie":
+        return "movie"
+    if _raw_has_tv_episode_cues(text):
+        return "tv"
+    if _extract_trailing_year(text) > 0:
+        return "movie"
+    return "ambiguous"
 
 
 def _release_year(release_date: str) -> int:
@@ -209,6 +268,59 @@ def _score_tv_results(
     return scored
 
 
+def _with_tmdb_ids_only(candidates: List[ResolvedTitle]) -> List[ResolvedTitle]:
+    return [c for c in candidates if c.tmdb_id]
+
+
+def _enrich_movie(api_key: str, candidate: ResolvedTitle) -> ResolvedTitle:
+    if not candidate.tmdb_id:
+        return candidate
+    candidate.imdb_id = _fetch_imdb_id(api_key, "movie", candidate.tmdb_id)
+    return candidate
+
+
+def _enrich_tv(api_key: str, candidate: ResolvedTitle, season: int, episode: int) -> ResolvedTitle:
+    if not candidate.tmdb_id:
+        return candidate
+    candidate.imdb_id = _fetch_imdb_id(api_key, "tv", candidate.tmdb_id)
+    ep_count = _tv_season_episode_count(api_key, candidate.tmdb_id, season)
+    if ep_count > 0 and episode > ep_count:
+        candidate.confidence = "low"
+        candidate.issue = "episode_out_of_range"
+        candidate.reason = f"Season {season} has {ep_count} episodes"
+    return candidate
+
+
+def _verify_movie_on_tmdb(api_key: str, title: str, year: int) -> Optional[ResolvedTitle]:
+    """Find a TMDB movie record for this title/year (required for suggestions)."""
+    query = title.strip()
+    results: List[Dict[str, Any]] = []
+    if year > 0:
+        results = _search_movies(api_key, query, year)
+    if not results:
+        results = _search_movies(api_key, query, 0)
+    scored = _score_movie_results(results, query)
+    if not scored:
+        return None
+    best_score, best = scored[0]
+    if best_score < _TITLE_SCORE_MIN or not best.tmdb_id:
+        return None
+    return _enrich_movie(api_key, best)
+
+
+def _verify_tv_on_tmdb(
+    api_key: str, title: str, season: int, episode: int
+) -> Optional[ResolvedTitle]:
+    results = _search_tv(api_key, title.strip())
+    scored = _score_tv_results(results, title, season, episode)
+    if not scored:
+        return None
+    best_score, best = scored[0]
+    if best_score < _TITLE_SCORE_MIN or not best.tmdb_id:
+        return None
+    return _enrich_tv(api_key, best, season, episode)
+
+
 def _tv_season_episode_count(api_key: str, tmdb_id: int, season: int) -> int:
     try:
         data = _tmdb_get(f"/tv/{tmdb_id}/season/{season}", api_key)
@@ -292,8 +404,12 @@ def _resolve_movie_tmdb(
         best.alternatives = [c for _, c in scored[1:3]]
         return best
 
-    if best.tmdb_id:
-        best.imdb_id = _fetch_imdb_id(api_key, "movie", best.tmdb_id)
+    if not best.tmdb_id:
+        best.confidence = "low"
+        best.issue = "not_found"
+        return best
+
+    best = _enrich_movie(api_key, best)
 
     # Year mismatch: title matches but user year wrong
     user_year = year
@@ -301,13 +417,15 @@ def _resolve_movie_tmdb(
     if user_year > 0 and tmdb_year > 0 and user_year != tmdb_year and top_score >= _TITLE_SCORE_MIN:
         best.confidence = "low"
         best.issue = "year_mismatch"
-        best.alternatives = [c for _, c in scored[1:3] if c.tmdb_id != best.tmdb_id]
+        best.alternatives = _with_tmdb_ids_only(
+            [c for _, c in scored[1:4] if c.tmdb_id != best.tmdb_id]
+        )[:2]
         return best
 
     if len(scored) > 1 and (top_score - second_score) < _AMBIGUITY_GAP and top_score >= _TITLE_SCORE_MIN:
         best.confidence = "low"
         best.issue = "ambiguous"
-        best.alternatives = [c for _, c in scored[1:3]]
+        best.alternatives = _with_tmdb_ids_only([c for _, c in scored[1:4]])[:2]
         return best
 
     if top_score >= _TITLE_SCORE_HIGH and (
@@ -320,13 +438,121 @@ def _resolve_movie_tmdb(
     if top_score >= _TITLE_SCORE_MIN:
         best.confidence = "low"
         best.issue = "uncertain"
-        best.alternatives = [c for _, c in scored[1:3]]
+        best.alternatives = _with_tmdb_ids_only([c for _, c in scored[1:4]])[:2]
         return best
 
     best.confidence = "low"
     best.issue = "not_found"
-    best.alternatives = [c for _, c in scored[1:3]]
+    best.alternatives = _with_tmdb_ids_only([c for _, c in scored[1:4]])[:2]
     return best
+
+
+def resolve_ambiguous(
+    query: str,
+    season: int,
+    episode: int,
+    *,
+    raw_input: str = "",
+    tmdb_api_key: Optional[str] = None,
+) -> ResolvedTitle:
+    """
+    Bare title: search TMDB for both movie and TV, pick the best verified match.
+  Prevents e.g. 'Inception' → TV documentary when the film is the clear winner.
+    """
+    user_parsed: Dict[str, Any] = {
+        "media_type": "ambiguous",
+        "series_name": query,
+        "season": season,
+        "episode": episode,
+        "raw": raw_input or query,
+    }
+    api_key = (tmdb_api_key or get_tmdb_api_key() or "").strip()
+    q = query.strip()
+
+    if api_key:
+        movie_scored = _score_movie_results(_search_movies(api_key, q, 0), q)
+        tv_scored = _score_tv_results(_search_tv(api_key, q), q, season, episode)
+        ms = movie_scored[0][0] if movie_scored else 0.0
+        mc = movie_scored[0][1] if movie_scored else None
+        ts = tv_scored[0][0] if tv_scored else 0.0
+        tc = tv_scored[0][1] if tv_scored else None
+
+        if mc and mc.tmdb_id and ms >= _TITLE_SCORE_MIN and (
+            ms >= _TITLE_SCORE_HIGH or ms >= ts + _CLEAR_WINNER_GAP
+        ):
+            mc = _enrich_movie(api_key, mc)
+            mc.user_parsed = {**user_parsed, "media_type": "movie", "movie_name": q, "year": mc.year}
+            mc.confidence = "high" if ms >= _TITLE_SCORE_HIGH else "low"
+            mc.issue = None if mc.confidence == "high" else "uncertain"
+            alts = _with_tmdb_ids_only([c for _, c in (tv_scored[:2] + movie_scored[1:3])])
+            mc.alternatives = [a for a in alts if a.tmdb_id != mc.tmdb_id][:2]
+            return mc
+
+        if tc and tc.tmdb_id and ts >= _TITLE_SCORE_MIN and (
+            ts >= _TITLE_SCORE_HIGH or ts >= ms + _CLEAR_WINNER_GAP
+        ):
+            tc = _enrich_tv(api_key, tc, season, episode)
+            tc.user_parsed = user_parsed
+            tc.confidence = "high" if ts >= _TITLE_SCORE_HIGH else "low"
+            tc.issue = None if tc.confidence == "high" else "uncertain"
+            alts = _with_tmdb_ids_only([c for _, c in (movie_scored[:2] + tv_scored[1:3])])
+            tc.alternatives = [a for a in alts if a.tmdb_id != tc.tmdb_id][:2]
+            return tc
+
+        # Both weak or close — offer verified options only
+        options: List[ResolvedTitle] = []
+        if mc and mc.tmdb_id and ms >= _TITLE_SCORE_MIN:
+            options.append(_enrich_movie(api_key, mc))
+        if tc and tc.tmdb_id and ts >= _TITLE_SCORE_MIN:
+            options.append(_enrich_tv(api_key, tc, season, episode))
+        if options:
+            best = options[0]
+            best.user_parsed = user_parsed
+            best.confidence = "low"
+            best.issue = "ambiguous"
+            best.alternatives = _with_tmdb_ids_only(options[1:3])
+            return best
+
+    # No TMDB or no hits — GPT TV only if no movie-shaped cues
+    gpt_movie = _resolve_movie_gpt(q, 0, raw_input or q, {**user_parsed, "media_type": "movie", "movie_name": q})
+    if api_key and gpt_movie.canonical_title:
+        verified = _verify_movie_on_tmdb(api_key, gpt_movie.canonical_title, gpt_movie.year)
+        if verified:
+            verified.user_parsed = user_parsed
+            verified.confidence = gpt_movie.confidence
+            verified.issue = gpt_movie.issue
+            return verified
+    if gpt_movie.confidence == "high":
+        gpt_movie.issue = "not_verified"
+        gpt_movie.confidence = "low"
+        return gpt_movie
+
+    return resolve_tv(q, season, episode, raw_input=raw_input, tmdb_api_key=api_key or None)
+
+
+def resolve_input(
+    raw: str,
+    *,
+    mode: str = "series",
+    movie_name: str = "",
+    year: int = 0,
+    series_name: str = "",
+    season: int = 1,
+    episode: int = 1,
+    tmdb_api_key: Optional[str] = None,
+) -> ResolvedTitle:
+    """Single entry: route to movie, TV, or dual TMDB search based on input shape."""
+    intent = detect_media_intent(raw, mode)
+    if intent == "movie":
+        name, yr = _strip_trailing_year(raw)
+        mn = movie_name or name or raw
+        y = year or yr or _extract_trailing_year(raw)
+        return resolve_movie(mn, y, raw_input=raw, tmdb_api_key=tmdb_api_key)
+    if intent == "tv":
+        sn = series_name or raw
+        return resolve_tv(sn, season, episode, raw_input=raw, tmdb_api_key=tmdb_api_key)
+    q = series_name or movie_name or _strip_trailing_year(raw)[0] or raw
+    return resolve_ambiguous(q, season, episode, raw_input=raw, tmdb_api_key=tmdb_api_key)
 
 
 def resolve_tv(
@@ -337,6 +563,14 @@ def resolve_tv(
     raw_input: str = "",
     tmdb_api_key: Optional[str] = None,
 ) -> ResolvedTitle:
+    # Movie-shaped input must not resolve as a TV series (e.g. "Inception 2000" → S1E1).
+    raw = raw_input or series_name
+    if _extract_trailing_year(raw) > 0 and not _raw_has_tv_episode_cues(raw):
+        name, yr = _strip_trailing_year(series_name)
+        if not name or name == series_name:
+            name, yr = _strip_trailing_year(raw)
+        return resolve_movie(name or series_name, yr, raw_input=raw, tmdb_api_key=tmdb_api_key)
+
     user_parsed: Dict[str, Any] = {
         "media_type": "tv",
         "series_name": series_name,
@@ -386,20 +620,20 @@ def _resolve_tv_tmdb(
             series_name, season, episode, user_parsed.get("raw", ""), user_parsed
         )
 
-    if best.tmdb_id:
-        best.imdb_id = _fetch_imdb_id(api_key, "tv", best.tmdb_id)
-        ep_count = _tv_season_episode_count(api_key, best.tmdb_id, season)
-        if ep_count > 0 and episode > ep_count:
-            best.confidence = "low"
-            best.issue = "episode_out_of_range"
-            best.reason = f"Season {season} has {ep_count} episodes"
-            best.alternatives = [c for _, c in scored[1:3]]
-            return best
+    if not best.tmdb_id:
+        return _resolve_tv_gpt(
+            series_name, season, episode, user_parsed.get("raw", ""), user_parsed
+        )
+
+    best = _enrich_tv(api_key, best, season, episode)
+    if best.issue == "episode_out_of_range":
+        best.alternatives = _with_tmdb_ids_only([c for _, c in scored[1:4]])[:2]
+        return best
 
     if len(scored) > 1 and (top_score - second_score) < _AMBIGUITY_GAP and top_score >= _TITLE_SCORE_MIN:
         best.confidence = "low"
         best.issue = "ambiguous"
-        best.alternatives = [c for _, c in scored[1:3]]
+        best.alternatives = _with_tmdb_ids_only([c for _, c in scored[1:4]])[:2]
         return best
 
     if top_score >= _TITLE_SCORE_HIGH or (
@@ -411,7 +645,7 @@ def _resolve_tv_tmdb(
 
     best.confidence = "low"
     best.issue = "uncertain"
-    best.alternatives = [c for _, c in scored[1:3]]
+    best.alternatives = _with_tmdb_ids_only([c for _, c in scored[1:4]])[:2]
     return best
 
 
@@ -469,7 +703,8 @@ If not a movie title, confidence "low"."""
         issue = None if conf == "high" else "gpt_uncertain"
         if year > 0 and yr > 0 and year != yr and _title_similarity(title, movie_name) >= 0.85:
             issue = "year_mismatch"
-        return ResolvedTitle(
+            conf = "low"
+        result = ResolvedTitle(
             media_type="movie",
             canonical_title=title,
             year=yr,
@@ -478,6 +713,20 @@ If not a movie title, confidence "low"."""
             user_parsed=user_parsed,
             reason=(data.get("reason") or "")[:200],
         )
+        tmdb_key = (get_tmdb_api_key() or "").strip()
+        if tmdb_key:
+            verified = _verify_movie_on_tmdb(tmdb_key, title, yr)
+            if verified:
+                verified.user_parsed = user_parsed
+                verified.confidence = conf if conf == "high" else "low"
+                verified.issue = issue
+                verified.reason = result.reason
+                if conf != "high":
+                    verified.confidence = "low"
+                return verified
+            result.confidence = "low"
+            result.issue = result.issue or "not_verified"
+        return result
     except Exception as e:
         fallback.reason = str(e)[:200]
         return fallback
@@ -534,7 +783,7 @@ Official IMDb-style series name. confidence "high" only when sure."""
         if changed and conf == "high":
             issue = "title_corrected"
             conf = "low"
-        return ResolvedTitle(
+        result = ResolvedTitle(
             media_type="tv",
             canonical_title=sn,
             season=s,
@@ -544,9 +793,47 @@ Official IMDb-style series name. confidence "high" only when sure."""
             user_parsed=user_parsed,
             reason=(data.get("reason") or "")[:200],
         )
+        tmdb_key = (get_tmdb_api_key() or "").strip()
+        if tmdb_key:
+            verified = _verify_tv_on_tmdb(tmdb_key, sn, s, e)
+            if verified:
+                verified.user_parsed = user_parsed
+                verified.confidence = conf if conf == "high" else "low"
+                verified.issue = issue
+                verified.reason = result.reason
+                if conf != "high":
+                    verified.confidence = "low"
+                return verified
+            result.confidence = "low"
+            result.issue = result.issue or "not_verified"
+        return result
     except Exception as e:
         fallback.reason = str(e)[:200]
         return fallback
+
+
+async def resolve_input_async(
+    raw: str,
+    *,
+    mode: str = "series",
+    movie_name: str = "",
+    year: int = 0,
+    series_name: str = "",
+    season: int = 1,
+    episode: int = 1,
+) -> ResolvedTitle:
+    import asyncio
+
+    return await asyncio.to_thread(
+        resolve_input,
+        raw,
+        mode=mode,
+        movie_name=movie_name,
+        year=year,
+        series_name=series_name,
+        season=season,
+        episode=episode,
+    )
 
 
 async def resolve_movie_async(

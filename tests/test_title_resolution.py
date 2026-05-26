@@ -12,6 +12,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from title_resolution import (
     ResolvedTitle,
+    detect_media_intent,
+    resolve_ambiguous,
+    resolve_input,
     resolve_movie,
     resolve_tv,
     _resolve_movie_tmdb,
@@ -98,7 +101,8 @@ def test_resolve_movie_gpt_fallback_no_tmdb():
                 mock_openai.return_value.chat.completions.create.return_value = mock_resp
                 result = resolve_movie("Inception", 2000, raw_input="Inception 2000")
 
-    assert result.confidence == "high"
+    assert result.confidence == "low"
+    assert result.issue == "year_mismatch"
     assert result.year == 2010
 
 
@@ -121,6 +125,62 @@ def test_resolve_tv_episode_out_of_range():
 
     assert result.confidence == "low"
     assert result.issue == "episode_out_of_range"
+
+
+def test_detect_media_intent_inception_2000_is_movie():
+    assert detect_media_intent("Inception 2000", "series") == "movie"
+    assert detect_media_intent("Fallout s2 e3", "series") == "tv"
+
+
+def test_resolve_tv_redirects_movie_shaped_input(inception_2010_results):
+    user_parsed = {"media_type": "tv", "series_name": "Inception 2000", "season": 1, "episode": 1}
+
+    def fake_search(api_key, query, year=0):
+        if year == 2000:
+            return []
+        return inception_2010_results
+
+    with patch("title_resolution.get_tmdb_api_key", return_value="fake-key"):
+        with patch("title_resolution._search_movies", side_effect=fake_search):
+            with patch("title_resolution._fetch_imdb_id", return_value="tt1375666"):
+                result = resolve_tv("Inception 2000", 1, 1, raw_input="Inception 2000")
+
+    assert result.media_type == "movie"
+    assert result.year == 2010
+    assert result.confidence == "low"
+    assert result.issue == "year_mismatch"
+    assert result.tmdb_id == 27205
+
+
+def test_resolve_ambiguous_inception_prefers_movie(inception_2010_results):
+    tv_results = [{"id": 999, "name": "Inception", "first_air_date": "2010-01-01"}]
+
+    with patch("title_resolution.get_tmdb_api_key", return_value="fake-key"):
+        with patch("title_resolution._search_movies", return_value=inception_2010_results):
+            with patch("title_resolution._search_tv", return_value=tv_results):
+                with patch("title_resolution._fetch_imdb_id", return_value="tt1375666"):
+                    result = resolve_ambiguous("Inception", 1, 1, raw_input="Inception")
+
+    assert result.media_type == "movie"
+    assert result.year == 2010
+    assert result.tmdb_id == 27205
+
+
+def test_resolve_input_inception_2000_is_movie_not_tv(inception_2010_results):
+    def fake_search(api_key, query, year=0):
+        if year == 2000:
+            return []
+        return inception_2010_results
+
+    with patch("title_resolution.get_tmdb_api_key", return_value="fake-key"):
+        with patch("title_resolution._search_movies", side_effect=fake_search):
+            with patch("title_resolution._search_tv", return_value=[]):
+                with patch("title_resolution._fetch_imdb_id", return_value="tt1375666"):
+                    result = resolve_input("Inception 2000", mode="series")
+
+    assert result.media_type == "movie"
+    assert result.year == 2010
+    assert result.issue == "year_mismatch"
 
 
 def test_resolved_title_from_user_parsed_movie():
