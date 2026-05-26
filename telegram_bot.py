@@ -52,6 +52,9 @@ TIERLIST_BASE = BASE_DIR / "Tier_lists"
 TRANSLATIONS_BASE = BASE_DIR / "translations"
 USER_DICTIONARY_JSON = BASE_DIR / "user_dictionary.json"
 WORD_LINK_INDEX_JSON = BASE_DIR / "word_link_index.json"
+MONITORING_ACTIVITY_JSON = BASE_DIR / "monitoring_activity.json"
+MONITORING_RECENT_EVENTS_LIMIT = 120
+MONITORING_RECENT_EVENTS_PER_USER = 30
 # Rare-in-series lists (high English frequency, low frequency in this episode); see subtitle_analyzer tier_4 split
 TIER_4_RARE_C_TRANSLATIONS_CSV = "tier_4_rare_c_translations.csv"
 TIER_4_RARE_B_TRANSLATIONS_CSV = "tier_4_rare_b_translations.csv"
@@ -288,6 +291,440 @@ def _write_latency(metrics: Dict[str, Any]) -> None:
 
 async def _write_latency_async(metrics: Dict[str, Any]) -> None:
     await asyncio.to_thread(_write_latency, metrics)
+
+
+def _monitoring_allowed_user_ids() -> set[int]:
+    raw = (
+        os.environ.get("MONITORING_ADMIN_IDS")
+        or os.environ.get("TELEGRAM_ADMIN_IDS")
+        or ""
+    )
+    out: set[int] = set()
+    for part in raw.split(","):
+        item = part.strip()
+        if item.isdigit():
+            out.add(int(item))
+    return out
+
+
+def _monitoring_user_from_update(update: Update, *, query=None) -> Optional[Any]:
+    if query is not None:
+        user = getattr(query, "from_user", None)
+        if user is not None:
+            return user
+    user = getattr(update, "effective_user", None)
+    if user is not None:
+        return user
+    msg = getattr(update, "message", None)
+    if msg is not None:
+        return getattr(msg, "from_user", None)
+    return None
+
+
+def _monitoring_user_id(update: Update, *, query=None) -> Optional[int]:
+    user = _monitoring_user_from_update(update, query=query)
+    if user is None:
+        return None
+    raw_id = getattr(user, "id", None)
+    if isinstance(raw_id, bool):
+        return None
+    if isinstance(raw_id, int):
+        return raw_id
+    if isinstance(raw_id, str) and raw_id.strip().isdigit():
+        return int(raw_id.strip())
+    return None
+
+
+def _monitoring_user_label(user: Dict[str, Any]) -> str:
+    username = (user.get("username") or "").strip()
+    if username:
+        return f"@{username}"
+    name = " ".join(
+        p
+        for p in [
+            str(user.get("first_name") or "").strip(),
+            str(user.get("last_name") or "").strip(),
+        ]
+        if p
+    ).strip()
+    return name or f"user {user.get('id', '?')}"
+
+
+def _monitoring_now() -> str:
+    return datetime.now().isoformat(timespec="seconds")
+
+
+def _monitoring_load() -> Dict[str, Any]:
+    if not MONITORING_ACTIVITY_JSON.exists():
+        return {
+            "created_at": _monitoring_now(),
+            "updated_at": None,
+            "events_total": 0,
+            "event_counts": {},
+            "action_counts": {},
+            "click_counts": {},
+            "pipeline_status_counts": {},
+            "pipeline_total_ms": 0,
+            "pipeline_count": 0,
+            "recent_events": [],
+            "users": {},
+        }
+    try:
+        raw = json.loads(MONITORING_ACTIVITY_JSON.read_text(encoding="utf-8"))
+        if isinstance(raw, dict):
+            raw.setdefault("events_total", 0)
+            raw.setdefault("event_counts", {})
+            raw.setdefault("action_counts", {})
+            raw.setdefault("click_counts", {})
+            raw.setdefault("pipeline_status_counts", {})
+            raw.setdefault("pipeline_total_ms", 0)
+            raw.setdefault("pipeline_count", 0)
+            raw.setdefault("recent_events", [])
+            raw.setdefault("users", {})
+            return raw
+    except Exception as e:
+        print(f"Warning: could not read monitoring activity: {e}", flush=True)
+    return {
+        "created_at": _monitoring_now(),
+        "updated_at": None,
+        "events_total": 0,
+        "event_counts": {},
+        "action_counts": {},
+        "click_counts": {},
+        "pipeline_status_counts": {},
+        "pipeline_total_ms": 0,
+        "pipeline_count": 0,
+        "recent_events": [],
+        "users": {},
+    }
+
+
+def _monitoring_save(data: Dict[str, Any]) -> None:
+    try:
+        data["updated_at"] = _monitoring_now()
+        tmp = MONITORING_ACTIVITY_JSON.with_suffix(".tmp")
+        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(MONITORING_ACTIVITY_JSON)
+    except Exception as e:
+        print(f"Warning: could not write monitoring activity: {e}", flush=True)
+
+
+def _monitoring_inc(mapping: Dict[str, Any], key: str, amount: int = 1) -> None:
+    mapping[key] = int(mapping.get(key, 0) or 0) + amount
+
+
+def _monitoring_trim(text: Any, limit: int = 120) -> str:
+    value = str(text or "").replace("\n", " ").strip()
+    if len(value) <= limit:
+        return value
+    return value[: limit - 1].rstrip() + "..."
+
+
+def _monitoring_record_event(
+    update: Update,
+    event_type: str,
+    action: str,
+    *,
+    query=None,
+    details: Optional[Dict[str, Any]] = None,
+) -> None:
+    user_obj = _monitoring_user_from_update(update, query=query)
+    user_id = _monitoring_user_id(update, query=query)
+    if user_id is None:
+        return
+
+    data = _monitoring_load()
+    users = data.setdefault("users", {})
+    key = str(user_id)
+    now = _monitoring_now()
+    user = users.setdefault(
+        key,
+        {
+            "id": user_id,
+            "first_seen": now,
+            "last_seen": now,
+            "username": "",
+            "first_name": "",
+            "last_name": "",
+            "message_count": 0,
+            "command_count": 0,
+            "callback_count": 0,
+            "document_count": 0,
+            "pipeline_count": 0,
+            "pipeline_status_counts": {},
+            "pipeline_total_ms": 0,
+            "click_counts": {},
+            "event_counts": {},
+            "recent_events": [],
+            "last_action": "",
+        },
+    )
+    user["id"] = user_id
+    user["last_seen"] = now
+    if user_obj is not None:
+        user["username"] = _monitoring_trim(getattr(user_obj, "username", None), 80)
+        user["first_name"] = _monitoring_trim(getattr(user_obj, "first_name", None), 80)
+        user["last_name"] = _monitoring_trim(getattr(user_obj, "last_name", None), 80)
+
+    data["events_total"] = int(data.get("events_total", 0) or 0) + 1
+    _monitoring_inc(data.setdefault("event_counts", {}), event_type)
+    _monitoring_inc(data.setdefault("action_counts", {}), action)
+    _monitoring_inc(user.setdefault("event_counts", {}), event_type)
+    if event_type == "message":
+        user["message_count"] = int(user.get("message_count", 0) or 0) + 1
+    elif event_type == "command":
+        user["command_count"] = int(user.get("command_count", 0) or 0) + 1
+    elif event_type == "callback":
+        user["callback_count"] = int(user.get("callback_count", 0) or 0) + 1
+        _monitoring_inc(data.setdefault("click_counts", {}), action)
+        _monitoring_inc(user.setdefault("click_counts", {}), action)
+    elif event_type == "document":
+        user["document_count"] = int(user.get("document_count", 0) or 0) + 1
+
+    event = {
+        "at": now,
+        "user_id": user_id,
+        "user": _monitoring_user_label(user),
+        "type": event_type,
+        "action": action,
+    }
+    if details:
+        event["details"] = {
+            str(k): _monitoring_trim(v, 160) if isinstance(v, str) else v
+            for k, v in details.items()
+            if v is not None
+        }
+    user["last_action"] = f"{event_type}:{action}"
+    user_events = user.setdefault("recent_events", [])
+    user_events.append(event)
+    del user_events[:-MONITORING_RECENT_EVENTS_PER_USER]
+    recent_events = data.setdefault("recent_events", [])
+    recent_events.append(event)
+    del recent_events[:-MONITORING_RECENT_EVENTS_LIMIT]
+    _monitoring_save(data)
+
+
+def _monitoring_record_pipeline_start(
+    update: Update,
+    *,
+    mode: str,
+    raw_input: str,
+) -> None:
+    _monitoring_record_event(
+        update,
+        "pipeline_start",
+        f"{mode}_request",
+        details={"input": _monitoring_trim(raw_input, 120)},
+    )
+    user_id = _monitoring_user_id(update)
+    if user_id is None:
+        return
+    data = _monitoring_load()
+    user = data.setdefault("users", {}).setdefault(str(user_id), {"id": user_id})
+    user["active_pipeline"] = {
+        "started_at": _monitoring_now(),
+        "mode": mode,
+        "input": _monitoring_trim(raw_input, 120),
+    }
+    _monitoring_save(data)
+
+
+def _monitoring_record_pipeline_finish(update: Update, latency: Dict[str, Any]) -> None:
+    user_id = _monitoring_user_id(update)
+    if user_id is None:
+        return
+    status = str(latency.get("status") or "unknown")
+    total_ms = int((latency.get("timings_ms") or {}).get("total_e2e_ms") or 0)
+    identity = latency.get("identity") if isinstance(latency.get("identity"), dict) else {}
+    if identity.get("movie_name"):
+        title = _movie_label(str(identity.get("movie_name")), int(identity.get("year") or 0))
+    else:
+        title = str(identity.get("series_name") or identity.get("canonical_title") or "")
+
+    data = _monitoring_load()
+    user = data.setdefault("users", {}).setdefault(str(user_id), {"id": user_id})
+    user["pipeline_count"] = int(user.get("pipeline_count", 0) or 0) + 1
+    user["pipeline_total_ms"] = int(user.get("pipeline_total_ms", 0) or 0) + total_ms
+    user.pop("active_pipeline", None)
+    _monitoring_inc(user.setdefault("pipeline_status_counts", {}), status)
+    data["pipeline_count"] = int(data.get("pipeline_count", 0) or 0) + 1
+    data["pipeline_total_ms"] = int(data.get("pipeline_total_ms", 0) or 0) + total_ms
+    _monitoring_inc(data.setdefault("pipeline_status_counts", {}), status)
+    user["last_pipeline"] = {
+        "at": _monitoring_now(),
+        "status": status,
+        "branch": latency.get("branch") or "",
+        "title": _monitoring_trim(title, 120),
+        "duration_ms": total_ms,
+        "error": _monitoring_trim(latency.get("error") or "", 160),
+    }
+    _monitoring_save(data)
+    _monitoring_record_event(
+        update,
+        "pipeline_finish",
+        status,
+        details={
+            "title": title,
+            "branch": latency.get("branch") or "",
+            "duration_s": round(total_ms / 1000, 2),
+            "error": latency.get("error") or "",
+        },
+    )
+
+
+def _monitoring_parse_time(value: Any) -> Optional[datetime]:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value))
+    except ValueError:
+        return None
+
+
+def _monitoring_format_span(seconds: float) -> str:
+    seconds = max(0, int(seconds))
+    if seconds < 60:
+        return f"{seconds}s"
+    minutes, seconds = divmod(seconds, 60)
+    if minutes < 60:
+        return f"{minutes}m {seconds}s"
+    hours, minutes = divmod(minutes, 60)
+    if hours < 48:
+        return f"{hours}h {minutes}m"
+    days, hours = divmod(hours, 24)
+    return f"{days}d {hours}h"
+
+
+def _monitoring_top_items(mapping: Dict[str, Any], limit: int = 8) -> List[str]:
+    pairs = sorted(
+        ((str(k), int(v or 0)) for k, v in mapping.items()),
+        key=lambda item: (-item[1], item[0]),
+    )
+    return [f"{k}: {v}" for k, v in pairs[:limit]]
+
+
+def _monitoring_render_report() -> str:
+    data = _monitoring_load()
+    now = datetime.now()
+    users = [
+        u for u in data.get("users", {}).values() if isinstance(u, dict)
+    ]
+    active_24h = 0
+    active_7d = 0
+    for user in users:
+        last = _monitoring_parse_time(user.get("last_seen"))
+        if not last:
+            continue
+        age = (now - last).total_seconds()
+        if age <= 24 * 3600:
+            active_24h += 1
+        if age <= 7 * 24 * 3600:
+            active_7d += 1
+
+    pipeline_count = int(data.get("pipeline_count", 0) or 0)
+    pipeline_total_ms = int(data.get("pipeline_total_ms", 0) or 0)
+    avg_pipeline = (
+        f"{pipeline_total_ms / pipeline_count / 1000:.1f}s"
+        if pipeline_count
+        else "n/a"
+    )
+    lines = [
+        "Monitoring",
+        "",
+        f"Users: {len(users)} total, {active_24h} active in 24h, {active_7d} active in 7d",
+        f"Events: {int(data.get('events_total', 0) or 0)}",
+        f"Pipelines: {pipeline_count}, avg {avg_pipeline}",
+    ]
+    status_line = ", ".join(_monitoring_top_items(data.get("pipeline_status_counts", {}), 6))
+    if status_line:
+        lines.append(f"Pipeline statuses: {status_line}")
+    top_clicks = ", ".join(_monitoring_top_items(data.get("click_counts", {}), 8))
+    if top_clicks:
+        lines.extend(["", f"Top clicks: {top_clicks}"])
+
+    active = []
+    for user in users:
+        active_pipeline = user.get("active_pipeline")
+        if isinstance(active_pipeline, dict):
+            started = _monitoring_parse_time(active_pipeline.get("started_at"))
+            age = _monitoring_format_span((now - started).total_seconds()) if started else "?"
+            active.append(
+                f"{_monitoring_user_label(user)}: {active_pipeline.get('mode', '?')} "
+                f"for {age} ({active_pipeline.get('input', '')})"
+            )
+    if active:
+        lines.extend(["", "Active now:"])
+        lines.extend(active[:8])
+
+    users_sorted = sorted(
+        users,
+        key=lambda user: str(user.get("last_seen") or ""),
+        reverse=True,
+    )
+    if users_sorted:
+        lines.extend(["", "Users:"])
+    for idx, user in enumerate(users_sorted[:10], start=1):
+        first = _monitoring_parse_time(user.get("first_seen"))
+        last = _monitoring_parse_time(user.get("last_seen"))
+        lifetime = (
+            _monitoring_format_span((last - first).total_seconds())
+            if first and last
+            else "?"
+        )
+        last_seen = last.strftime("%Y-%m-%d %H:%M") if last else "?"
+        clicks = int(user.get("callback_count", 0) or 0)
+        messages = int(user.get("message_count", 0) or 0)
+        commands = int(user.get("command_count", 0) or 0)
+        pipelines = int(user.get("pipeline_count", 0) or 0)
+        avg_user_pipeline = (
+            f"{int(user.get('pipeline_total_ms', 0) or 0) / pipelines / 1000:.1f}s"
+            if pipelines
+            else "n/a"
+        )
+        last_pipeline = user.get("last_pipeline") if isinstance(user.get("last_pipeline"), dict) else {}
+        lines.append(
+            f"{idx}. {_monitoring_user_label(user)} ({user.get('id')}) - "
+            f"last {last_seen}; in bot {lifetime}; msg {messages}, cmd {commands}, "
+            f"click {clicks}, runs {pipelines}, avg run {avg_user_pipeline}"
+        )
+        if last_pipeline:
+            lp_title = last_pipeline.get("title") or ""
+            lp_status = last_pipeline.get("status") or "?"
+            lp_seconds = int(last_pipeline.get("duration_ms") or 0) / 1000
+            lines.append(f"   last run: {lp_status} {lp_seconds:.1f}s {lp_title}".rstrip())
+        click_line = ", ".join(_monitoring_top_items(user.get("click_counts", {}), 4))
+        if click_line:
+            lines.append(f"   clicks: {click_line}")
+
+    recent = data.get("recent_events", [])
+    if recent:
+        lines.extend(["", "Recent actions:"])
+    for event in list(reversed(recent))[:12]:
+        at = _monitoring_parse_time(event.get("at"))
+        stamp = at.strftime("%H:%M:%S") if at else "?"
+        detail = ""
+        details = event.get("details")
+        if isinstance(details, dict):
+            if details.get("input"):
+                detail = f" - {details.get('input')}"
+            elif details.get("title"):
+                detail = f" - {details.get('title')}"
+        lines.append(
+            f"{stamp} {event.get('user', '?')}: "
+            f"{event.get('type', '?')} {event.get('action', '?')}{detail}"
+        )
+
+    return "\n".join(lines)[:3900]
+
+
+async def monitoring(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    allowed = _monitoring_allowed_user_ids()
+    user_id = _monitoring_user_id(update)
+    if allowed and user_id not in allowed:
+        await update.message.reply_text("Monitoring is not available for this account.")
+        return
+    _monitoring_record_event(update, "command", "monitoring")
+    await update.message.reply_text(_monitoring_render_report())
 
 
 def keyboard_discovery(context: ContextTypes.DEFAULT_TYPE) -> InlineKeyboardMarkup:
@@ -575,6 +1012,7 @@ Return ONLY a JSON object with exactly this key: "series_name". No markdown."""
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    _monitoring_record_event(update, "command", "start")
     context.user_data["mode"] = "series"
     args = context.args if isinstance(getattr(context, "args", None), list) else []
     if args and str(args[0]).startswith("dw_"):
@@ -582,10 +1020,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
     build = BOT_BUILD_DATETIME or "unknown"
     await update.message.reply_text(
-        "👋 **SerialTranslate**\n\n"
-        "Gives a list of hard words with short English meanings from a specific episode of a TV series or a movie.\n"
-        "Keeps track of the words you want to learn\n"
-        "\n"
+        "👋 **Welcome to SerialTranslate**\n\n"
+        "Gives a list of hard words with short English meanings from a specific episode of a TV series or a movie.\n\n"
+        "Keeps track of the words you want to learn\n\n"
         "To start enter the name of a TV series with season and episode or a movie with a year \n(e.g. Fallout S2E2, _The Matrix 1999_).\n\n"
         f"_v{BOT_VERSION} · {build}_",
         parse_mode="Markdown",
@@ -594,6 +1031,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def next_series(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.__class__.__name__ != "CallbackWrappedUpdate":
+        _monitoring_record_event(update, "command", "next")
     context.user_data["mode"] = "series"
     await update.message.reply_text(
         "📺 **Which TV series?**\n\n"
@@ -605,6 +1044,8 @@ async def next_series(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 async def next_movie(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.__class__.__name__ != "CallbackWrappedUpdate":
+        _monitoring_record_event(update, "command", "movie")
     context.user_data["mode"] = "movie"
     await update.message.reply_text(
         "🎬 **Which movie?**\n\n"
@@ -1162,6 +1603,7 @@ async def _run_movie_pipeline(
         latency["finished_at"] = datetime.now().isoformat()
         latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
         await _write_latency_async(latency)
+        _monitoring_record_pipeline_finish(update, latency)
 
 
 async def _run_series_pipeline(
@@ -1428,6 +1870,7 @@ async def _run_series_pipeline(
         latency["finished_at"] = datetime.now().isoformat()
         latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
         await _write_latency_async(latency)
+        _monitoring_record_pipeline_finish(update, latency)
 
 
 def _do_analyze_movie(
@@ -1518,6 +1961,7 @@ async def _handle_message_movie(
     update: Update, context: ContextTypes.DEFAULT_TYPE, raw: str
 ) -> None:
     """Handle movie search flow: parse, resolve title, confirm if needed, then pipeline."""
+    _monitoring_record_pipeline_start(update, mode="movie", raw_input=raw)
     context.user_data.pop("pending_title", None)
     _clear_pipeline_status(context)
     req_started = time.perf_counter()
@@ -1570,6 +2014,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     raw = update.message.text.strip()
+    if raw == "\\monitoring":
+        await monitoring(update, context)
+        return
+    _monitoring_record_event(
+        update,
+        "message",
+        "text",
+        details={"input": _monitoring_trim(raw, 120)},
+    )
     if _is_show_my_words_text(raw):
         await show_my_words(update, context)
         return
@@ -1597,6 +2050,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await _handle_message_movie(update, context, raw)
         return
 
+    _monitoring_record_pipeline_start(update, mode="series", raw_input=raw)
     context.user_data.pop("pending_title", None)
     _clear_pipeline_status(context)
     phase_started = time.perf_counter()
@@ -2556,6 +3010,8 @@ async def send_full_list(
     *,
     query=None,
 ) -> None:
+    if query is None:
+        _monitoring_record_event(update, "command", "full")
     await send_rare_c_series_full_list(update, context, query=query)
 
 
@@ -2990,6 +3446,8 @@ async def send_phrasal_verbs(
     show_all: bool = False,
 ) -> None:
     """Load or generate phrasal_verbs.csv; send top N preview unless ``show_all``."""
+    if query is None:
+        _monitoring_record_event(update, "command", "phrasal")
     last_dir = context.user_data.get("last_translations_dir")
     kb_empty = keyboard_discovery(context)
 
@@ -3130,6 +3588,8 @@ async def send_idiomatic_expressions(
     show_all: bool = False,
 ) -> None:
     """Load or generate idiomatic_expressions.csv; send top N preview unless ``show_all``."""
+    if query is None:
+        _monitoring_record_event(update, "command", "idioms")
     if not IDIOMS_FEATURE_ENABLED:
         await _send_idioms_disabled_placeholder(update, context, query=query)
         return
@@ -3252,6 +3712,8 @@ async def show_my_words(
     *,
     query=None,
 ) -> None:
+    if query is None:
+        _monitoring_record_event(update, "command", "mywords")
     user_id = _safe_user_id(update, query=query)
     if user_id is None:
         await _reply_bot_message(
@@ -3475,6 +3937,7 @@ async def _handle_title_callback(
             latency["finished_at"] = datetime.now().isoformat()
             latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
             await _write_latency_async(latency)
+            _monitoring_record_pipeline_finish(wrapped, latency)
         await _reply_bot_message(
             wrapped,
             query=query,
@@ -3533,6 +3996,13 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     data = query.data or ""
     if not query.message:
         return
+    _monitoring_record_event(
+        update,
+        "callback",
+        data.split(":", 1)[0] if data.startswith("title_") else data,
+        query=query,
+        details={"callback_data": _monitoring_trim(data, 160)},
+    )
 
     wrapped = _wrap_callback_update(query)
 
@@ -3585,6 +4055,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 async def handle_document_placeholder(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    _monitoring_record_event(update, "document", "upload_placeholder")
     await update.message.reply_text(
         "📥 Subtitle file upload: *coming soon.*\n\n"
         "For now, send a TV series or movie title (e.g. _Game of Thrones s2 e3_) to build a word list.",
@@ -3602,6 +4073,7 @@ def main() -> None:
     print(f"Bot build (start) time: {BOT_BUILD_DATETIME}", flush=True)
     print("Bot running. Real output: hard-word translations saved under translations/", flush=True)
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
+    app.add_handler(CommandHandler("monitoring", monitoring))
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("next", next_series))
     app.add_handler(CommandHandler("movie", next_movie))

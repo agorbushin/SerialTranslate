@@ -16,6 +16,7 @@ env/
 *.tmp
 test_results/
 daily_subtitle_state.json
+monitoring_activity.json
 
 # Secrets (loaded by env_config.load_dotenv)
 .env
