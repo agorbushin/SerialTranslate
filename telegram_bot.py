@@ -29,6 +29,13 @@ from telegram.ext import (
 )
 
 from env_config import get_openai_api_key, get_opensubtitles_api_key, resolve_openai_api_key
+from title_resolution import (
+    ResolvedTitle,
+    new_pending_token,
+    pending_to_dict,
+    resolve_movie_async,
+    resolve_tv_async,
+)
 from translation_modes import DEFAULT_TRANSLATION_MODE
 
 TELEGRAM_BOT_TOKEN = (os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip()
@@ -721,17 +728,688 @@ def _do_analyze(
     return episode_dir, analyze_metrics, raw if isinstance(raw, str) else None
 
 
-def _do_download_movie(movie_name: str, year: int) -> Optional[Path]:
+def _do_download_movie(
+    movie_name: str,
+    year: int,
+    *,
+    imdb_id: Optional[str] = None,
+) -> Optional[Path]:
     """Download movie subtitle. Returns subtitle path or None."""
     from download_movie_subtitles import download_movie_subtitle
 
     path = download_movie_subtitle(
         movie_title=movie_name,
         year=year,
+        imdb_id=imdb_id,
         base_dir=SUBTITLE_BASE,
         api_key=OPENSUBTITLES_API_KEY,
     )
     return path
+
+
+def _movie_label(movie_name: str, year: int) -> str:
+    return f"*{_md1(movie_name)}*" + (f" ({year})" if year else "")
+
+
+def _identity_from_resolved(resolved: ResolvedTitle) -> Dict[str, Any]:
+    d = resolved.to_identity_dict()
+    if resolved.media_type == "movie":
+        d["movie_name"] = resolved.canonical_title
+    else:
+        d["series_name"] = resolved.canonical_title
+    return d
+
+
+def _identity_from_pending_choice(
+    pending: Dict[str, Any], choice: str, pick_index: Optional[int] = None
+) -> Dict[str, Any]:
+    mt = pending.get("media_type") or "movie"
+    if choice == "keep":
+        up = dict(pending.get("user_parsed") or {})
+        if mt == "movie":
+            name = str(up.get("movie_name") or "Unknown")
+            return {
+                "media_type": "movie",
+                "movie_name": name,
+                "canonical_title": name,
+                "year": int(up.get("year") or 0),
+            }
+        name = str(up.get("series_name") or "Unknown")
+        return {
+            "media_type": "tv",
+            "series_name": name,
+            "canonical_title": name,
+            "season": int(up.get("season") or 1),
+            "episode": int(up.get("episode") or 1),
+        }
+    if choice == "pick" and pick_index is not None:
+        alts = pending.get("alternatives") or []
+        if 0 <= pick_index < len(alts):
+            alt = dict(alts[pick_index])
+            if mt == "movie":
+                alt["movie_name"] = alt.get("canonical_title") or alt.get("movie_name")
+            else:
+                alt["series_name"] = alt.get("canonical_title") or alt.get("series_name")
+            alt["media_type"] = mt
+            return alt
+    sug = dict(pending.get("suggestion") or {})
+    if mt == "movie":
+        sug["movie_name"] = sug.get("canonical_title") or sug.get("movie_name")
+    else:
+        sug["series_name"] = sug.get("canonical_title") or sug.get("series_name")
+    sug["media_type"] = mt
+    return sug
+
+
+def _title_confirmation_keyboard(token: str, pending: Dict[str, Any]) -> InlineKeyboardMarkup:
+    rows: List[List[InlineKeyboardButton]] = [
+        [InlineKeyboardButton("✅ Use suggestion", callback_data=f"title_use:{token}")]
+    ]
+    alts = pending.get("alternatives") or []
+    for i, alt in enumerate(alts[:2]):
+        title = alt.get("canonical_title") or "?"
+        yr = alt.get("year") or 0
+        if pending.get("media_type") == "movie":
+            label = f"{title} ({yr})" if yr else title
+        else:
+            label = f"{title} S{alt.get('season', 1)}E{alt.get('episode', 1)}"
+        rows.append(
+            [InlineKeyboardButton(f"📌 {label[:40]}", callback_data=f"title_pick:{token}:{i}")]
+        )
+    rows.append(
+        [InlineKeyboardButton("↩️ Keep what I typed", callback_data=f"title_keep:{token}")]
+    )
+    rows.append([InlineKeyboardButton("❌ Cancel", callback_data=f"title_cancel:{token}")])
+    return InlineKeyboardMarkup(rows)
+
+
+def _title_confirmation_text(pending: Dict[str, Any], resolved: ResolvedTitle) -> str:
+    raw = pending.get("raw") or ""
+    mt = pending.get("media_type") or resolved.media_type
+    issue = pending.get("issue") or resolved.issue or ""
+    if mt == "movie":
+        up = pending.get("user_parsed") or {}
+        entered = f"*{_md1(up.get('movie_name', raw))}*"
+        uy = int(up.get("year") or 0)
+        if uy:
+            entered += f" ({uy})"
+        suggested = _movie_label(resolved.canonical_title, resolved.year)
+        if issue == "year_mismatch":
+            body = f"You entered: {entered}\nBest match: {suggested} — use this year?"
+        elif issue == "ambiguous":
+            body = f"You entered: {entered}\nDid you mean {suggested}?"
+        else:
+            body = f"You entered: {entered}\nSuggested: {suggested}"
+    else:
+        up = pending.get("user_parsed") or {}
+        sn = up.get("series_name") or raw
+        s, e = int(up.get("season", 1)), int(up.get("episode", 1))
+        entered = f"*{_md1(sn)}*{_tv_episode_suffix(sn, s, e)}"
+        suggested = (
+            f"*{_md1(resolved.canonical_title)}*"
+            f"{_tv_episode_suffix(resolved.canonical_title, resolved.season, resolved.episode)}"
+        )
+        if issue == "episode_out_of_range":
+            body = f"You entered: {entered}\n{resolved.reason}\nSuggested: {suggested}"
+        else:
+            body = f"You entered: {entered}\nDid you mean {suggested}?"
+    return f"🔍 **Confirm title**\n\n{body}\n\nTap a button to continue."
+
+
+async def _send_title_confirmation(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    resolved: ResolvedTitle,
+    token: str,
+    raw: str,
+    latency: Dict[str, Any],
+    req_started: float,
+) -> None:
+    pending = pending_to_dict(resolved, token, raw)
+    pending["latency"] = latency
+    pending["req_started"] = req_started
+    context.user_data["pending_title"] = pending
+    await update.message.reply_text(
+        _title_confirmation_text(pending, resolved),
+        parse_mode="Markdown",
+        reply_markup=_title_confirmation_keyboard(token, pending),
+    )
+
+
+async def _run_movie_pipeline(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    identity: Dict[str, Any],
+    latency: Dict[str, Any],
+    req_started: float,
+) -> None:
+    movie_name = str(identity.get("movie_name") or identity.get("canonical_title") or "Unknown")
+    year = int(identity.get("year") or 0)
+    imdb_id = identity.get("imdb_id")
+    latency["identity"] = {"movie_name": movie_name, "year": year, "imdb_id": imdb_id}
+    label = _movie_label(movie_name, year)
+    loop = asyncio.get_running_loop()
+    timeout = 600.0
+
+    try:
+        phase_started = time.perf_counter()
+        episode_dir, translations_dir, subtitle_path = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: _find_existing_movie(movie_name, year),
+            ),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["find_existing"] = _ms_since(phase_started)
+
+        if translations_dir is not None:
+            latency["branch"] = "cache_hit_translations"
+            await update.message.reply_text(
+                f"🎬 Processing: {label}\n"
+                f"✅ Found existing translations.\n\n"
+                f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            await _send_translations_list(
+                update,
+                context,
+                translations_dir,
+                movie_name,
+                0,
+                0,
+                is_movie=True,
+                year=year,
+                latency_ms=_ms_since(req_started),
+            )
+            _persist_loaded_title_context(
+                context,
+                translations_dir=translations_dir,
+                series_name=movie_name,
+                episode_dir=episode_dir,
+            )
+            latency["status"] = "success"
+            return
+
+        if episode_dir is not None:
+            latency["branch"] = "tier_exists_translate_only"
+            await update.message.reply_text(
+                f"🎬 Processing: {label}\n"
+                f"✅ Found existing hard words list.\n\n"
+                "⏳ Translating words…",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            if subtitle_path is None:
+                await update.message.reply_text(
+                    f"🎬 Processing: {label}\n"
+                    "⏳ Subtitle file missing, downloading…",
+                    parse_mode="Markdown",
+                    reply_markup=keyboard_discovery(context),
+                )
+                phase_started = time.perf_counter()
+                subtitle_path = await asyncio.wait_for(
+                    loop.run_in_executor(
+                        None,
+                        lambda m=movie_name, y=year, imdb=imdb_id: _do_download_movie(
+                            m, y, imdb_id=imdb
+                        ),
+                    ),
+                    timeout=timeout,
+                )
+                latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
+                if not subtitle_path:
+                    await update.message.reply_text(
+                        f"❌ **Subtitle download failed** for {label}.\n\n"
+                        "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
+                        parse_mode="Markdown",
+                        reply_markup=keyboard_discovery(context),
+                    )
+                    latency["status"] = "failed"
+                    latency["error"] = "subtitle_download_failed"
+                    return
+            phase_started = time.perf_counter()
+            ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
+                loop.run_in_executor(
+                    None,
+                    lambda: _do_translate(episode_dir, subtitle_path),
+                ),
+                timeout=timeout,
+            )
+            latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
+            latency["translator_metrics"] = translator_metrics
+            if not ok or not out_dir:
+                reason = (trans_err or "Translation failed.").strip()
+                await update.message.reply_text(
+                    f"❌ **Translation failed.**\n\n{_md1(reason)}",
+                    parse_mode="Markdown",
+                    reply_markup=keyboard_discovery(context),
+                )
+                latency["status"] = "failed"
+                latency["error"] = reason
+                return
+            rel = out_dir.relative_to(BASE_DIR)
+            await update.message.reply_text(
+                f"✅ {label}\n\n"
+                f"📁 C-level words translated and saved to: `{rel}/`",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            await _send_translations_list(
+                update,
+                context,
+                out_dir,
+                movie_name,
+                0,
+                0,
+                is_movie=True,
+                year=year,
+                latency_ms=_ms_since(req_started),
+            )
+            _persist_loaded_title_context(
+                context,
+                translations_dir=out_dir,
+                series_name=movie_name,
+                episode_dir=episode_dir,
+            )
+            latency["status"] = "success"
+            return
+
+        latency["branch"] = "full_pipeline"
+        await update.message.reply_text(
+            f"🎬 Processing: {label}\n\n"
+            "⏳ Downloading subtitle…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        phase_started = time.perf_counter()
+        subtitle_path = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda m=movie_name, y=year, imdb=imdb_id: _do_download_movie(m, y, imdb_id=imdb),
+            ),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
+        if not subtitle_path:
+            await update.message.reply_text(
+                f"❌ **Subtitle download failed** for {label}.\n\n"
+                "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            latency["status"] = "failed"
+            latency["error"] = "subtitle_download_failed"
+            return
+
+        await update.message.reply_text(
+            f"🎬 Processing: {label}\n"
+            f"✅ Subtitle downloaded.\n\n"
+            "⏳ Building the hard-word list from the subtitle…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        phase_started = time.perf_counter()
+        episode_dir, analyze_metrics, subtitle_raw_handoff = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda sp=subtitle_path, mn=movie_name, y=year: _do_analyze_movie(sp, mn, y),
+            ),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
+        latency["analyze_metrics"] = analyze_metrics
+        if not episode_dir:
+            await update.message.reply_text(
+                "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
+                "The file may be invalid or empty.",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            latency["status"] = "failed"
+            latency["error"] = "tier_list_build_failed"
+            return
+
+        await update.message.reply_text(
+            f"🎬 Processing: {label}\n"
+            f"✅ C-level list ready.\n\n"
+            "⏳ Translating words…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        phase_started = time.perf_counter()
+        ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda ed=episode_dir, sp=subtitle_path, raw=subtitle_raw_handoff: _do_translate(
+                    ed, sp, subtitle_raw=raw
+                ),
+            ),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
+        latency["translator_metrics"] = translator_metrics
+        if not ok or not out_dir:
+            reason = (trans_err or "Translation failed.").strip()
+            await update.message.reply_text(
+                f"❌ **Translation failed.**\n\n{_md1(reason)}",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            latency["status"] = "failed"
+            latency["error"] = reason
+            return
+
+        rel = out_dir.relative_to(BASE_DIR)
+        await update.message.reply_text(
+            f"✅ {label}\n\n"
+            f"📁 C-level words translated and saved to: `{rel}/`",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        await _send_translations_list(
+            update,
+            context,
+            out_dir,
+            movie_name,
+            0,
+            0,
+            is_movie=True,
+            year=year,
+            latency_ms=_ms_since(req_started),
+        )
+        _persist_loaded_title_context(
+            context,
+            translations_dir=out_dir,
+            series_name=movie_name,
+            episode_dir=episode_dir,
+        )
+        latency["status"] = "success"
+
+    except asyncio.TimeoutError:
+        await update.message.reply_text(
+            "❌ **Request timed out** (download/analysis/translation took too long).",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        latency["status"] = "timeout"
+        latency["error"] = "request_timeout"
+    except Exception as e:
+        await update.message.reply_text(
+            f"❌ **Error:** {_md1(str(e)[:150])}",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        latency["status"] = "failed"
+        latency["error"] = str(e)[:200]
+    finally:
+        latency["finished_at"] = datetime.now().isoformat()
+        latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
+        await _write_latency_async(latency)
+
+
+async def _run_series_pipeline(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    identity: Dict[str, Any],
+    latency: Dict[str, Any],
+    req_started: float,
+) -> None:
+    series_name = str(identity.get("series_name") or identity.get("canonical_title") or "Unknown")
+    season = int(identity.get("season") or 1)
+    episode = int(identity.get("episode") or 1)
+    latency["identity"] = {
+        "series_name": series_name,
+        "season": season,
+        "episode": episode,
+    }
+    loop = asyncio.get_running_loop()
+    timeout = 600.0
+
+    try:
+        phase_started = time.perf_counter()
+        episode_dir, translations_dir, subtitle_path = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda sn=series_name, s=season, e=episode: _find_existing(sn, s, e),
+            ),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["find_existing"] = _ms_since(phase_started)
+
+        if translations_dir is not None:
+            latency["branch"] = "cache_hit_translations"
+            await update.message.reply_text(
+                f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
+                f"✅ Found existing translations.\n\n"
+                f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            await _send_translations_list(
+                update,
+                context,
+                translations_dir,
+                series_name,
+                season,
+                episode,
+                latency_ms=_ms_since(req_started),
+            )
+            _persist_loaded_title_context(
+                context,
+                translations_dir=translations_dir,
+                series_name=series_name,
+                episode_dir=episode_dir,
+            )
+            latency["status"] = "success"
+            return
+
+        if episode_dir is not None:
+            latency["branch"] = "tier_exists_translate_only"
+            await update.message.reply_text(
+                f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
+                f"✅ Found existing hard words list.\n\n"
+                "⏳ Translating words…",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            if subtitle_path is None:
+                await update.message.reply_text(
+                    f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
+                    "⏳ Subtitle file missing, downloading…",
+                    parse_mode="Markdown",
+                    reply_markup=keyboard_discovery(context),
+                )
+                phase_started = time.perf_counter()
+                subtitle_path = await asyncio.wait_for(
+                    loop.run_in_executor(
+                        None,
+                        lambda sn=series_name, s=season, e=episode: _do_download(sn, s, e),
+                    ),
+                    timeout=timeout,
+                )
+                latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
+                if not subtitle_path:
+                    await update.message.reply_text(
+                        f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
+                        "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
+                        parse_mode="Markdown",
+                        reply_markup=keyboard_discovery(context),
+                    )
+                    latency["status"] = "failed"
+                    latency["error"] = "subtitle_download_failed"
+                    return
+            phase_started = time.perf_counter()
+            ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
+                loop.run_in_executor(
+                    None,
+                    lambda ed=episode_dir, sp=subtitle_path: _do_translate(ed, sp),
+                ),
+                timeout=timeout,
+            )
+            latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
+            latency["translator_metrics"] = translator_metrics
+            if not ok or not out_dir:
+                reason = (trans_err or "Translation failed.").strip()
+                await update.message.reply_text(
+                    f"❌ **Translation failed.**\n\n{_md1(reason)}\n\n💡 Use /next or **Next series** to try another title.",
+                    parse_mode="Markdown",
+                    reply_markup=keyboard_discovery(context),
+                )
+                latency["status"] = "failed"
+                latency["error"] = reason
+                return
+            rel = out_dir.relative_to(BASE_DIR)
+            await update.message.reply_text(
+                f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
+                f"📁 C-level words translated and saved to: `{rel}/`",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            await _send_translations_list(
+                update,
+                context,
+                out_dir,
+                series_name,
+                season,
+                episode,
+                latency_ms=_ms_since(req_started),
+            )
+            _persist_loaded_title_context(
+                context,
+                translations_dir=out_dir,
+                series_name=series_name,
+                episode_dir=episode_dir,
+            )
+            latency["status"] = "success"
+            return
+
+        latency["branch"] = "full_pipeline"
+        await update.message.reply_text(
+            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
+            "⏳ Downloading subtitle…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        phase_started = time.perf_counter()
+        subtitle_path = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda sn=series_name, s=season, e=episode: _do_download(sn, s, e),
+            ),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
+        if not subtitle_path:
+            await update.message.reply_text(
+                f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
+                "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            latency["status"] = "failed"
+            latency["error"] = "subtitle_download_failed"
+            return
+
+        await update.message.reply_text(
+            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
+            f"✅ Subtitle downloaded.\n\n"
+            "⏳ Building the hard-word list from the subtitle…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        phase_started = time.perf_counter()
+        episode_dir, analyze_metrics, subtitle_raw_handoff = await asyncio.wait_for(
+            loop.run_in_executor(None, lambda sp=subtitle_path: _do_analyze(sp)),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
+        latency["analyze_metrics"] = analyze_metrics
+        if not episode_dir:
+            await update.message.reply_text(
+                "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
+                "The file may be invalid or empty.",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            latency["status"] = "failed"
+            latency["error"] = "tier_list_build_failed"
+            return
+
+        await update.message.reply_text(
+            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
+            f"✅ C-level list ready.\n\n"
+            "⏳ Translating words…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        phase_started = time.perf_counter()
+        ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda ed=episode_dir, sp=subtitle_path, raw=subtitle_raw_handoff: _do_translate(
+                    ed, sp, subtitle_raw=raw
+                ),
+            ),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
+        latency["translator_metrics"] = translator_metrics
+        if not ok or not out_dir:
+            reason = (trans_err or "Translation failed.").strip()
+            await update.message.reply_text(
+                f"❌ **Translation failed.**\n\n{_md1(reason)}",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            latency["status"] = "failed"
+            latency["error"] = reason
+            return
+
+        rel = out_dir.relative_to(BASE_DIR)
+        await update.message.reply_text(
+            f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
+            f"📁 C-level words translated and saved to: `{rel}/`",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        await _send_translations_list(
+            update,
+            context,
+            out_dir,
+            series_name,
+            season,
+            episode,
+            latency_ms=_ms_since(req_started),
+        )
+        _persist_loaded_title_context(
+            context,
+            translations_dir=out_dir,
+            series_name=series_name,
+            episode_dir=episode_dir,
+        )
+        latency["status"] = "success"
+
+    except asyncio.TimeoutError:
+        await update.message.reply_text(
+            "❌ **Request timed out** (download/analysis/translation took too long).",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        latency["status"] = "timeout"
+        latency["error"] = "request_timeout"
+    except Exception as e:
+        await update.message.reply_text(
+            f"❌ **Error:** {_md1(str(e)[:150])}",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        latency["status"] = "failed"
+        latency["error"] = str(e)[:200]
+    finally:
+        latency["finished_at"] = datetime.now().isoformat()
+        latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
+        await _write_latency_async(latency)
 
 
 def _do_analyze_movie(
@@ -821,280 +1499,45 @@ def _do_translate(
 async def _handle_message_movie(
     update: Update, context: ContextTypes.DEFAULT_TYPE, raw: str
 ) -> None:
-    """Handle movie search flow: parse, find existing, download, analyze, translate."""
+    """Handle movie search flow: parse, resolve title, confirm if needed, then pipeline."""
+    context.user_data.pop("pending_title", None)
     req_started = time.perf_counter()
     latency = _new_latency(raw, "movie")
     phase_started = time.perf_counter()
     movie_name, year = _parse_movie_input(raw)
     latency["phase_timings_ms"]["parse_input"] = _ms_since(phase_started)
-    latency["identity"] = {"movie_name": movie_name, "year": year}
-    label = f"*{_md1(movie_name)}*" + (f" ({year})" if year else "")
-    status_msg = await update.message.reply_text(
+
+    label = _movie_label(movie_name, year)
+    await update.message.reply_text(
         f"🎬 Processing request for: {label}\n\n"
-        "⏳ Looking for a saved word list or translations…",
+        "⏳ Resolving title…",
         parse_mode="Markdown",
         reply_markup=keyboard_discovery(context),
     )
 
-    loop = asyncio.get_running_loop()
-    timeout = 600.0
+    phase_started = time.perf_counter()
+    resolved = await resolve_movie_async(movie_name, year, raw_input=raw)
+    latency["phase_timings_ms"]["resolve_title"] = _ms_since(phase_started)
+    latency["title_resolution"] = {
+        "confidence": resolved.confidence,
+        "issue": resolved.issue,
+        "canonical_title": resolved.canonical_title,
+        "year": resolved.year,
+    }
 
-    try:
-        phase_started = time.perf_counter()
-        episode_dir, translations_dir, subtitle_path = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: _find_existing_movie(movie_name, year),
-            ),
-            timeout=timeout,
-        )
-        latency["phase_timings_ms"]["find_existing"] = _ms_since(phase_started)
-
-        # Case A: translations already exist
-        if translations_dir is not None:
-            latency["branch"] = "cache_hit_translations"
-            await update.message.reply_text(
-                f"🎬 Processing: {label}\n"
-                f"✅ Found existing translations.\n\n"
-                f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            await _send_translations_list(
-                update,
-                context,
-                translations_dir,
-                movie_name,
-                0,
-                0,
-                is_movie=True,
-                year=year,
-                latency_ms=_ms_since(req_started),
-            )
-            _persist_loaded_title_context(
-                context,
-                translations_dir=translations_dir,
-                series_name=movie_name,
-                episode_dir=episode_dir,
-            )
-            latency["status"] = "success"
-            return
-
-        # Case B: tier list exists but no translations
-        if episode_dir is not None:
-            latency["branch"] = "tier_exists_translate_only"
-            await update.message.reply_text(
-                f"🎬 Processing: {label}\n"
-                f"✅ Found existing hard words list.\n\n"
-                "⏳ Translating words…",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            if subtitle_path is None:
-                await update.message.reply_text(
-                    f"🎬 Processing: {label}\n"
-                    "⏳ Subtitle file missing, downloading…",
-                    parse_mode="Markdown",
-                    reply_markup=keyboard_discovery(context),
-                )
-                phase_started = time.perf_counter()
-                subtitle_path = await asyncio.wait_for(
-                    loop.run_in_executor(
-                        None,
-                        lambda: _do_download_movie(movie_name, year),
-                    ),
-                    timeout=timeout,
-                )
-                latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
-                if not subtitle_path:
-                    await update.message.reply_text(
-                        f"❌ **Subtitle download failed** for {label}.\n\n"
-                        "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
-                        parse_mode="Markdown",
-                        reply_markup=keyboard_discovery(context),
-                    )
-                    latency["status"] = "failed"
-                    latency["error"] = "subtitle_download_failed"
-                    return
-            phase_started = time.perf_counter()
-            ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
-                loop.run_in_executor(
-                    None,
-                    lambda: _do_translate(episode_dir, subtitle_path),
-                ),
-                timeout=timeout,
-            )
-            latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
-            latency["translator_metrics"] = translator_metrics
-            if not ok or not out_dir:
-                reason = (trans_err or "Translation failed.").strip()
-                await update.message.reply_text(
-                    f"❌ **Translation failed.**\n\n{_md1(reason)}",
-                    parse_mode="Markdown",
-                    reply_markup=keyboard_discovery(context),
-                )
-                latency["status"] = "failed"
-                latency["error"] = reason
-                return
-            rel = out_dir.relative_to(BASE_DIR)
-            await update.message.reply_text(
-                f"✅ {label}\n\n"
-                f"📁 C-level words translated and saved to: `{rel}/`",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            await _send_translations_list(
-                update,
-                context,
-                out_dir,
-                movie_name,
-                0,
-                0,
-                is_movie=True,
-                year=year,
-                latency_ms=_ms_since(req_started),
-            )
-            _persist_loaded_title_context(
-                context,
-                translations_dir=out_dir,
-                series_name=movie_name,
-                episode_dir=episode_dir,
-            )
-            latency["status"] = "success"
-            return
-
-        # Case C: nothing exists — download, analyze, translate
-        latency["branch"] = "full_pipeline"
+    if resolved.confidence == "high":
+        identity = _identity_from_resolved(resolved)
         await update.message.reply_text(
-            f"🎬 Processing: {label}\n\n"
-            "⏳ Downloading subtitle…",
+            f"🎬 Processing: {_movie_label(identity['movie_name'], identity['year'])}\n\n"
+            "⏳ Looking for a saved word list or translations…",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
         )
-        phase_started = time.perf_counter()
-        subtitle_path = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: _do_download_movie(movie_name, year),
-            ),
-            timeout=timeout,
-        )
-        latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
-        if not subtitle_path:
-            await update.message.reply_text(
-                f"❌ **Subtitle download failed** for {label}.\n\n"
-                "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            latency["status"] = "failed"
-            latency["error"] = "subtitle_download_failed"
-            return
+        await _run_movie_pipeline(update, context, identity, latency, req_started)
+        return
 
-        await update.message.reply_text(
-            f"🎬 Processing: {label}\n"
-            f"✅ Subtitle downloaded.\n\n"
-            "⏳ Building the hard-word list from the subtitle…",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        phase_started = time.perf_counter()
-        episode_dir, analyze_metrics, subtitle_raw_handoff = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: _do_analyze_movie(subtitle_path, movie_name, year),
-            ),
-            timeout=timeout,
-        )
-        latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
-        latency["analyze_metrics"] = analyze_metrics
-        if not episode_dir:
-            await update.message.reply_text(
-                "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
-                "The file may be invalid or empty.",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            latency["status"] = "failed"
-            latency["error"] = "tier_list_build_failed"
-            return
-
-        await update.message.reply_text(
-            f"🎬 Processing: {label}\n"
-            f"✅ C-level list ready.\n\n"
-            "⏳ Translating words…",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        phase_started = time.perf_counter()
-        ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: _do_translate(
-                    episode_dir, subtitle_path, subtitle_raw=subtitle_raw_handoff
-                ),
-            ),
-            timeout=timeout,
-        )
-        latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
-        latency["translator_metrics"] = translator_metrics
-        if not ok or not out_dir:
-            reason = (trans_err or "Translation failed.").strip()
-            await update.message.reply_text(
-                f"❌ **Translation failed.**\n\n{_md1(reason)}",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            latency["status"] = "failed"
-            latency["error"] = reason
-            return
-
-        rel = out_dir.relative_to(BASE_DIR)
-        await update.message.reply_text(
-            f"✅ {label}\n\n"
-            f"📁 C-level words translated and saved to: `{rel}/`",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        await _send_translations_list(
-            update,
-            context,
-            out_dir,
-            movie_name,
-            0,
-            0,
-            is_movie=True,
-            year=year,
-            latency_ms=_ms_since(req_started),
-        )
-        _persist_loaded_title_context(
-            context,
-            translations_dir=out_dir,
-            series_name=movie_name,
-            episode_dir=episode_dir,
-        )
-        latency["status"] = "success"
-
-    except asyncio.TimeoutError:
-        await update.message.reply_text(
-            "❌ **Request timed out** (download/analysis/translation took too long).",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        latency["status"] = "timeout"
-        latency["error"] = "request_timeout"
-    except Exception as e:
-        await update.message.reply_text(
-            f"❌ **Error:** {_md1(str(e)[:150])}",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        latency["status"] = "failed"
-        latency["error"] = str(e)[:200]
-    finally:
-        latency["finished_at"] = datetime.now().isoformat()
-        latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
-        await _write_latency_async(latency)
+    token = new_pending_token()
+    await _send_title_confirmation(update, context, resolved, token, raw, latency, req_started)
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1133,6 +1576,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await _handle_message_movie(update, context, raw)
         return
 
+    context.user_data.pop("pending_title", None)
     phase_started = time.perf_counter()
     series_name, season, episode = _parse_series_input(raw)
     latency["phase_timings_ms"]["parse_input"] = _ms_since(phase_started)
@@ -1141,21 +1585,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         "season": season,
         "episode": episode,
     }
-    status_msg = await update.message.reply_text(
+    await update.message.reply_text(
         f"🔍 Processing request for: *{_md1(raw)}*\n\n"
-        "⏳ Looking for a saved word list or translations…",
+        "⏳ Resolving title…",
         parse_mode="Markdown",
         reply_markup=keyboard_discovery(context),
     )
 
-    # If simple parse likely failed (e.g. "ep 2 season 2" left in series name), ask ChatGPT
     if _simple_parse_likely_failed(raw, series_name, season, episode):
-        await update.message.reply_text(
-            f"🔍 Processing request for: *{_md1(raw)}*\n\n"
-            "⏳ Normalizing with ChatGPT…",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
         phase_started = time.perf_counter()
         chatgpt_result = await _normalize_with_chatgpt(raw)
         latency["phase_timings_ms"]["normalize_input"] = _ms_since(phase_started)
@@ -1166,286 +1603,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 "season": season,
                 "episode": episode,
             }
-            await update.message.reply_text(
-                f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
-                "⏳ Looking for a saved word list or translations…",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-    else:
+
+    phase_started = time.perf_counter()
+    resolved = await resolve_tv_async(series_name, season, episode, raw_input=raw)
+    latency["phase_timings_ms"]["resolve_title"] = _ms_since(phase_started)
+    latency["title_resolution"] = {
+        "confidence": resolved.confidence,
+        "issue": resolved.issue,
+        "canonical_title": resolved.canonical_title,
+        "season": resolved.season,
+        "episode": resolved.episode,
+    }
+
+    if resolved.confidence == "high":
+        identity = _identity_from_resolved(resolved)
         await update.message.reply_text(
-            f"🔍 Processing request for: *{_md1(raw)}*\n\n"
-            "⏳ Checking series title…",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        phase_started = time.perf_counter()
-        series_name = await _correct_series_title_typos(series_name)
-        latency["phase_timings_ms"]["spellfix_title"] = _ms_since(phase_started)
-        latency["identity"] = {
-            "series_name": series_name,
-            "season": season,
-            "episode": episode,
-        }
-        await update.message.reply_text(
-            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
+            f"🔍 Processing: *{_md1(identity['series_name'])}*"
+            f"{_tv_episode_suffix(identity['series_name'], identity['season'], identity['episode'])}\n\n"
             "⏳ Looking for a saved word list or translations…",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
         )
+        await _run_series_pipeline(update, context, identity, latency, req_started)
+        return
 
-    loop = asyncio.get_running_loop()
-    timeout = 600.0
-
-    try:
-        # Step 1: look for existing tier list and translations
-        phase_started = time.perf_counter()
-        episode_dir, translations_dir, subtitle_path = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: _find_existing(series_name, season, episode),
-            ),
-            timeout=timeout,
-        )
-        latency["phase_timings_ms"]["find_existing"] = _ms_since(phase_started)
-
-        # Case A: translations already exist — send word list in chat
-        if translations_dir is not None:
-            latency["branch"] = "cache_hit_translations"
-            await update.message.reply_text(
-                f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
-                f"✅ Found existing translations.\n\n"
-                f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            await _send_translations_list(
-                update,
-                context,
-                translations_dir,
-                series_name,
-                season,
-                episode,
-                latency_ms=_ms_since(req_started),
-            )
-            _persist_loaded_title_context(
-                context,
-                translations_dir=translations_dir,
-                series_name=series_name,
-                episode_dir=episode_dir,
-            )
-            latency["status"] = "success"
-            return
-
-        # Case B: tier list exists but no translations — translate only
-        if episode_dir is not None:
-            latency["branch"] = "tier_exists_translate_only"
-            await update.message.reply_text(
-                f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
-                f"✅ Found existing hard words list.\n\n"
-                "⏳ Translating words…",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            if subtitle_path is None:
-                # Try to get subtitle path from episode_info and download if missing
-                await update.message.reply_text(
-                    f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
-                    "⏳ Subtitle file missing, downloading…",
-                    parse_mode="Markdown",
-                    reply_markup=keyboard_discovery(context),
-                )
-                phase_started = time.perf_counter()
-                subtitle_path = await asyncio.wait_for(
-                    loop.run_in_executor(
-                        None,
-                        lambda: _do_download(series_name, season, episode),
-                    ),
-                    timeout=timeout,
-                )
-                latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
-                if not subtitle_path:
-                    await update.message.reply_text(
-                        f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
-                        "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
-                        parse_mode="Markdown",
-                        reply_markup=keyboard_discovery(context),
-                    )
-                    latency["status"] = "failed"
-                    latency["error"] = "subtitle_download_failed"
-                    return
-            phase_started = time.perf_counter()
-            ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
-                loop.run_in_executor(
-                    None,
-                    lambda: _do_translate(episode_dir, subtitle_path),
-                ),
-                timeout=timeout,
-            )
-            latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
-            latency["translator_metrics"] = translator_metrics
-            if not ok or not out_dir:
-                reason = (trans_err or "Translation failed.").strip()
-                await update.message.reply_text(
-                    f"❌ **Translation failed.**\n\n{_md1(reason)}\n\n💡 Use /next or **Next series** to try another title.",
-                    parse_mode="Markdown",
-                    reply_markup=keyboard_discovery(context),
-                )
-                latency["status"] = "failed"
-                latency["error"] = reason
-                return
-            rel = out_dir.relative_to(BASE_DIR)
-            await update.message.reply_text(
-                f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
-                f"📁 C-level words translated and saved to: `{rel}/`",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            await _send_translations_list(
-                update,
-                context,
-                out_dir,
-                series_name,
-                season,
-                episode,
-                latency_ms=_ms_since(req_started),
-            )
-            _persist_loaded_title_context(
-                context,
-                translations_dir=out_dir,
-                series_name=series_name,
-                episode_dir=episode_dir,
-            )
-            latency["status"] = "success"
-            return
-
-        # Case C: nothing exists — download, analyze, translate
-        latency["branch"] = "full_pipeline"
-        await update.message.reply_text(
-            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
-            "⏳ Downloading subtitle…",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        phase_started = time.perf_counter()
-        subtitle_path = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: _do_download(series_name, season, episode),
-            ),
-            timeout=timeout,
-        )
-        latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
-        if not subtitle_path:
-            await update.message.reply_text(
-                f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
-                "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            latency["status"] = "failed"
-            latency["error"] = "subtitle_download_failed"
-            return
-
-        await update.message.reply_text(
-            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
-            f"✅ Subtitle downloaded.\n\n"
-            "⏳ Building the hard-word list from the subtitle…",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        phase_started = time.perf_counter()
-        episode_dir, analyze_metrics, subtitle_raw_handoff = await asyncio.wait_for(
-            loop.run_in_executor(None, lambda: _do_analyze(subtitle_path)),
-            timeout=timeout,
-        )
-        latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
-        latency["analyze_metrics"] = analyze_metrics
-        if not episode_dir:
-            await update.message.reply_text(
-                "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
-                "The file may be invalid or empty.",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            latency["status"] = "failed"
-            latency["error"] = "tier_list_build_failed"
-            return
-
-        await update.message.reply_text(
-            f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
-            f"✅ C-level list ready.\n\n"
-            "⏳ Translating words…",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        phase_started = time.perf_counter()
-        ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: _do_translate(
-                    episode_dir, subtitle_path, subtitle_raw=subtitle_raw_handoff
-                ),
-            ),
-            timeout=timeout,
-        )
-        latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
-        latency["translator_metrics"] = translator_metrics
-        if not ok or not out_dir:
-            reason = (trans_err or "Translation failed.").strip()
-            await update.message.reply_text(
-                f"❌ **Translation failed.**\n\n{_md1(reason)}",
-                parse_mode="Markdown",
-                reply_markup=keyboard_discovery(context),
-            )
-            latency["status"] = "failed"
-            latency["error"] = reason
-            return
-
-        rel = out_dir.relative_to(BASE_DIR)
-        await update.message.reply_text(
-            f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
-            f"📁 C-level words translated and saved to: `{rel}/`",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        await _send_translations_list(
-            update,
-            context,
-            out_dir,
-            series_name,
-            season,
-            episode,
-            latency_ms=_ms_since(req_started),
-        )
-        _persist_loaded_title_context(
-            context,
-            translations_dir=out_dir,
-            series_name=series_name,
-            episode_dir=episode_dir,
-        )
-        latency["status"] = "success"
-
-    except asyncio.TimeoutError:
-        await update.message.reply_text(
-            "❌ **Request timed out** (download/analysis/translation took too long).",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        latency["status"] = "timeout"
-        latency["error"] = "request_timeout"
-    except Exception as e:
-        await update.message.reply_text(
-            f"❌ **Error:** {_md1(str(e)[:150])}",
-            parse_mode="Markdown",
-            reply_markup=keyboard_discovery(context),
-        )
-        latency["status"] = "failed"
-        latency["error"] = str(e)[:200]
-    finally:
-        latency["finished_at"] = datetime.now().isoformat()
-        latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
-        await _write_latency_async(latency)
+    token = new_pending_token()
+    await _send_title_confirmation(update, context, resolved, token, raw, latency, req_started)
 
 
 def _load_translation_pairs_csv(csv_path: Path) -> List[Tuple[str, str, str]]:
@@ -3096,6 +3279,87 @@ send_phrasal_placeholder = send_phrasal_verbs
 send_idioms_placeholder = send_idiomatic_expressions
 
 
+async def _handle_title_callback(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    query: Any,
+    data: str,
+    wrapped: Any,
+) -> None:
+    parts = data.split(":")
+    if len(parts) < 2:
+        await query.answer("Invalid action.", show_alert=True)
+        return
+    action, token = parts[0], parts[1]
+    pick_index: Optional[int] = None
+    if len(parts) > 2 and action == "title_pick":
+        try:
+            pick_index = int(parts[2])
+        except ValueError:
+            pick_index = None
+
+    pending = context.user_data.get("pending_title")
+    if not pending or pending.get("token") != token:
+        await query.answer("Confirmation expired — send the title again.", show_alert=True)
+        return
+
+    latency = pending.get("latency")
+    req_started = float(pending.get("req_started") or time.perf_counter())
+    context.user_data.pop("pending_title", None)
+
+    if action == "title_cancel":
+        if isinstance(latency, dict):
+            latency["status"] = "cancelled"
+            latency["error"] = "user_cancelled"
+            latency["finished_at"] = datetime.now().isoformat()
+            latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
+            await _write_latency_async(latency)
+        await _reply_bot_message(
+            wrapped,
+            query=query,
+            text="Cancelled. Send another title or tap **Next series**.",
+            reply_markup=keyboard_discovery(context),
+            parse_mode="Markdown",
+        )
+        return
+
+    if action == "title_use":
+        identity = _identity_from_pending_choice(pending, "use")
+    elif action == "title_keep":
+        identity = _identity_from_pending_choice(pending, "keep")
+    elif action == "title_pick":
+        identity = _identity_from_pending_choice(pending, "pick", pick_index)
+    else:
+        await query.answer("Unknown action.", show_alert=True)
+        return
+
+    if not isinstance(latency, dict):
+        latency = _new_latency(pending.get("raw") or "", pending.get("media_type") or "series")
+
+    mt = identity.get("media_type") or pending.get("media_type")
+    if mt == "movie":
+        label = _movie_label(
+            identity.get("movie_name") or identity.get("canonical_title") or "?",
+            int(identity.get("year") or 0),
+        )
+    else:
+        sn = identity.get("series_name") or identity.get("canonical_title") or "?"
+        label = f"*{_md1(sn)}*{_tv_episode_suffix(sn, int(identity.get('season', 1)), int(identity.get('episode', 1)))}"
+
+    await _reply_bot_message(
+        wrapped,
+        query=query,
+        text=f"⏳ Processing {label}…",
+        reply_markup=keyboard_discovery(context),
+        parse_mode="Markdown",
+    )
+
+    if mt == "movie":
+        await _run_movie_pipeline(wrapped, context, identity, latency, req_started)
+    else:
+        await _run_series_pipeline(wrapped, context, identity, latency, req_started)
+
+
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     if not query:
@@ -3112,7 +3376,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     wrapped = WrappedUpdate(query.message)
 
     try:
-        if data == "frequent_c_words":
+        if data.startswith("title_"):
+            await _handle_title_callback(update, context, query, data, wrapped)
+        elif data == "frequent_c_words":
             await send_frequent_c_words(wrapped, context, query=query)
         elif data == "rare_c_series":
             await send_rare_c_series_full_list(wrapped, context, query=query)

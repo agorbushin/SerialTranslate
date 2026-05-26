@@ -331,12 +331,21 @@ class TestMessageHandling:
             "Better Call Saul",
         ]
 
+        from title_resolution import ResolvedTitle
+
+        high = ResolvedTitle(
+            media_type="tv",
+            canonical_title="Fallout",
+            season=1,
+            episode=1,
+            confidence="high",
+        )
         for series_name in test_cases:
             mock_update.message.text = series_name
             with patch(
-                "telegram_bot._correct_series_title_typos",
+                "telegram_bot.resolve_tv_async",
                 new_callable=AsyncMock,
-                side_effect=lambda s: s,
+                return_value=high,
             ):
                 with patch(
                     "telegram_bot._find_existing",
@@ -351,11 +360,19 @@ class TestMessageHandling:
         """Test series name input - series with season/episode."""
         from telegram_bot import handle_message
 
+        from title_resolution import ResolvedTitle
+
         mock_update.message.text = "Fallout S02E01"
         with patch(
-            "telegram_bot._correct_series_title_typos",
+            "telegram_bot.resolve_tv_async",
             new_callable=AsyncMock,
-            side_effect=lambda s: s,
+            return_value=ResolvedTitle(
+                media_type="tv",
+                canonical_title="Fallout",
+                season=2,
+                episode=1,
+                confidence="high",
+            ),
         ):
             with patch("telegram_bot._find_existing", return_value=(None, None, None)):
                 with patch("telegram_bot._do_download", return_value=None):
@@ -447,10 +464,18 @@ class TestMessageHandling:
         status_msg.edit_text = AsyncMock()
         mock_update.message.reply_text = AsyncMock(return_value=status_msg)
 
+        from title_resolution import ResolvedTitle
+
         with patch(
-            "telegram_bot._correct_series_title_typos",
+            "telegram_bot.resolve_tv_async",
             new_callable=AsyncMock,
-            side_effect=lambda s: s,
+            return_value=ResolvedTitle(
+                media_type="tv",
+                canonical_title="Test Series",
+                season=1,
+                episode=1,
+                confidence="high",
+            ),
         ):
             with patch(
                 "telegram_bot._find_existing",
@@ -462,6 +487,107 @@ class TestMessageHandling:
         assert Path(mock_context.user_data.get("last_episode_dir")).resolve() == sample_episode_dir.resolve()
         assert mock_context.user_data.get("last_series_name") == "Test Series"
         assert Path(mock_context.user_data.get("last_translations_dir")).resolve() == trans_dir.resolve()
+
+    @pytest.mark.asyncio
+    async def test_movie_high_confidence_runs_pipeline_without_confirmation(
+        self, mock_update, mock_context
+    ):
+        """High-confidence movie resolution proceeds to pipeline without confirm keyboard."""
+        from title_resolution import ResolvedTitle
+        from telegram_bot import _handle_message_movie
+
+        mock_update.message.text = "Inception 2010"
+        high = ResolvedTitle(
+            media_type="movie",
+            canonical_title="Inception",
+            year=2010,
+            confidence="high",
+            imdb_id="tt1375666",
+        )
+        with patch(
+            "telegram_bot.resolve_movie_async",
+            new_callable=AsyncMock,
+            return_value=high,
+        ):
+            with patch(
+                "telegram_bot._run_movie_pipeline", new_callable=AsyncMock
+            ) as m_pipe:
+                with patch(
+                    "telegram_bot._send_title_confirmation", new_callable=AsyncMock
+                ) as m_confirm:
+                    await _handle_message_movie(mock_update, mock_context, "Inception 2010")
+        m_pipe.assert_called_once()
+        m_confirm.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_movie_low_confidence_asks_before_download(
+        self, mock_update, mock_context
+    ):
+        """Low-confidence movie resolution shows confirmation, no pipeline yet."""
+        from title_resolution import ResolvedTitle
+        from telegram_bot import _handle_message_movie
+
+        low = ResolvedTitle(
+            media_type="movie",
+            canonical_title="Inception",
+            year=2010,
+            confidence="low",
+            issue="year_mismatch",
+            user_parsed={"media_type": "movie", "movie_name": "Inception", "year": 2000},
+        )
+        with patch(
+            "telegram_bot.resolve_movie_async",
+            new_callable=AsyncMock,
+            return_value=low,
+        ):
+            with patch(
+                "telegram_bot._run_movie_pipeline", new_callable=AsyncMock
+            ) as m_pipe:
+                with patch(
+                    "telegram_bot._send_title_confirmation", new_callable=AsyncMock
+                ) as m_confirm:
+                    await _handle_message_movie(mock_update, mock_context, "Inception 2000")
+        m_confirm.assert_called_once()
+        m_pipe.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_title_use_callback_runs_movie_pipeline(self, mock_update, mock_context):
+        """title_use callback resumes movie pipeline with suggested identity."""
+        from telegram_bot import _handle_title_callback, button_callback
+        from telegram import CallbackQuery
+
+        pending = {
+            "token": "abc123",
+            "media_type": "movie",
+            "raw": "Inception 2000",
+            "user_parsed": {"media_type": "movie", "movie_name": "Inception", "year": 2000},
+            "suggestion": {
+                "media_type": "movie",
+                "canonical_title": "Inception",
+                "movie_name": "Inception",
+                "year": 2010,
+            },
+            "alternatives": [],
+            "latency": {"timings_ms": {}, "phase_timings_ms": {}},
+            "req_started": 0.0,
+        }
+        mock_context.user_data["pending_title"] = pending
+
+        query = Mock(spec=CallbackQuery)
+        query.data = "title_use:abc123"
+        query.answer = AsyncMock()
+        query.message = mock_update.message
+
+        class WrappedUpdate:
+            message = mock_update.message
+
+        wrapped = WrappedUpdate()
+        with patch("telegram_bot._run_movie_pipeline", new_callable=AsyncMock) as m_pipe:
+            await _handle_title_callback(
+                mock_update, mock_context, query, "title_use:abc123", wrapped
+            )
+        m_pipe.assert_called_once()
+        assert mock_context.user_data.get("pending_title") is None
     
     @pytest.mark.asyncio
     async def test_context_persistence(self, mock_update, mock_context, sample_episode_dir):
