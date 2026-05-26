@@ -6,6 +6,7 @@ Uses existing tier lists and translations when found; shows step-by-step status 
 
 import asyncio
 import csv
+import hashlib
 import json
 import os
 import re
@@ -41,6 +42,7 @@ BASE_DIR = Path(__file__).resolve().parent
 SUBTITLE_BASE = BASE_DIR / "Subtitle"
 TIERLIST_BASE = BASE_DIR / "Tier_lists"
 TRANSLATIONS_BASE = BASE_DIR / "translations"
+USER_DICTIONARY_JSON = BASE_DIR / "user_dictionary.json"
 # Rare-in-series lists (high English frequency, low frequency in this episode); see subtitle_analyzer tier_4 split
 TIER_4_RARE_C_TRANSLATIONS_CSV = "tier_4_rare_c_translations.csv"
 TIER_4_RARE_B_TRANSLATIONS_CSV = "tier_4_rare_b_translations.csv"
@@ -64,6 +66,59 @@ OPENAI_HTTP_TIMEOUT_SEC = 45.0
 def _md1(text: str) -> str:
     """Escape for Telegram legacy Markdown when embedding user/model-derived titles."""
     return escape_markdown((text or "").strip(), version=1)
+
+
+def _safe_user_id(update: Update, *, query=None) -> Optional[int]:
+    user = query.from_user if query else update.effective_user
+    if not user:
+        return None
+    try:
+        return int(user.id)
+    except (TypeError, ValueError):
+        return None
+
+
+def _load_user_dictionary_map() -> Dict[str, Dict[str, Dict[str, str]]]:
+    if not USER_DICTIONARY_JSON.exists():
+        return {}
+    try:
+        data = json.loads(USER_DICTIONARY_JSON.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            return {}
+        out: Dict[str, Dict[str, Dict[str, str]]] = {}
+        for uid, words in data.items():
+            if isinstance(words, dict):
+                out[str(uid)] = words
+        return out
+    except Exception:
+        return {}
+
+
+def _save_user_dictionary_map(data: Dict[str, Dict[str, Dict[str, str]]]) -> None:
+    USER_DICTIONARY_JSON.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
+def _dict_entry_key(word: str, translation: str) -> str:
+    return f"{word.strip().lower()}::{translation.strip().lower()}"
+
+
+def _get_user_dictionary(user_id: int) -> Dict[str, Dict[str, str]]:
+    data = _load_user_dictionary_map()
+    return data.get(str(user_id), {})
+
+
+def _set_user_dictionary(user_id: int, words_map: Dict[str, Dict[str, str]]) -> None:
+    data = _load_user_dictionary_map()
+    data[str(user_id)] = words_map
+    _save_user_dictionary_map(data)
+
+
+def _is_show_my_words_text(text: str) -> bool:
+    t = (text or "").strip().lower()
+    return t in {"показать мои слова", "мои слова", "my words", "show my words"}
 
 
 def _ms_since(started: float) -> int:
@@ -173,6 +228,7 @@ def keyboard_loaded(
             ]
         )
     rows.append([InlineKeyboardButton("📺 Next series", callback_data="next_series")])
+    rows.append([InlineKeyboardButton("📚 My words", callback_data="show_my_words")])
     return InlineKeyboardMarkup(rows)
 
 
@@ -957,6 +1013,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     raw = update.message.text.strip()
+    if _is_show_my_words_text(raw):
+        await show_my_words(update, context)
+        return
     req_started = time.perf_counter()
     latency = _new_latency(raw, "series")
     if len(raw) < 2:
@@ -1360,8 +1419,16 @@ def _word_list_example_suffix(example: str, *, max_len: int = 180) -> str:
     return f"\n   _{short}_"
 
 
-def _format_word_entry_line(index: int, word: str, translation: str, example: str = "") -> str:
-    line = f"{index}. *{_md1(word)}* → {_md1(translation)}"
+def _format_word_entry_line(
+    index: int,
+    word: str,
+    translation: str,
+    example: str = "",
+    *,
+    is_saved: bool = False,
+) -> str:
+    shown_word = f"{word} 📚" if is_saved else word
+    line = f"{index}. *{_md1(shown_word)}* → {_md1(translation)}"
     line += _word_list_example_suffix(example)
     return line
 
@@ -1390,6 +1457,7 @@ def _format_b_level_list(
     is_movie: bool = False,
     year: int = 0,
     max_lines_per_band: int = 40,
+    saved_keys: Optional[Collection[str]] = None,
 ) -> str:
     """Format a single B-level list; truncates with '… and N more'."""
     if is_movie:
@@ -1409,8 +1477,16 @@ def _format_b_level_list(
     if not merged:
         return header + "_No words._"
     show = merged[:max_lines_per_band]
+    saved = set(saved_keys or [])
     lines = [
-        _format_word_entry_line(i, w, t, ex) for i, (w, t, ex) in enumerate(show, 1)
+        _format_word_entry_line(
+            i,
+            w,
+            t,
+            ex,
+            is_saved=_dict_entry_key(w, t) in saved,
+        )
+        for i, (w, t, ex) in enumerate(show, 1)
     ]
     body = "\n".join(lines)
     if n > max_lines_per_band:
@@ -1427,6 +1503,7 @@ def _format_word_list(
     *,
     is_movie: bool = False,
     year: int = 0,
+    saved_keys: Optional[Collection[str]] = None,
 ) -> str:
     """Format header + numbered word list. If pairs > max_lines, show first max_lines and '... and N more'."""
     n = len(pairs)
@@ -1437,8 +1514,16 @@ def _format_word_list(
     if not pairs:
         return header + "_No words._"
     show = pairs[:max_lines]
+    saved = set(saved_keys or [])
     lines = [
-        _format_word_entry_line(i, w, t, ex) for i, (w, t, ex) in enumerate(show, 1)
+        _format_word_entry_line(
+            i,
+            w,
+            t,
+            ex,
+            is_saved=_dict_entry_key(w, t) in saved,
+        )
+        for i, (w, t, ex) in enumerate(show, 1)
     ]
     body = "\n".join(lines)
     if n > max_lines:
@@ -1455,6 +1540,7 @@ def _format_rare_in_series_full_list(
     is_movie: bool = False,
     year: int = 0,
     band: str = "c",
+    saved_keys: Optional[Collection[str]] = None,
 ) -> str:
     """Full numbered list for rare-in-series translations (C-level vs B-level band)."""
     n = len(pairs)
@@ -1465,10 +1551,61 @@ def _format_rare_in_series_full_list(
         header = f"📋 *{label}* — *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n📊 *{n} words*\n\n"
     if not pairs:
         return header + "_No words._"
+    saved = set(saved_keys or [])
     lines = [
-        _format_word_entry_line(i, w, t, ex) for i, (w, t, ex) in enumerate(pairs, 1)
+        _format_word_entry_line(
+            i,
+            w,
+            t,
+            ex,
+            is_saved=_dict_entry_key(w, t) in saved,
+        )
+        for i, (w, t, ex) in enumerate(pairs, 1)
     ]
     return header + "\n".join(lines)
+
+
+def _register_word_buttons(
+    context: ContextTypes.DEFAULT_TYPE,
+    rows: List[Tuple[str, str, str]],
+) -> Dict[str, Tuple[str, str, str]]:
+    mapping = context.user_data.setdefault("dict_word_tokens", {})
+    out: Dict[str, Tuple[str, str, str]] = {}
+    for w, t, ex in rows:
+        token = hashlib.sha1(f"{w}|{t}|{ex}".encode("utf-8")).hexdigest()[:16]
+        payload = (w, t, ex)
+        mapping[token] = payload
+        out[token] = payload
+    return out
+
+
+def _word_toggle_keyboard(
+    context: ContextTypes.DEFAULT_TYPE,
+    rows: List[Tuple[str, str, str]],
+    saved_keys: Collection[str],
+) -> Optional[InlineKeyboardMarkup]:
+    if not rows:
+        return None
+    mapping = _register_word_buttons(context, rows)
+    saved = set(saved_keys)
+    btn_rows: List[List[InlineKeyboardButton]] = []
+    current: List[InlineKeyboardButton] = []
+    for token, (word, translation, _example) in mapping.items():
+        is_saved = _dict_entry_key(word, translation) in saved
+        prefix = "📚" if is_saved else "➕"
+        current.append(
+            InlineKeyboardButton(
+                f"{prefix} {word[:28]}",
+                callback_data=f"dict_toggle:{token}",
+            )
+        )
+        if len(current) == 2:
+            btn_rows.append(current)
+            current = []
+    if current:
+        btn_rows.append(current)
+    btn_rows.append([InlineKeyboardButton("📚 My words", callback_data="show_my_words")])
+    return InlineKeyboardMarkup(btn_rows)
 
 
 def _split_message_chunks(text: str, max_len: int = 4096) -> List[str]:
@@ -1664,6 +1801,10 @@ async def _send_translations_list(
     """Load tier_1 translations and send frequent C-level list (chunked). Supports callback via query=."""
     episode_dir = _resolve_episode_dir(translations_dir, context)
     pairs = _load_translations_list(translations_dir)
+    user_id = _safe_user_id(update, query=query)
+    saved_keys: Collection[str] = ()
+    if user_id is not None:
+        saved_keys = set(_get_user_dictionary(user_id).keys())
     sp = _subtitle_path_for_loaded_title(
         series_name,
         season,
@@ -1686,7 +1827,15 @@ async def _send_translations_list(
         body = f"{header}\n\n📁 Saved to: {rel}{latency_suffix}\n\n_No words in CSV._"
         await _reply_bot_message(update, query=query, text=body, reply_markup=kb)
         return
-    text = _format_word_list(series_name, season, episode, pairs, is_movie=is_movie, year=year)
+    text = _format_word_list(
+        series_name,
+        season,
+        episode,
+        pairs,
+        is_movie=is_movie,
+        year=year,
+        saved_keys=saved_keys,
+    )
     if latency_suffix:
         text += f"\n\n{latency_suffix}"
     max_len = 4096
@@ -1695,6 +1844,15 @@ async def _send_translations_list(
     else:
         parts = _split_message_chunks(text, max_len=max_len)
         await _reply_bot_chunks(update, query=query, chunks=parts, reply_markup=kb)
+    toggle_kb = _word_toggle_keyboard(context, pairs[:25], saved_keys)
+    if toggle_kb is not None:
+        await _reply_bot_message(
+            update,
+            query=query,
+            text="Нажми на слово, чтобы добавить/удалить его из личного словаря:",
+            reply_markup=toggle_kb,
+            parse_mode=None,
+        )
 
 
 async def send_frequent_c_words(
@@ -1932,12 +2090,32 @@ async def _send_rare_series_full_list(
             return
 
     pairs = _attach_subtitle_examples(pairs, sp)
+    user_id = _safe_user_id(update, query=query)
+    saved_keys: Collection[str] = ()
+    if user_id is not None:
+        saved_keys = set(_get_user_dictionary(user_id).keys())
     full_text = _format_rare_in_series_full_list(
-        series_name, season, episode, pairs, is_movie=is_movie, year=year, band=format_band
+        series_name,
+        season,
+        episode,
+        pairs,
+        is_movie=is_movie,
+        year=year,
+        band=format_band,
+        saved_keys=saved_keys,
     )
     chunks = _split_message_chunks(full_text)
     kb = keyboard_loaded(context)
     await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
+    toggle_kb = _word_toggle_keyboard(context, pairs[:40], saved_keys)
+    if toggle_kb is not None:
+        await _reply_bot_message(
+            update,
+            query=query,
+            text="Нажми на слово, чтобы добавить/удалить его из личного словаря:",
+            reply_markup=toggle_kb,
+            parse_mode=None,
+        )
 
 
 async def send_rare_c_series_full_list(
@@ -2009,6 +2187,10 @@ async def send_b_level_words(
         translations_dir=translations_dir,
     )
     kb = keyboard_loaded(context)
+    user_id = _safe_user_id(update, query=query)
+    saved_keys: Collection[str] = ()
+    if user_id is not None:
+        saved_keys = set(_get_user_dictionary(user_id).keys())
     title = (
         f"🎬 *{_md1(series_name)}*" + (f" ({year})" if year else "")
         if is_movie
@@ -2093,10 +2275,26 @@ async def send_b_level_words(
         return
 
     full_text = _format_b_level_list(
-        series_name, season, episode, b1, b2, is_movie=is_movie, year=year
+        series_name,
+        season,
+        episode,
+        b1,
+        b2,
+        is_movie=is_movie,
+        year=year,
+        saved_keys=saved_keys,
     )
     chunks = _split_message_chunks(full_text)
     await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
+    toggle_kb = _word_toggle_keyboard(context, [*b1, *b2][:40], saved_keys)
+    if toggle_kb is not None:
+        await _reply_bot_message(
+            update,
+            query=query,
+            text="Нажми на слово, чтобы добавить/удалить его из личного словаря:",
+            reply_markup=toggle_kb,
+            parse_mode=None,
+        )
 
 
 def _read_translation_info_json(translations_dir: Path) -> Optional[Dict[str, Any]]:
@@ -2623,6 +2821,58 @@ async def send_idiomatic_expressions(
     await _reply_bot_chunks(update, query=query, chunks=chunks, reply_markup=kb)
 
 
+async def show_my_words(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    *,
+    query=None,
+) -> None:
+    user_id = _safe_user_id(update, query=query)
+    if user_id is None:
+        await _reply_bot_message(
+            update,
+            query=query,
+            text="❌ Could not identify the user for personal dictionary.",
+            reply_markup=keyboard_discovery(context),
+        )
+        return
+    words_map = _get_user_dictionary(user_id)
+    if not words_map:
+        await _reply_bot_message(
+            update,
+            query=query,
+            text="📚 Личный словарь пока пуст.\n\nДобавляй слова кликом по ним в списках перевода.",
+            reply_markup=keyboard_loaded(context),
+            parse_mode=None,
+        )
+        return
+    rows: List[Tuple[str, str, str]] = []
+    for payload in words_map.values():
+        rows.append(
+            (
+                payload.get("word", ""),
+                payload.get("translation", ""),
+                payload.get("example", ""),
+            )
+        )
+    rows.sort(key=lambda item: item[0].lower())
+    text = (
+        "📚 *My words*\n\n"
+        f"📊 *Saved words: {len(rows)}*\n\n"
+        + "\n".join(
+            _format_word_entry_line(i, w, t, ex, is_saved=True)
+            for i, (w, t, ex) in enumerate(rows, 1)
+        )
+    )
+    for part in _split_message_chunks(text):
+        await _reply_bot_message(
+            update,
+            query=query,
+            text=part,
+            reply_markup=keyboard_loaded(context),
+        )
+
+
 # Registered in main() as /phrasal; keep name so main() stays unchanged.
 send_phrasal_placeholder = send_phrasal_verbs
 send_idioms_placeholder = send_idiomatic_expressions
@@ -2660,6 +2910,43 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             await send_idiomatic_expressions(wrapped, context, query=query)
         elif data == "idiomatic_expressions_all":
             await send_idiomatic_expressions(wrapped, context, query=query, show_all=True)
+        elif data == "show_my_words":
+            await show_my_words(wrapped, context, query=query)
+        elif data.startswith("dict_toggle:"):
+            token = data.split(":", 1)[1]
+            payload = context.user_data.get("dict_word_tokens", {}).get(token)
+            uid = _safe_user_id(update, query=query)
+            if not payload or uid is None:
+                await _reply_bot_message(
+                    wrapped,
+                    query=query,
+                    text="Не удалось изменить словарь: слово не найдено. Пожалуйста, открой список заново.",
+                    reply_markup=keyboard_loaded(context),
+                    parse_mode=None,
+                )
+                return
+            word, translation, example = payload
+            words_map = _get_user_dictionary(uid)
+            key = _dict_entry_key(word, translation)
+            if key in words_map:
+                words_map.pop(key, None)
+                _set_user_dictionary(uid, words_map)
+                action = "удалено из"
+            else:
+                words_map[key] = {
+                    "word": word,
+                    "translation": translation,
+                    "example": example or "",
+                    "saved_at": datetime.now().isoformat(),
+                }
+                _set_user_dictionary(uid, words_map)
+                action = "добавлено в"
+            await _reply_bot_message(
+                wrapped,
+                query=query,
+                text=f"✅ *{_md1(word)}* — {action} личный словарь.",
+                reply_markup=keyboard_loaded(context),
+            )
         elif data == "next_series":
             await next_series(wrapped, context)
         elif data == "next_movie":
@@ -2709,6 +2996,7 @@ def main() -> None:
     app.add_handler(CommandHandler("next", next_series))
     app.add_handler(CommandHandler("movie", next_movie))
     app.add_handler(CommandHandler("full", send_full_list))
+    app.add_handler(CommandHandler("mywords", show_my_words))
     app.add_handler(CommandHandler("phrasal", send_phrasal_placeholder))
     app.add_handler(CommandHandler("idioms", send_idioms_placeholder))
     app.add_handler(CallbackQueryHandler(button_callback))

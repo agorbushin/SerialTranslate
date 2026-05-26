@@ -620,6 +620,32 @@ class TestWordListExamples:
         )
         assert rows[0][2] == "The maid left early."
 
+    def test_format_word_entry_line_shows_dictionary_icon_when_saved(self):
+        from telegram_bot import _format_word_entry_line
+
+        line = _format_word_entry_line(1, "maid", "служанка", "", is_saved=True)
+        assert "maid 📚" in line
+
+
+class TestMyWordsFeature:
+    def test_show_my_words_text_trigger_ru(self):
+        from telegram_bot import _is_show_my_words_text
+
+        assert _is_show_my_words_text("показать мои слова")
+        assert _is_show_my_words_text("мои слова")
+        assert not _is_show_my_words_text("Fallout")
+
+    @pytest.mark.asyncio
+    async def test_show_my_words_empty_dictionary_message(self, mock_update, mock_context):
+        import telegram_bot as tb
+
+        with patch.object(tb, "_safe_user_id", return_value=12345):
+            with patch.object(tb, "_get_user_dictionary", return_value={}):
+                await tb.show_my_words(mock_update, mock_context)
+        assert mock_update.message.reply_text.called
+        text = mock_update.message.reply_text.call_args[0][0]
+        assert "Личный словарь пока пуст" in text
+
 
 class TestEpisodeDirResolution:
     def test_resolve_episode_dir_from_translation_info(self, temp_dir, monkeypatch):
