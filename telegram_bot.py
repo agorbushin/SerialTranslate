@@ -582,12 +582,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
     build = BOT_BUILD_DATETIME or "unknown"
     await update.message.reply_text(
-        "👋 Welcome to **SerialTranslate**.\n\n"
-        "**What you get:** harder English words that show up *often* in a specific TV episode or "
-        "movie — with short English dictionary glosses, built from real subtitles.\n\n"
-        "**What to do:** tap **Next series**, then send the show name (with season/episode if you want). "
-        "For a **movie**, use the /movie command, then send the title.\n\n"
-        "Examples: _Fallout s2 e3_, _Inception_, _The Matrix 1999_.\n\n"
+        "👋 **SerialTranslate**\n\n"
+        "Gives a list of hard words with short English meanings from a specific episode of a TV series or a movie.\n"
+        "Keeps track of the words you want to learn"
+        "To start enter the name of a TV series with season and episode or a movie with a year (e.g. Fallout S2E2, _The Matrix 1999_).\n\n"
         f"_v{BOT_VERSION} · {build}_",
         parse_mode="Markdown",
         reply_markup=keyboard_discovery(context),
