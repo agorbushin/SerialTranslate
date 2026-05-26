@@ -797,6 +797,75 @@ class TestMyWordsFeature:
         link = _deep_link_for_word_token("mybot", "abc123")
         assert link == "https://t.me/mybot?start=dw_abc123"
 
+    def test_format_my_words_list_includes_clickable_links(self):
+        from telegram_bot import _format_my_words_list
+
+        text = _format_my_words_list(
+            [("legion", "a large military unit", "The legion marched.")],
+            saved_keys={"legion::a large military unit"},
+            word_tokens={"legion::a large military unit": "tok1"},
+            bot_username="mybot",
+        )
+        assert "[legion 📚](https://t.me/mybot?start=dw_tok1)" in text
+        assert "personal dictionary" in text
+
+    def test_render_my_words_view_drops_removed_entries(self):
+        from telegram_bot import _render_word_view_text
+
+        view = {
+            "kind": "my_words",
+            "rows": [
+                ("alpha", "first", ""),
+                ("beta", "second", ""),
+            ],
+        }
+        text = _render_word_view_text(
+            view,
+            saved_keys={"alpha::first"},
+            bot_username="mybot",
+        )
+        assert "alpha" in text
+        assert "beta" not in text
+        assert "Saved words: 1" in text
+
+    @pytest.mark.asyncio
+    async def test_dictionary_deep_link_refreshes_my_words_anchor(
+        self, mock_update, mock_context
+    ):
+        import telegram_bot as tb
+
+        mock_context.user_data["word_list_anchor"] = {
+            "chat_id": 1,
+            "message_id": 99,
+            "view": {
+                "kind": "my_words",
+                "rows": [("legion", "a large military unit", "")],
+            },
+        }
+        mock_context.bot = Mock()
+        mock_context.bot.edit_message_text = AsyncMock()
+        mock_context.bot.username = "mybot"
+        mock_update.message.delete = AsyncMock()
+
+        with patch.object(tb, "_safe_user_id", return_value=12345):
+            with patch.object(
+                tb,
+                "_toggle_dictionary_word_by_token",
+                return_value=True,
+            ) as m_toggle:
+                with patch.object(
+                    tb,
+                    "_get_user_dictionary",
+                    return_value={},
+                ):
+                    await tb._handle_dictionary_deep_link(
+                        mock_update, mock_context, "tok1"
+                    )
+        m_toggle.assert_called_once_with(12345, "tok1")
+        mock_context.bot.edit_message_text.assert_called_once()
+        edited = mock_context.bot.edit_message_text.call_args.kwargs["text"]
+        assert "empty" in edited.lower()
+
 
 class TestEpisodeDirResolution:
     def test_resolve_episode_dir_from_translation_info(self, temp_dir, monkeypatch):

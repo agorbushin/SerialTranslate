@@ -1730,6 +1730,39 @@ def _word_list_dictionary_hint() -> str:
     )
 
 
+def _format_my_words_list(
+    rows: List[Tuple[str, str, str]],
+    *,
+    saved_keys: Optional[Collection[str]] = None,
+    word_tokens: Optional[Dict[str, str]] = None,
+    bot_username: str = "",
+) -> str:
+    """Format personal dictionary list with clickable words (tap to remove)."""
+    if not rows:
+        return (
+            "📚 *My words*\n\n"
+            "_Your personal dictionary is empty._\n\n"
+            "_Add words by tapping them in a translation list._"
+        )
+    saved = set(saved_keys or [])
+    tokens = word_tokens or {}
+    lines = [
+        _format_word_entry_line(
+            i,
+            w,
+            t,
+            ex,
+            is_saved=_dict_entry_key(w, t) in saved,
+            word_link=_deep_link_for_word_token(
+                bot_username, tokens.get(_dict_entry_key(w, t))
+            ),
+        )
+        for i, (w, t, ex) in enumerate(rows, 1)
+    ]
+    header = f"📚 *My words*\n\n📊 *Saved words: {len(rows)}*\n\n"
+    return header + "\n".join(lines) + _word_list_dictionary_hint()
+
+
 def _format_word_entry_line(
     index: int,
     word: str,
@@ -3247,21 +3280,36 @@ async def show_my_words(
             )
         )
     rows.sort(key=lambda item: item[0].lower())
-    text = (
-        "📚 *My words*\n\n"
-        f"📊 *Saved words: {len(rows)}*\n\n"
-        + "\n".join(
-            _format_word_entry_line(i, w, t, ex, is_saved=True)
-            for i, (w, t, ex) in enumerate(rows, 1)
-        )
+    bot_username = _bot_username_from_context(context)
+    word_tokens = _register_word_link_tokens(rows)
+    saved_keys = set(words_map.keys())
+    text = _format_my_words_list(
+        rows,
+        saved_keys=saved_keys,
+        word_tokens=word_tokens,
+        bot_username=bot_username,
     )
-    for part in _split_message_chunks(text):
-        await _reply_bot_message(
-            update,
-            query=query,
-            text=part,
-            reply_markup=keyboard_loaded(context),
+    kb = keyboard_loaded(context)
+    max_len = 4096
+    if len(text) <= max_len:
+        sent = await _reply_bot_message(
+            update, query=query, text=text, reply_markup=kb
         )
+        if sent and hasattr(sent, "chat_id") and hasattr(sent, "message_id"):
+            _persist_word_list_anchor(
+                context,
+                chat_id=int(sent.chat_id),
+                message_id=int(sent.message_id),
+                view={"kind": "my_words", "rows": rows},
+            )
+    else:
+        for part in _split_message_chunks(text, max_len=max_len):
+            await _reply_bot_message(
+                update,
+                query=query,
+                text=part,
+                reply_markup=kb,
+            )
 
 
 def _render_word_view_text(
@@ -3278,6 +3326,21 @@ def _render_word_view_text(
     is_movie = bool(view.get("is_movie", False))
     year = int(view.get("year", 0))
     word_tokens = _register_word_link_tokens(rows)
+    if kind == "my_words":
+        all_rows = view.get("rows", [])
+        rows = [
+            r
+            for r in all_rows
+            if _dict_entry_key(r[0], r[1]) in saved_keys
+        ]
+        rows.sort(key=lambda item: item[0].lower())
+        word_tokens = _register_word_link_tokens(rows)
+        return _format_my_words_list(
+            rows,
+            saved_keys=saved_keys,
+            word_tokens=word_tokens,
+            bot_username=bot_username,
+        )
     if kind == "b_level":
         return _format_b_level_list(
             series_name,
