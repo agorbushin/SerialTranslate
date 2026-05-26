@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-Translate tier words to Russian using ChatGPT (subtitle context, one word per request).
+Translate tier words using ChatGPT (subtitle context, one word per request).
+
+Default mode (Telegram bot): English dictionary-style glosses.
+Legacy mode: Russian glosses (``translation_mode="russian"`` or ``TRANSLATION_MODE=russian``).
 
 Reads tier_1_hard_usable_words.csv, tier_b1_words.csv, tier_b2_words.csv,
 tier_4_rare_c_words.csv, tier_4_rare_b_words.csv when present.
-Writes matching *_translations.csv files.
+Writes matching *_translations.csv files (``translation_ru`` column holds the gloss text).
 
 ``run(tier_ids=...)`` limits which bands are translated in one invocation (CLI default:
 all tiers that have words). The Telegram bot translates frequent tiers first and rare
@@ -20,6 +23,14 @@ import time
 from pathlib import Path
 from typing import List, Dict, Optional, Any, Tuple, Collection, FrozenSet
 import argparse
+
+from translation_modes import (
+    DEFAULT_TRANSLATION_MODE,
+    TranslationMode,
+    build_translate_batch_prompt,
+    get_translation_mode_from_env,
+    normalize_translation_mode,
+)
 
 # Internal tier keys used by run(tier_ids=...). CLI uses tier_ids=None (all tiers that have words).
 TIER_ID_TIER_1 = "tier_1"
@@ -133,8 +144,23 @@ def load_tier1_words(episode_dir: Path) -> List[str]:
     return load_tier_words(episode_dir, TIER_1_CSV)
 
 
+def load_translation_info_mode(translations_dir: Path) -> Optional[TranslationMode]:
+    """Read translation_mode from translation_info.json, if present."""
+    path = translations_dir / "translation_info.json"
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        raw = data.get("translation_mode")
+        if raw:
+            return normalize_translation_mode(str(raw))
+    except Exception:
+        pass
+    return None
+
+
 def load_existing_translations(csv_path: Path) -> Dict[str, str]:
-    """Load word -> translation_ru from an existing tier_1_translations.csv."""
+    """Load word -> gloss from an existing tier_*_translations.csv (translation_ru column)."""
     out: Dict[str, str] = {}
     if not csv_path.is_file():
         return out
@@ -252,9 +278,10 @@ async def translate_batch(
     subtitle_context: str,
     series_name: str,
     examples: Dict[str, List[str]],
-    target_language: str = "Russian",
+    *,
+    translation_mode: TranslationMode = DEFAULT_TRANSLATION_MODE,
 ) -> Dict[str, str]:
-    """Call OpenAI to translate a batch of words. Returns dict word -> translation_ru."""
+    """Call OpenAI to gloss a batch of words. Returns dict word -> gloss (stored in translation_ru CSV column)."""
     if not words:
         return {}
     words_list = ", ".join([f'"{w}"' for w in words])
@@ -270,37 +297,13 @@ async def translate_batch(
             examples_lines.append(f'  "{w}": (no example in subtitle)')
     examples_block = "\n".join(examples_lines)
 
-    prompt = f"""Series: {series_name}. Use the meaning that fits this show's setting (e.g. medieval/fantasy: maid = handmaid/servant = служанка; crow can be the bird or to crow; choose based on the example lines below).
-
-You are a dictionary translator. Translate the following English words into {target_language}.
-
-EXAMPLE LINES FROM THE EPISODE (use these to choose the correct sense):
-{examples_block}
-
-SUBTITLE CONTEXT (fallback when a word has no example above):
-{context}
-
-WORDS TO TRANSLATE: {words_list}
-
-RULES:
-- Translation must be short and dictionary-like: maximum 4-5 words.
-- Prefer the meaning that appears in the EXAMPLE LINES above; if there are no examples for a word, use the subtitle context and the series setting.
-- For period/fantasy series, prefer setting-appropriate terms (e.g. maid as servant = служанка; appropriate register for nobility/war).
-- Avoid generic or default dictionary sense when the context clearly suggests a more specific sense (e.g. beating in a fight context; raped as in the dialogue).
-- NEVER phonetically transcribe English sounds into Russian. Always use a real Russian dictionary word.
-  Wrong: "cockroach" → "Кокроча"   Right: "cockroach" → "таракан"
-  Wrong: "erm" → "эм"              Right: "erm" → "э-э (звук колебания)"
-  If a word has no clean Russian equivalent, use the closest semantic meaning — never a phonetic copy.
-- IMPORTANT NAME RULE: if the EXAMPLE LINES show that this token is used as a character/person name in the episode,
-  output this exact pattern:
-  "<русская передача имени> (имя в сериале), словарный перевод — <обычный перевод слова>"
-  Example: "destiny" when used as a name → "Дестини (имя в сериале), словарный перевод — судьба"
-- The "maximum 4-5 words" rule does NOT apply to this special NAME RULE format.
-- If you are genuinely unsure of a word's meaning in context, leave its value as an empty string "".
-- Output ONLY a JSON object with the exact English word as key and the {target_language} translation as value. No explanation.
-- Example format: {{"word1": "translation1", "word2": "translation2"}}
-
-Respond with a single JSON object only."""
+    prompt, system_message = build_translate_batch_prompt(
+        mode=translation_mode,
+        series_name=series_name,
+        words_list=words_list,
+        examples_block=examples_block,
+        context=context,
+    )
 
     response = None
     for attempt in range(4):
@@ -312,7 +315,7 @@ Respond with a single JSON object only."""
             response = await client.chat.completions.create(
                 model="gpt-5.4",
                 messages=[
-                    {"role": "system", "content": "You are a precise Russian dictionary translator. You respond only with valid JSON. No markdown, no extra text. Never phonetically transcribe — always use real Russian words."},
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.1,
@@ -355,6 +358,7 @@ async def _run_translate_batches_for_words(
     translations: Dict[str, str],
     *,
     tier_label: str = "",
+    translation_mode: TranslationMode = DEFAULT_TRANSLATION_MODE,
 ) -> Dict[str, int]:
     """
     Fill translations[w] for each w in words_to_translate via API (1 word per batch).
@@ -377,7 +381,12 @@ async def _run_translate_batches_for_words(
                 f"  {prefix}Translating batch {batch_index}/{n_batches}: {batch_words[0]!r}..."
             )
             return await translate_batch(
-                async_client, batch_words, prompt_context, series_name, examples
+                async_client,
+                batch_words,
+                prompt_context,
+                series_name,
+                examples,
+                translation_mode=translation_mode,
             )
 
     batches: List[List[str]] = [
@@ -412,6 +421,7 @@ async def _run_translate_batches_for_words(
                     prompt_context,
                     series_name,
                     examples,
+                    translation_mode=translation_mode,
                 )
 
         retry_batches: List[List[str]] = [
@@ -448,6 +458,7 @@ def run(
     subtitle_raw: Optional[str] = None,
     translation_overwrite: bool = False,
     tier_ids: Optional[Collection[str]] = None,
+    translation_mode: Optional[TranslationMode] = None,
 ) -> tuple[bool, Optional[str]]:
     """Load words and subtitle, translate in batches, save to translations dir.
 
@@ -455,7 +466,11 @@ def run(
     tier ids are translated and written; other translation CSVs on disk are left unchanged.
     Known ids: tier_1, b1, b2, tier_4c, tier_4b (see ALL_TRANSLATION_TIER_IDS).
 
+    translation_mode: ``english_dictionary`` (default) or ``russian``. When unset, uses
+    ``TRANSLATION_MODE`` env or english_dictionary.
+
     Returns (success, error_message). On success error_message is None."""
+    active_mode = translation_mode or get_translation_mode_from_env()
     started_total = time.perf_counter()
     started_phase = started_total
     timings_ms: Dict[str, Any] = {
@@ -563,6 +578,17 @@ def run(
             base, series_name, season_number, episode_number
         )
     out_dir_early.mkdir(parents=True, exist_ok=True)
+    cached_mode = load_translation_info_mode(out_dir_early)
+    reuse_cached_translations = (
+        not translation_overwrite
+        and cached_mode is not None
+        and cached_mode == active_mode
+    )
+    if cached_mode is not None and cached_mode != active_mode:
+        print(
+            f"Translation mode changed ({cached_mode} -> {active_mode}); "
+            "re-translating words for this run."
+        )
 
     if subtitle_raw is not None:
         subtitle_content = subtitle_raw
@@ -625,7 +651,7 @@ def run(
                 out_p = out_dir_early / out_csv
                 existing = (
                     {}
-                    if translation_overwrite
+                    if translation_overwrite or not reuse_cached_translations
                     else load_existing_translations(out_p)
                 )
                 trans: Dict[str, str] = {}
@@ -646,6 +672,7 @@ def run(
                     series_name,
                     trans,
                     tier_label=label,
+                    translation_mode=active_mode,
                 )
                 results_by_id[tier_id] = trans
                 tier_metrics_detail[tier_id] = {
@@ -661,7 +688,8 @@ def run(
     print(
         f"Loaded tier_1={len(words)}, B1={len(words_b1)}, B2={len(words_b2)}, "
         f"rare_C={len(words_4c)}, rare_B={len(words_4b)}; "
-        f"tier_ids={sorted(requested_tier_ids)}; subtitle context {len(subtitle_text)} chars."
+        f"tier_ids={sorted(requested_tier_ids)}; mode={active_mode}; "
+        f"subtitle context {len(subtitle_text)} chars."
     )
 
     try:
@@ -742,6 +770,7 @@ def run(
         "season_number": season_number,
         "episode_number": episode_number,
         "source_subtitle": source_subtitle_name,
+        "translation_mode": active_mode,
         "translated_at": __import__("datetime").datetime.now().isoformat(),
         "tier_word_counts": {
             "tier_1": len(words),
@@ -772,7 +801,7 @@ def run(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Translate tier_1, B1, and B2 words to Russian using ChatGPT and subtitle context."
+        description="Gloss tier words using ChatGPT and subtitle context (English dictionary or Russian)."
     )
     parser.add_argument(
         "--episode-dir",
@@ -809,7 +838,21 @@ def main() -> None:
         action="store_true",
         help="Re-translate all words for tier_1, B1, and B2; ignore existing translation CSVs",
     )
+    parser.add_argument(
+        "--translation-mode",
+        type=str,
+        default=None,
+        choices=["english_dictionary", "russian"],
+        help=(
+            "Gloss style: english_dictionary (default) or russian. "
+            "Overrides TRANSLATION_MODE env."
+        ),
+    )
     args = parser.parse_args()
+
+    mode: Optional[TranslationMode] = None
+    if args.translation_mode:
+        mode = normalize_translation_mode(args.translation_mode)
 
     ok, err = run(
         episode_dir=args.episode_dir,
@@ -818,6 +861,7 @@ def main() -> None:
         translations_base=args.translations_base_dir,
         subtitle_base=args.subtitle_base_dir,
         translation_overwrite=args.force_translate,
+        translation_mode=mode,
     )
     if not ok and err:
         print(f"Error: {err}")

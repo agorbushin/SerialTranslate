@@ -29,6 +29,7 @@ from telegram.ext import (
 )
 
 from env_config import get_openai_api_key, get_opensubtitles_api_key, resolve_openai_api_key
+from translation_modes import DEFAULT_TRANSLATION_MODE
 
 TELEGRAM_BOT_TOKEN = (os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip()
 OPENAI_API_KEY = get_openai_api_key()
@@ -454,7 +455,7 @@ async def _normalize_with_chatgpt(user_input: str) -> Optional[Tuple[str, int, i
     api_key = resolve_openai_api_key()
     if not api_key or not user_input.strip():
         return None
-    prompt = f"""The user wants frequent hard words from a TV series (with Russian glosses). They entered: "{user_input}"
+    prompt = f"""The user wants frequent hard words from a TV series (with English dictionary-style glosses). They entered: "{user_input}"
 
 Extract:
 1. The official TV series name (as used on IMDb / OpenSubtitles), e.g. "Game of Thrones", "Breaking Bad".
@@ -562,7 +563,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "👋 Welcome to **SerialTranslate**.\n\n"
         "**What you get:** harder English words that show up *often* in a specific TV episode or "
-        "movie — with Russian glosses, built from real subtitles.\n\n"
+        "movie — with short English dictionary glosses, built from real subtitles.\n\n"
         "**What to do:** tap **Next series**, then send the show name (with season/episode if you want). "
         "For a **movie**, use the /movie command, then send the title.\n\n"
         "Examples: _Fallout s2 e3_, _Inception_, _The Matrix 1999_.\n\n"
@@ -789,6 +790,7 @@ def _do_translate(
         subtitle_raw=subtitle_raw,
         translation_overwrite=translation_overwrite,
         tier_ids=tiers,
+        translation_mode=DEFAULT_TRANSLATION_MODE,
     )
     if not ok:
         return False, None, err or "Translation failed.", metrics
