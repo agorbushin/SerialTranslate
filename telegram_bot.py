@@ -77,8 +77,27 @@ def _md1(text: str) -> str:
     return escape_markdown((text or "").strip(), version=1)
 
 
+def _wrap_callback_update(query: Any) -> Any:
+    """Minimal Update-like object for callback handlers (message + user from the button tap)."""
+    msg = query.message
+    user = getattr(query, "from_user", None) or getattr(msg, "from_user", None)
+
+    class CallbackWrappedUpdate:
+        __slots__ = ("message", "effective_user")
+
+        def __init__(self, message, effective_user):
+            self.message = message
+            self.effective_user = effective_user
+
+    return CallbackWrappedUpdate(msg, user)
+
+
 def _safe_user_id(update: Update, *, query=None) -> Optional[int]:
-    user = query.from_user if query else update.effective_user
+    user = query.from_user if query else getattr(update, "effective_user", None)
+    if user is None:
+        msg = getattr(update, "message", None)
+        if msg is not None:
+            user = getattr(msg, "from_user", None)
     if not user:
         return None
     try:
@@ -902,7 +921,7 @@ async def _run_movie_pipeline(
 
         if translations_dir is not None:
             latency["branch"] = "cache_hit_translations"
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 f"🎬 Processing: {label}\n"
                 f"✅ Found existing translations.\n\n"
                 f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
@@ -931,7 +950,7 @@ async def _run_movie_pipeline(
 
         if episode_dir is not None:
             latency["branch"] = "tier_exists_translate_only"
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 f"🎬 Processing: {label}\n"
                 f"✅ Found existing hard words list.\n\n"
                 "⏳ Translating words…",
@@ -939,7 +958,7 @@ async def _run_movie_pipeline(
                 reply_markup=keyboard_discovery(context),
             )
             if subtitle_path is None:
-                await update.message.reply_text(
+                await _update_pipeline_status(update, context, 
                     f"🎬 Processing: {label}\n"
                     "⏳ Subtitle file missing, downloading…",
                     parse_mode="Markdown",
@@ -957,7 +976,7 @@ async def _run_movie_pipeline(
                 )
                 latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
                 if not subtitle_path:
-                    await update.message.reply_text(
+                    await _update_pipeline_status(update, context, 
                         f"❌ **Subtitle download failed** for {label}.\n\n"
                         "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
                         parse_mode="Markdown",
@@ -978,7 +997,7 @@ async def _run_movie_pipeline(
             latency["translator_metrics"] = translator_metrics
             if not ok or not out_dir:
                 reason = (trans_err or "Translation failed.").strip()
-                await update.message.reply_text(
+                await _update_pipeline_status(update, context, 
                     f"❌ **Translation failed.**\n\n{_md1(reason)}",
                     parse_mode="Markdown",
                     reply_markup=keyboard_discovery(context),
@@ -986,10 +1005,10 @@ async def _run_movie_pipeline(
                 latency["status"] = "failed"
                 latency["error"] = reason
                 return
-            rel = out_dir.relative_to(BASE_DIR)
-            await update.message.reply_text(
-                f"✅ {label}\n\n"
-                f"📁 C-level words translated and saved to: `{rel}/`",
+            await _update_pipeline_status(
+                update,
+                context,
+                f"✅ {label}\n\n⏳ Sending word list…",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
             )
@@ -1014,7 +1033,7 @@ async def _run_movie_pipeline(
             return
 
         latency["branch"] = "full_pipeline"
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"🎬 Processing: {label}\n\n"
             "⏳ Downloading subtitle…",
             parse_mode="Markdown",
@@ -1030,7 +1049,7 @@ async def _run_movie_pipeline(
         )
         latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
         if not subtitle_path:
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 f"❌ **Subtitle download failed** for {label}.\n\n"
                 "Possible causes: wrong movie name, or subtitle not on OpenSubtitles.",
                 parse_mode="Markdown",
@@ -1040,7 +1059,7 @@ async def _run_movie_pipeline(
             latency["error"] = "subtitle_download_failed"
             return
 
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"🎬 Processing: {label}\n"
             f"✅ Subtitle downloaded.\n\n"
             "⏳ Building the hard-word list from the subtitle…",
@@ -1058,7 +1077,7 @@ async def _run_movie_pipeline(
         latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
         latency["analyze_metrics"] = analyze_metrics
         if not episode_dir:
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
                 "The file may be invalid or empty.",
                 parse_mode="Markdown",
@@ -1068,7 +1087,7 @@ async def _run_movie_pipeline(
             latency["error"] = "tier_list_build_failed"
             return
 
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"🎬 Processing: {label}\n"
             f"✅ C-level list ready.\n\n"
             "⏳ Translating words…",
@@ -1089,7 +1108,7 @@ async def _run_movie_pipeline(
         latency["translator_metrics"] = translator_metrics
         if not ok or not out_dir:
             reason = (trans_err or "Translation failed.").strip()
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 f"❌ **Translation failed.**\n\n{_md1(reason)}",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
@@ -1098,10 +1117,10 @@ async def _run_movie_pipeline(
             latency["error"] = reason
             return
 
-        rel = out_dir.relative_to(BASE_DIR)
-        await update.message.reply_text(
-            f"✅ {label}\n\n"
-            f"📁 C-level words translated and saved to: `{rel}/`",
+        await _update_pipeline_status(
+            update,
+            context,
+            f"✅ {label}\n\n⏳ Sending word list…",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
         )
@@ -1125,7 +1144,7 @@ async def _run_movie_pipeline(
         latency["status"] = "success"
 
     except asyncio.TimeoutError:
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             "❌ **Request timed out** (download/analysis/translation took too long).",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -1133,7 +1152,7 @@ async def _run_movie_pipeline(
         latency["status"] = "timeout"
         latency["error"] = "request_timeout"
     except Exception as e:
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"❌ **Error:** {_md1(str(e)[:150])}",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -1177,7 +1196,7 @@ async def _run_series_pipeline(
 
         if translations_dir is not None:
             latency["branch"] = "cache_hit_translations"
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
                 f"✅ Found existing translations.\n\n"
                 f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
@@ -1204,7 +1223,7 @@ async def _run_series_pipeline(
 
         if episode_dir is not None:
             latency["branch"] = "tier_exists_translate_only"
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
                 f"✅ Found existing hard words list.\n\n"
                 "⏳ Translating words…",
@@ -1212,7 +1231,7 @@ async def _run_series_pipeline(
                 reply_markup=keyboard_discovery(context),
             )
             if subtitle_path is None:
-                await update.message.reply_text(
+                await _update_pipeline_status(update, context, 
                     f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
                     "⏳ Subtitle file missing, downloading…",
                     parse_mode="Markdown",
@@ -1228,7 +1247,7 @@ async def _run_series_pipeline(
                 )
                 latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
                 if not subtitle_path:
-                    await update.message.reply_text(
+                    await _update_pipeline_status(update, context, 
                         f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
                         "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
                         parse_mode="Markdown",
@@ -1249,7 +1268,7 @@ async def _run_series_pipeline(
             latency["translator_metrics"] = translator_metrics
             if not ok or not out_dir:
                 reason = (trans_err or "Translation failed.").strip()
-                await update.message.reply_text(
+                await _update_pipeline_status(update, context, 
                     f"❌ **Translation failed.**\n\n{_md1(reason)}\n\n💡 Use /next or **Next series** to try another title.",
                     parse_mode="Markdown",
                     reply_markup=keyboard_discovery(context),
@@ -1257,10 +1276,11 @@ async def _run_series_pipeline(
                 latency["status"] = "failed"
                 latency["error"] = reason
                 return
-            rel = out_dir.relative_to(BASE_DIR)
-            await update.message.reply_text(
+            await _update_pipeline_status(
+                update,
+                context,
                 f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
-                f"📁 C-level words translated and saved to: `{rel}/`",
+                "⏳ Sending word list…",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
             )
@@ -1283,7 +1303,7 @@ async def _run_series_pipeline(
             return
 
         latency["branch"] = "full_pipeline"
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
             "⏳ Downloading subtitle…",
             parse_mode="Markdown",
@@ -1299,7 +1319,7 @@ async def _run_series_pipeline(
         )
         latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
         if not subtitle_path:
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 f"❌ **Subtitle download failed** for *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}.\n\n"
                 "Possible causes: wrong series/episode name, or subtitle not on OpenSubtitles.",
                 parse_mode="Markdown",
@@ -1309,7 +1329,7 @@ async def _run_series_pipeline(
             latency["error"] = "subtitle_download_failed"
             return
 
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
             f"✅ Subtitle downloaded.\n\n"
             "⏳ Building the hard-word list from the subtitle…",
@@ -1324,7 +1344,7 @@ async def _run_series_pipeline(
         latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
         latency["analyze_metrics"] = analyze_metrics
         if not episode_dir:
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 "❌ **Hard-word list build failed** (could not read the subtitle).\n\n"
                 "The file may be invalid or empty.",
                 parse_mode="Markdown",
@@ -1334,7 +1354,7 @@ async def _run_series_pipeline(
             latency["error"] = "tier_list_build_failed"
             return
 
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"🔍 Processing: *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n"
             f"✅ C-level list ready.\n\n"
             "⏳ Translating words…",
@@ -1355,7 +1375,7 @@ async def _run_series_pipeline(
         latency["translator_metrics"] = translator_metrics
         if not ok or not out_dir:
             reason = (trans_err or "Translation failed.").strip()
-            await update.message.reply_text(
+            await _update_pipeline_status(update, context, 
                 f"❌ **Translation failed.**\n\n{_md1(reason)}",
                 parse_mode="Markdown",
                 reply_markup=keyboard_discovery(context),
@@ -1364,10 +1384,11 @@ async def _run_series_pipeline(
             latency["error"] = reason
             return
 
-        rel = out_dir.relative_to(BASE_DIR)
-        await update.message.reply_text(
+        await _update_pipeline_status(
+            update,
+            context,
             f"✅ *{_md1(series_name)}*{_tv_episode_suffix(series_name, season, episode)}\n\n"
-            f"📁 C-level words translated and saved to: `{rel}/`",
+            "⏳ Sending word list…",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
         )
@@ -1389,7 +1410,7 @@ async def _run_series_pipeline(
         latency["status"] = "success"
 
     except asyncio.TimeoutError:
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             "❌ **Request timed out** (download/analysis/translation took too long).",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -1397,7 +1418,7 @@ async def _run_series_pipeline(
         latency["status"] = "timeout"
         latency["error"] = "request_timeout"
     except Exception as e:
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"❌ **Error:** {_md1(str(e)[:150])}",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -1499,6 +1520,7 @@ async def _handle_message_movie(
 ) -> None:
     """Handle movie search flow: parse, resolve title, confirm if needed, then pipeline."""
     context.user_data.pop("pending_title", None)
+    _clear_pipeline_status(context)
     req_started = time.perf_counter()
     latency = _new_latency(raw, "movie")
     phase_started = time.perf_counter()
@@ -1506,7 +1528,7 @@ async def _handle_message_movie(
     latency["phase_timings_ms"]["parse_input"] = _ms_since(phase_started)
 
     label = _movie_label(movie_name, year)
-    await update.message.reply_text(
+    await _update_pipeline_status(update, context, 
         f"🎬 Processing request for: {label}\n\n"
         "⏳ Resolving title…",
         parse_mode="Markdown",
@@ -1527,7 +1549,7 @@ async def _handle_message_movie(
 
     if resolved.confidence == "high":
         identity = _identity_from_resolved(resolved)
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"🎬 Processing: {_movie_label(identity['movie_name'], identity['year'])}\n\n"
             "⏳ Looking for a saved word list or translations…",
             parse_mode="Markdown",
@@ -1542,7 +1564,7 @@ async def _handle_message_movie(
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not update.message or not update.message.text:
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             "❌ Please send a TV series or movie title.",
             reply_markup=keyboard_discovery(context),
         )
@@ -1555,7 +1577,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     req_started = time.perf_counter()
     latency = _new_latency(raw, "series")
     if len(raw) < 2:
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             "❌ Name too short. Try e.g. _Fallout_, _Inception_, _Game of Thrones_.",
             parse_mode="Markdown",
             reply_markup=keyboard_discovery(context),
@@ -1577,6 +1599,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     context.user_data.pop("pending_title", None)
+    _clear_pipeline_status(context)
     phase_started = time.perf_counter()
     series_name, season, episode = _parse_series_input(raw)
     latency["phase_timings_ms"]["parse_input"] = _ms_since(phase_started)
@@ -1585,7 +1608,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         "season": season,
         "episode": episode,
     }
-    await update.message.reply_text(
+    await _update_pipeline_status(update, context, 
         f"🔍 Processing request for: *{_md1(raw)}*\n\n"
         "⏳ Resolving title…",
         parse_mode="Markdown",
@@ -1623,7 +1646,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     if resolved.confidence == "high":
         identity = _identity_from_resolved(resolved)
-        await update.message.reply_text(
+        await _update_pipeline_status(update, context, 
             f"🔍 Processing: *{_md1(identity['series_name'])}*"
             f"{_tv_episode_suffix(identity['series_name'], identity['season'], identity['episode'])}\n\n"
             "⏳ Looking for a saved word list or translations…",
@@ -1699,6 +1722,14 @@ def _word_list_example_suffix(example: str, *, max_len: int = 180) -> str:
         return ""
     short = ex[:max_len] + ("…" if len(ex) > max_len else "")
     return f"\n   _{short}_"
+
+
+def _word_list_dictionary_hint() -> str:
+    """Footer shown under clickable word lists (deep-link save to personal dictionary)."""
+    return (
+        "\n\n_💡 Tap a **word** in the list to add it to your personal dictionary "
+        "(tap again to remove). Saved words show 📚 — open **My dictionary** anytime._"
+    )
 
 
 def _format_word_entry_line(
@@ -1784,7 +1815,7 @@ def _format_b_level_list(
     body = "\n".join(lines)
     if n > max_lines_per_band:
         body += f"\n\n… and {n - max_lines_per_band} more."
-    return header + body
+    return header + body + _word_list_dictionary_hint()
 
 
 def _format_word_list(
@@ -1827,7 +1858,7 @@ def _format_word_list(
     body = "\n".join(lines)
     if n > max_lines:
         body += f"\n\n… and {n - max_lines} more words."
-    return header + body
+    return header + body + _word_list_dictionary_hint()
 
 
 def _format_rare_in_series_full_list(
@@ -1867,7 +1898,7 @@ def _format_rare_in_series_full_list(
         )
         for i, (w, t, ex) in enumerate(pairs, 1)
     ]
-    return header + "\n".join(lines)
+    return header + "\n".join(lines) + _word_list_dictionary_hint()
 
 
 def _split_message_chunks(text: str, max_len: int = 4096) -> List[str]:
@@ -1894,6 +1925,65 @@ def _split_message_chunks(text: str, max_len: int = 4096) -> List[str]:
 def _chat_message(update: Update, *, query=None):
     """Message object to reply on — callback queries use the message that held the button."""
     return query.message if query else update.message
+
+
+_PIPELINE_STATUS_KEY = "pipeline_status"
+
+
+def _clear_pipeline_status(context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data.pop(_PIPELINE_STATUS_KEY, None)
+
+
+def _seed_pipeline_status(
+    context: ContextTypes.DEFAULT_TYPE, chat_id: Any, message_id: Any
+) -> None:
+    try:
+        context.user_data[_PIPELINE_STATUS_KEY] = {
+            "chat_id": int(chat_id),
+            "message_id": int(message_id),
+        }
+    except (TypeError, ValueError):
+        pass
+
+
+async def _update_pipeline_status(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    text: str,
+    *,
+    reply_markup: Optional[InlineKeyboardMarkup] = None,
+    parse_mode: str = "Markdown",
+) -> None:
+    """Create or edit the single in-flight status message (download / translate progress)."""
+    msg = update.message
+    if msg is None:
+        return
+    kb = reply_markup if reply_markup is not None else keyboard_discovery(context)
+    anchor = context.user_data.get(_PIPELINE_STATUS_KEY)
+    chat_id = msg.chat_id
+
+    if anchor and anchor.get("chat_id") == chat_id and anchor.get("message_id"):
+        try:
+            await context.bot.edit_message_text(
+                chat_id=int(anchor["chat_id"]),
+                message_id=int(anchor["message_id"]),
+                text=text,
+                parse_mode=parse_mode,
+                reply_markup=kb,
+            )
+            return
+        except BadRequest as exc:
+            if "message is not modified" in str(exc).lower():
+                return
+
+    try:
+        sent = await msg.reply_text(text, parse_mode=parse_mode, reply_markup=kb)
+    except BadRequest:
+        if parse_mode is None:
+            raise
+        sent = await msg.reply_text(text, parse_mode=None, reply_markup=kb)
+    if sent is not None:
+        _seed_pipeline_status(context, getattr(sent, "chat_id", None), getattr(sent, "message_id", None))
 
 
 async def _reply_bot_message(
@@ -2060,6 +2150,7 @@ async def _send_translations_list(
     query=None,
 ) -> None:
     """Load tier_1 translations and send frequent C-level list (chunked). Supports callback via query=."""
+    _clear_pipeline_status(context)
     episode_dir = _resolve_episode_dir(translations_dir, context)
     pairs = _load_translations_list(translations_dir)
     user_id = _safe_user_id(update, query=query)
@@ -3352,10 +3443,14 @@ async def _handle_title_callback(
         sn = identity.get("series_name") or identity.get("canonical_title") or "?"
         label = f"*{_md1(sn)}*{_tv_episode_suffix(sn, int(identity.get('season', 1)), int(identity.get('episode', 1)))}"
 
-    await _reply_bot_message(
+    if query.message:
+        _seed_pipeline_status(
+            context, query.message.chat_id, query.message.message_id
+        )
+    await _update_pipeline_status(
         wrapped,
-        query=query,
-        text=f"⏳ Processing {label}…",
+        context,
+        f"⏳ Processing {label}…",
         reply_markup=keyboard_discovery(context),
         parse_mode="Markdown",
     )
@@ -3375,11 +3470,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     if not query.message:
         return
 
-    class WrappedUpdate:
-        def __init__(self, msg):
-            self.message = msg
-
-    wrapped = WrappedUpdate(query.message)
+    wrapped = _wrap_callback_update(query)
 
     try:
         if data.startswith("title_"):

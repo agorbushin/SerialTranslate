@@ -461,6 +461,8 @@ class TestMessageHandling:
 
         mock_update.message.text = "Test Series"
         status_msg = Mock()
+        status_msg.chat_id = 12345
+        status_msg.message_id = 200
         status_msg.edit_text = AsyncMock()
         mock_update.message.reply_text = AsyncMock(return_value=status_msg)
 
@@ -553,7 +555,8 @@ class TestMessageHandling:
     @pytest.mark.asyncio
     async def test_title_use_callback_runs_movie_pipeline(self, mock_update, mock_context):
         """title_use callback resumes movie pipeline with suggested identity."""
-        from telegram_bot import _handle_title_callback, button_callback
+        import telegram_bot as tb
+        from telegram_bot import _handle_title_callback
         from telegram import CallbackQuery
 
         pending = {
@@ -578,10 +581,7 @@ class TestMessageHandling:
         query.answer = AsyncMock()
         query.message = mock_update.message
 
-        class WrappedUpdate:
-            message = mock_update.message
-
-        wrapped = WrappedUpdate()
+        wrapped = tb._wrap_callback_update(query)
         with patch("telegram_bot._run_movie_pipeline", new_callable=AsyncMock) as m_pipe:
             await _handle_title_callback(
                 mock_update, mock_context, query, "title_use:abc123", wrapped
@@ -710,6 +710,13 @@ class TestWordListExamples:
         assert "beating" in text
         assert "избиение" in text
         assert "Stop the beating" in text
+        assert "personal dictionary" in text
+
+    def test_format_word_list_omits_dictionary_hint_when_empty(self):
+        from telegram_bot import _format_word_list
+
+        text = _format_word_list("Test Show", 1, 1, [])
+        assert "personal dictionary" not in text
 
     def test_load_translation_pairs_reads_example_en(self, temp_dir):
         from telegram_bot import _load_translation_pairs_csv

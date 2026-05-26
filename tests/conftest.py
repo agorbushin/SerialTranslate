@@ -194,6 +194,8 @@ def mock_update():
     update.message.reply_text = AsyncMock()
     update.message.reply_document = AsyncMock()
     update.message.reply_markdown = AsyncMock()
+    update.message.chat_id = 12345
+    update.message.message_id = 100
     update.effective_user = update.message.from_user
     update.effective_chat = Mock(spec=Chat)
     update.effective_chat.id = 12345
@@ -207,6 +209,7 @@ def mock_context():
     context.user_data = {}
     context.bot = Mock()
     context.bot.get_file = AsyncMock()
+    context.bot.edit_message_text = AsyncMock()
     return context
 
 
