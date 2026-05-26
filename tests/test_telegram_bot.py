@@ -626,6 +626,18 @@ class TestWordListExamples:
         line = _format_word_entry_line(1, "maid", "служанка", "", is_saved=True)
         assert "maid 📚" in line
 
+    def test_format_word_entry_line_makes_clickable_link(self):
+        from telegram_bot import _format_word_entry_line
+
+        line = _format_word_entry_line(
+            1,
+            "legion",
+            "Легион",
+            "",
+            word_link="https://t.me/mybot?start=dw_abc123",
+        )
+        assert "[legion](https://t.me/mybot?start=dw_abc123)" in line
+
 
 class TestMyWordsFeature:
     def test_show_my_words_text_trigger_ru(self):
@@ -646,51 +658,11 @@ class TestMyWordsFeature:
         text = mock_update.message.reply_text.call_args[0][0]
         assert "Личный словарь пока пуст" in text
 
-    def test_word_toggle_keyboard_builds_buttons(self, mock_context):
-        from telegram_bot import _word_toggle_keyboard
+    def test_deep_link_for_word_token(self):
+        from telegram_bot import _deep_link_for_word_token
 
-        kb = _word_toggle_keyboard(
-            mock_context,
-            [("maid", "служанка", "")],
-            saved_keys=set(),
-        )
-        assert kb.inline_keyboard
-
-    @pytest.mark.asyncio
-    async def test_dict_toggle_edits_current_message(self, mock_context, mock_callback_query):
-        import telegram_bot as tb
-
-        token = "abc123token"
-        mock_callback_query.data = f"dict_toggle:{token}"
-        mock_callback_query.message.chat_id = 555
-        mock_callback_query.message.message_id = 42
-        mock_callback_query.edit_message_text = AsyncMock()
-        mock_callback_query.message.reply_text = AsyncMock()
-
-        update = Mock(spec=Update)
-        update.callback_query = mock_callback_query
-
-        mock_context.bot_data = {
-            "dict_word_tokens": {token: ("maid", "служанка", "The maid left early.")},
-            "word_list_views": {
-                "555:42": {
-                    "kind": "frequent_c",
-                    "series_name": "Test Show",
-                    "season": 1,
-                    "episode": 1,
-                    "is_movie": False,
-                    "year": 0,
-                    "rows": [("maid", "служанка", "The maid left early.")],
-                }
-            },
-        }
-        with patch.object(tb, "_safe_user_id", return_value=12345):
-            with patch.object(tb, "_get_user_dictionary", return_value={}):
-                with patch.object(tb, "_set_user_dictionary", return_value=None):
-                    await tb.button_callback(update, mock_context)
-
-        assert mock_callback_query.edit_message_text.called
-        assert not mock_callback_query.message.reply_text.called
+        link = _deep_link_for_word_token("mybot", "abc123")
+        assert link == "https://t.me/mybot?start=dw_abc123"
 
 
 class TestEpisodeDirResolution:
