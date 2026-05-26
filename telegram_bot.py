@@ -584,8 +584,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "👋 **SerialTranslate**\n\n"
         "Gives a list of hard words with short English meanings from a specific episode of a TV series or a movie.\n"
-        "Keeps track of the words you want to learn"
-        "To start enter the name of a TV series with season and episode or a movie with a year (e.g. Fallout S2E2, _The Matrix 1999_).\n\n"
+        "Keeps track of the words you want to learn\n"
+        "\n"
+        "To start enter the name of a TV series with season and episode or a movie with a year \n(e.g. Fallout S2E2, _The Matrix 1999_).\n\n"
         f"_v{BOT_VERSION} · {build}_",
         parse_mode="Markdown",
         reply_markup=keyboard_discovery(context),
