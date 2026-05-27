@@ -139,6 +139,47 @@ def get_translations_movie_dir(base_dir: Path, movie_name: str, year: int) -> Pa
     return base_dir / "Movies" / movie_name / folder
 
 
+def _normalize_youtube_for_filename(video_title: str) -> str:
+    """Normalize YouTube title for filenames/folders."""
+    return _normalize_series_for_filename(video_title) or "youtube_video"
+
+
+def _youtube_folder_name(video_title: str) -> str:
+    title = (video_title or "").strip()
+    return title or "YouTube Video"
+
+
+def _youtube_slug(video_title: str, video_id: str) -> str:
+    base = _normalize_youtube_for_filename(video_title)
+    vid = re.sub(r"[^\w-]", "", (video_id or "").strip())
+    return f"{base}_{vid}" if vid else base
+
+
+def get_youtube_subtitle_path(base_dir: Path, video_title: str, video_id: str) -> Path:
+    """
+    Return where a YouTube subtitle should be stored.
+    Path: base_dir / YouTube / video_title / {video_title}_{video_id}.srt
+    """
+    slug = _youtube_slug(video_title, video_id)
+    return base_dir / "YouTube" / _youtube_folder_name(video_title) / f"{slug}.srt"
+
+
+def get_tierlist_youtube_dir(base_dir: Path, video_title: str, video_id: str) -> Path:
+    """
+    Return where tier list files for a YouTube video should be stored.
+    Path: base_dir / YouTube / video_title / {video_title}_{video_id}/
+    """
+    return base_dir / "YouTube" / _youtube_folder_name(video_title) / _youtube_slug(video_title, video_id)
+
+
+def get_translations_youtube_dir(base_dir: Path, video_title: str, video_id: str) -> Path:
+    """
+    Return where translations for a YouTube video should be stored.
+    Same layout as get_tierlist_youtube_dir; typically base_dir is "translations".
+    """
+    return base_dir / "YouTube" / _youtube_folder_name(video_title) / _youtube_slug(video_title, video_id)
+
+
 class OpenSubtitlesDownloader:
     """Download subtitles from OpenSubtitles API and save under Subtitle/{series}/{season}/."""
 

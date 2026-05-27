@@ -728,10 +728,15 @@ async def monitoring(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 def keyboard_discovery(context: ContextTypes.DEFAULT_TYPE) -> InlineKeyboardMarkup:
-    """Pre-load: start another TV show. Movies: use /movie."""
+    """Pre-load: start another TV show, movie, or YouTube video."""
     _ = context  # reserved for future (e.g. optional Next movie)
     return InlineKeyboardMarkup(
-        [[InlineKeyboardButton("📺 Next series", callback_data="next_series")]]
+        [
+            [
+                InlineKeyboardButton("📺 Next series", callback_data="next_series"),
+                InlineKeyboardButton("▶️ YouTube", callback_data="next_youtube"),
+            ]
+        ]
     )
 
 
@@ -1021,9 +1026,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     build = BOT_BUILD_DATETIME or "unknown"
     await update.message.reply_text(
         "👋 **Welcome to SerialTranslate**\n\n"
-        "Gives a list of hard words with short English meanings from a specific episode of a TV series or a movie.\n\n"
+        "Gives a list of hard words with short English meanings from a specific episode of a TV series, a movie, or a YouTube video.\n\n"
         "Keeps track of the words you want to learn\n\n"
-        "To start enter the name of a TV series with season and episode or a movie with a year \n(e.g. Fallout S2E2, _The Matrix 1999_).\n\n"
+        "To start enter the name of a TV series with season and episode, a movie with a year, or a YouTube link \n(e.g. Fallout S2E2, _The Matrix 1999_).\n\n"
         f"_v{BOT_VERSION} · {build}_",
         parse_mode="Markdown",
         reply_markup=keyboard_discovery(context),
@@ -1050,6 +1055,18 @@ async def next_movie(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await update.message.reply_text(
         "🎬 **Which movie?**\n\n"
         "Send the title (optional year helps), e.g. _Inception_, _The Matrix 1999_, _Dune (2021)_.",
+        parse_mode="Markdown",
+        reply_markup=keyboard_discovery(context),
+    )
+
+
+async def next_youtube(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.__class__.__name__ != "CallbackWrappedUpdate":
+        _monitoring_record_event(update, "command", "youtube")
+    context.user_data["mode"] = "youtube"
+    await update.message.reply_text(
+        "▶️ **Which YouTube video?**\n\n"
+        "Send a YouTube link. I’ll use manual captions when available, otherwise auto captions.",
         parse_mode="Markdown",
         reply_markup=keyboard_discovery(context),
     )
@@ -1143,6 +1160,42 @@ def _find_existing_movie(
     )
 
 
+def _find_existing_youtube(
+    video_title: str, video_id: str
+) -> Tuple[Optional[Path], Optional[Path], Optional[Path]]:
+    """Look for existing tier list/translations/subtitle for a YouTube video."""
+    from download_subtitles import (
+        get_tierlist_youtube_dir,
+        get_translations_youtube_dir,
+        get_youtube_subtitle_path,
+    )
+
+    episode_dir = get_tierlist_youtube_dir(TIERLIST_BASE, video_title, video_id)
+    has_tier = episode_dir.exists() and (episode_dir / "tier_1_hard_usable_words.csv").exists()
+
+    translations_dir = get_translations_youtube_dir(TRANSLATIONS_BASE, video_title, video_id)
+    has_translations = (translations_dir / "tier_1_translations.csv").exists()
+
+    subtitle_path = get_youtube_subtitle_path(SUBTITLE_BASE, video_title, video_id)
+    if not subtitle_path.exists() and episode_dir.exists():
+        info_file = episode_dir / "episode_info.json"
+        if info_file.exists():
+            try:
+                info = json.loads(info_file.read_text(encoding="utf-8"))
+                title = info.get("series") or video_title
+                sub_name = info.get("subtitle_file")
+                if sub_name:
+                    subtitle_path = SUBTITLE_BASE / "YouTube" / title / sub_name
+            except Exception:
+                pass
+
+    return (
+        episode_dir if has_tier else None,
+        translations_dir if has_translations else None,
+        subtitle_path if subtitle_path.exists() else None,
+    )
+
+
 def _do_download(series_name: str, season: int, episode: int) -> Optional[Path]:
     """Download subtitle. Returns subtitle path or None."""
     from download_subtitles import get_subtitle_path, download_subtitle
@@ -1199,6 +1252,17 @@ def _do_download_movie(
         api_key=OPENSUBTITLES_API_KEY,
     )
     return path
+
+
+def _do_download_youtube(url: str) -> Any:
+    """Download YouTube captions as SRT. Returns YouTubeSubtitleResult."""
+    from youtube_subtitles import download_youtube_subtitle
+
+    return download_youtube_subtitle(url, base_dir=SUBTITLE_BASE)
+
+
+def _youtube_label(video_title: str) -> str:
+    return f"*{_md1(video_title or 'YouTube video')}*"
 
 
 def _movie_label(movie_name: str, year: int) -> str:
@@ -1873,6 +1937,202 @@ async def _run_series_pipeline(
         _monitoring_record_pipeline_finish(update, latency)
 
 
+async def _run_youtube_pipeline(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    url: str,
+    latency: Dict[str, Any],
+    req_started: float,
+) -> None:
+    loop = asyncio.get_running_loop()
+    timeout = 600.0
+
+    try:
+        latency["branch"] = "youtube_pipeline"
+        await _update_pipeline_status(
+            update,
+            context,
+            "▶️ Processing YouTube video\n\n⏳ Fetching captions…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        phase_started = time.perf_counter()
+        yt = await asyncio.wait_for(
+            loop.run_in_executor(None, lambda: _do_download_youtube(url)),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["download_subtitle"] = _ms_since(phase_started)
+        latency["identity"] = {
+            "media_type": "youtube",
+            "video_title": yt.video_title,
+            "youtube_id": yt.video_id,
+            "language": yt.language,
+            "is_auto_generated": yt.is_auto_generated,
+        }
+
+        label = _youtube_label(yt.video_title)
+        episode_dir, translations_dir, subtitle_path = _find_existing_youtube(
+            yt.video_title, yt.video_id
+        )
+        subtitle_path = subtitle_path or yt.subtitle_path
+
+        if translations_dir is not None:
+            latency["branch"] = "cache_hit_translations"
+            await _update_pipeline_status(
+                update,
+                context,
+                f"▶️ Processing: {label}\n"
+                f"✅ Found existing translations.\n\n"
+                f"📁 Saved to: `{translations_dir.relative_to(BASE_DIR)}/`",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            await _send_translations_list(
+                update,
+                context,
+                translations_dir,
+                yt.video_title,
+                0,
+                0,
+                latency_ms=_ms_since(req_started),
+            )
+            _persist_loaded_title_context(
+                context,
+                translations_dir=translations_dir,
+                series_name=yt.video_title,
+                episode_dir=episode_dir,
+            )
+            latency["status"] = "success"
+            return
+
+        if episode_dir is None:
+            caption_kind = "auto captions" if yt.is_auto_generated else "captions"
+            await _update_pipeline_status(
+                update,
+                context,
+                f"▶️ Processing: {label}\n"
+                f"✅ Downloaded {caption_kind} ({_md1(yt.language)}).\n\n"
+                "⏳ Building the hard-word list from captions…",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            phase_started = time.perf_counter()
+            episode_dir, analyze_metrics, subtitle_raw_handoff = await asyncio.wait_for(
+                loop.run_in_executor(
+                    None,
+                    lambda: _do_analyze_youtube(
+                        yt.subtitle_path,
+                        yt.video_title,
+                        yt.video_id,
+                        yt.webpage_url,
+                    ),
+                ),
+                timeout=timeout,
+            )
+            latency["phase_timings_ms"]["analyze_subtitle"] = _ms_since(phase_started)
+            latency["analyze_metrics"] = analyze_metrics
+            if not episode_dir:
+                await _update_pipeline_status(
+                    update,
+                    context,
+                    "❌ **Hard-word list build failed** (could not read the captions).",
+                    parse_mode="Markdown",
+                    reply_markup=keyboard_discovery(context),
+                )
+                latency["status"] = "failed"
+                latency["error"] = "tier_list_build_failed"
+                return
+        else:
+            subtitle_raw_handoff = None
+            latency["branch"] = "tier_exists_translate_only"
+
+        await _update_pipeline_status(
+            update,
+            context,
+            f"▶️ Processing: {label}\n"
+            "✅ C-level list ready.\n\n"
+            "⏳ Translating words…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        phase_started = time.perf_counter()
+        ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: _do_translate(
+                    episode_dir,
+                    subtitle_path,
+                    subtitle_raw=subtitle_raw_handoff,
+                ),
+            ),
+            timeout=timeout,
+        )
+        latency["phase_timings_ms"]["translate"] = _ms_since(phase_started)
+        latency["translator_metrics"] = translator_metrics
+        if not ok or not out_dir:
+            reason = (trans_err or "Translation failed.").strip()
+            await _update_pipeline_status(
+                update,
+                context,
+                f"❌ **Translation failed.**\n\n{_md1(reason)}",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            latency["status"] = "failed"
+            latency["error"] = reason
+            return
+
+        await _update_pipeline_status(
+            update,
+            context,
+            f"✅ {label}\n\n⏳ Sending word list…",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        await _send_translations_list(
+            update,
+            context,
+            out_dir,
+            yt.video_title,
+            0,
+            0,
+            latency_ms=_ms_since(req_started),
+        )
+        _persist_loaded_title_context(
+            context,
+            translations_dir=out_dir,
+            series_name=yt.video_title,
+            episode_dir=episode_dir,
+        )
+        latency["status"] = "success"
+
+    except asyncio.TimeoutError:
+        await _update_pipeline_status(
+            update,
+            context,
+            "❌ **Request timed out** (caption download/analysis/translation took too long).",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        latency["status"] = "timeout"
+        latency["error"] = "request_timeout"
+    except Exception as e:
+        await _update_pipeline_status(
+            update,
+            context,
+            f"❌ **YouTube captions failed:** {_md1(str(e)[:180])}",
+            parse_mode="Markdown",
+            reply_markup=keyboard_discovery(context),
+        )
+        latency["status"] = "failed"
+        latency["error"] = str(e)[:200]
+    finally:
+        latency["finished_at"] = datetime.now().isoformat()
+        latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
+        await _write_latency_async(latency)
+        _monitoring_record_pipeline_finish(update, latency)
+
+
 def _do_analyze_movie(
     subtitle_path: Path, movie_name: str, year: int
 ) -> Tuple[Optional[Path], Dict[str, int], Optional[str]]:
@@ -1901,6 +2161,38 @@ def _do_analyze_movie(
     return episode_dir, analyze_metrics, raw if isinstance(raw, str) else None
 
 
+def _do_analyze_youtube(
+    subtitle_path: Path,
+    video_title: str,
+    video_id: str,
+    source_url: str,
+) -> Tuple[Optional[Path], Dict[str, int], Optional[str]]:
+    """Run tier pipeline for YouTube captions."""
+    from subtitle_analyzer import run_pipeline
+
+    analyze_metrics: Dict[str, int] = {}
+    handoff: Dict[str, Any] = {}
+    oa_key = resolve_openai_api_key() or None
+    episode_dir = run_pipeline(
+        subtitle_path=subtitle_path,
+        base_dir=BASE_DIR,
+        tierlist_base_dir=TIERLIST_BASE,
+        max_english_freq=20_000_000,
+        openai_api_key=oa_key,
+        is_youtube=True,
+        series_name=video_title,
+        youtube_id=video_id,
+        source_url=source_url,
+        metrics_out=analyze_metrics,
+        handoff_out=handoff,
+        skip_if_outputs_fresh=True,
+    )
+    if not episode_dir or not (episode_dir / "tier_1_hard_usable_words.csv").exists():
+        return None, analyze_metrics, None
+    raw = handoff.get("subtitle_raw")
+    return episode_dir, analyze_metrics, raw if isinstance(raw, str) else None
+
+
 def _do_translate(
     episode_dir: Path,
     subtitle_path: Optional[Path],
@@ -1913,7 +2205,11 @@ def _do_translate(
 
     tier_ids None: frequent lists only (tier_1, B1, B2). Pass explicit ids for on-demand rare tiers.
     """
-    from download_subtitles import get_translations_episode_dir, get_translations_movie_dir
+    from download_subtitles import (
+        get_translations_episode_dir,
+        get_translations_movie_dir,
+        get_translations_youtube_dir,
+    )
     from translate_tier_translations import FREQUENT_TRANSLATION_TIER_IDS, run as run_translate
 
     metrics: Dict[str, Any] = {}
@@ -1937,6 +2233,8 @@ def _do_translate(
     series_name = "Unknown"
     season_num = episode_num = 1
     is_movie = False
+    is_youtube = False
+    youtube_id = ""
     year = 0
     if info.exists():
         try:
@@ -1945,10 +2243,18 @@ def _do_translate(
             season_num = int(data.get("season_number", 1))
             episode_num = int(data.get("episode_number", 1))
             is_movie = bool(data.get("is_movie", False))
+            is_youtube = bool(data.get("is_youtube", False))
+            youtube_id = str(data.get("youtube_id") or "")
             year = int(data.get("year", 0))
         except Exception:
             pass
-    if is_movie:
+    if is_youtube:
+        out_dir = get_translations_youtube_dir(
+            TRANSLATIONS_BASE,
+            series_name,
+            youtube_id,
+        )
+    elif is_movie:
         out_dir = get_translations_movie_dir(TRANSLATIONS_BASE, series_name, year)
     else:
         out_dir = get_translations_episode_dir(
@@ -2042,6 +2348,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     mode = context.user_data.get("mode", "series")
+    from youtube_subtitles import is_youtube_url
+
+    if mode == "youtube" or is_youtube_url(raw):
+        if not is_youtube_url(raw):
+            await _update_pipeline_status(update, context,
+                "❌ Please send a valid YouTube link.",
+                parse_mode="Markdown",
+                reply_markup=keyboard_discovery(context),
+            )
+            latency["status"] = "failed"
+            latency["error"] = "invalid_youtube_url"
+            latency["finished_at"] = datetime.now().isoformat()
+            latency["timings_ms"]["total_e2e_ms"] = _ms_since(req_started)
+            _write_latency(latency)
+            return
+        _monitoring_record_pipeline_start(update, mode="youtube", raw_input=raw)
+        context.user_data.pop("pending_title", None)
+        _clear_pipeline_status(context)
+        latency["mode"] = "youtube"
+        await _run_youtube_pipeline(update, context, raw, latency, req_started)
+        return
+
     if mode == "movie":
         await _handle_message_movie(update, context, raw)
         return
@@ -2529,7 +2857,11 @@ def _resolve_episode_dir(
     Locate Tier_lists episode folder for a loaded translations dir.
     Handles cache hits where translations exist but last_episode_dir was empty or path mismatched.
     """
-    from download_subtitles import get_tierlist_episode_dir, get_tierlist_movie_dir
+    from download_subtitles import (
+        get_tierlist_episode_dir,
+        get_tierlist_movie_dir,
+        get_tierlist_youtube_dir,
+    )
 
     if episode_dir_hint is not None:
         hinted = Path(episode_dir_hint).resolve()
@@ -2546,7 +2878,13 @@ def _resolve_episode_dir(
     if ti:
         series = str(ti.get("series") or context.user_data.get("last_series_name") or "").strip()
         if series:
-            if ti.get("is_movie"):
+            if ti.get("is_youtube"):
+                candidate = get_tierlist_youtube_dir(
+                    TIERLIST_BASE,
+                    series,
+                    str(ti.get("youtube_id") or ""),
+                )
+            elif ti.get("is_movie"):
                 yr = int(ti.get("year", 0))
                 candidate = get_tierlist_movie_dir(TIERLIST_BASE, series, yr)
             else:
@@ -3189,7 +3527,7 @@ def _read_translation_info_json(translations_dir: Path) -> Optional[Dict[str, An
 
 
 def _episode_info_from_translation_info(data: Dict[str, Any]) -> Dict[str, Any]:
-    return {
+    out = {
         "series": data.get("series") or "",
         "subtitle_file": data.get("source_subtitle") or "",
         "season_number": int(data.get("season_number", 0)),
@@ -3197,6 +3535,13 @@ def _episode_info_from_translation_info(data: Dict[str, Any]) -> Dict[str, Any]:
         "is_movie": bool(data.get("is_movie", False)),
         "year": int(data.get("year", 0)),
     }
+    if data.get("is_youtube"):
+        out["is_youtube"] = True
+        out["media_type"] = "youtube"
+        out["youtube_id"] = str(data.get("youtube_id") or "")
+        if data.get("source_url"):
+            out["source_url"] = str(data.get("source_url") or "")
+    return out
 
 
 def _resolve_subtitle_for_phrasal(
@@ -4031,6 +4376,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             await next_series(wrapped, context)
         elif data == "next_movie":
             await next_movie(wrapped, context)
+        elif data == "next_youtube":
+            await next_youtube(wrapped, context)
         else:
             await _reply_bot_message(
                 wrapped,
@@ -4077,6 +4424,7 @@ def main() -> None:
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("next", next_series))
     app.add_handler(CommandHandler("movie", next_movie))
+    app.add_handler(CommandHandler("youtube", next_youtube))
     app.add_handler(CommandHandler("full", send_full_list))
     app.add_handler(CommandHandler("mywords", show_my_words))
     app.add_handler(CommandHandler("phrasal", send_phrasal_placeholder))

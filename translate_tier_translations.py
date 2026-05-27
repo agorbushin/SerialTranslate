@@ -244,7 +244,16 @@ def resolve_subtitle_path(
         episode_number = int(episode_number)
 
     path: Optional[Path] = None
-    if episode_info.get("is_movie"):
+    if episode_info.get("is_youtube"):
+        if not series:
+            return _find_subtitle_under_base(
+                subtitle_base_dir,
+                subtitle_file,
+                season_number=None,
+                episode_number=None,
+            )
+        path = subtitle_base_dir / "YouTube" / series / subtitle_file
+    elif episode_info.get("is_movie"):
         if not series:
             return _find_subtitle_under_base(
                 subtitle_base_dir,
@@ -570,7 +579,13 @@ def run(
     base = (translations_base or TRANSLATIONS_BASE_DIR).resolve()
     from download_subtitles import get_translations_episode_dir, get_translations_movie_dir
 
-    if episode_info.get("is_movie"):
+    if episode_info.get("is_youtube"):
+        from download_subtitles import get_translations_youtube_dir
+
+        out_dir_early = get_translations_youtube_dir(
+            base, series_name, str(episode_info.get("youtube_id") or "")
+        )
+    elif episode_info.get("is_movie"):
         year = int(episode_info.get("year", 0))
         out_dir_early = get_translations_movie_dir(base, series_name, year)
     else:
@@ -786,6 +801,12 @@ def run(
     if episode_info.get("is_movie"):
         info["is_movie"] = True
         info["year"] = int(episode_info.get("year", 0))
+    if episode_info.get("is_youtube"):
+        info["is_youtube"] = True
+        info["media_type"] = "youtube"
+        info["youtube_id"] = str(episode_info.get("youtube_id") or "")
+        if episode_info.get("source_url"):
+            info["source_url"] = str(episode_info.get("source_url") or "")
     (out_dir / "translation_info.json").write_text(
         json.dumps(info, indent=2, ensure_ascii=False), encoding="utf-8"
     )

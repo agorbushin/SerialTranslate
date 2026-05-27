@@ -449,6 +449,25 @@ def extract_movie_info(subtitle_path: Path) -> Dict[str, Optional[str]]:
     return {"series": movie_name or "Unknown", "year": year}
 
 
+def extract_youtube_info(subtitle_path: Path) -> Dict[str, Optional[str]]:
+    """Extract YouTube title/id from path like .../YouTube/Title/title_VIDEOID.srt."""
+    parts = subtitle_path.parts
+    title = None
+    video_id = None
+    if "YouTube" in parts:
+        idx = parts.index("YouTube")
+        if idx + 1 < len(parts):
+            title = parts[idx + 1]
+    stem = subtitle_path.stem
+    m = re.search(r"_([A-Za-z0-9_-]{6,})$", stem)
+    if m:
+        video_id = m.group(1)
+    if not title:
+        title = re.sub(r"_[A-Za-z0-9_-]{6,}$", "", stem)
+        title = title.replace("_", " ").replace(".", " ").strip().title()
+    return {"series": title or "YouTube Video", "youtube_id": video_id}
+
+
 def save_tierlist_results_to_dir(
     tiers: Dict[str, List],
     output_episode_dir: Path,
@@ -463,6 +482,9 @@ def save_tierlist_results_to_dir(
     c1_assessment: Optional[Dict[str, str]] = None,
     is_movie: bool = False,
     movie_year: Optional[int] = None,
+    is_youtube: bool = False,
+    youtube_id: Optional[str] = None,
+    source_url: Optional[str] = None,
     min_episode_count: Optional[int] = None,
     gpt_coarse_cefr: Optional[Dict[str, str]] = None,
 ) -> None:
@@ -500,6 +522,8 @@ def save_tierlist_results_to_dir(
 
     output_episode_dir.mkdir(parents=True, exist_ok=True)
     season_label = (
+        "YouTube video" if is_youtube
+        else
         f"Movie ({movie_year})" if is_movie and movie_year
         else "Movie" if is_movie
         else f"Season {season_number}"
@@ -603,6 +627,13 @@ def save_tierlist_results_to_dir(
     if is_movie and movie_year is not None:
         metadata["is_movie"] = True
         metadata["year"] = movie_year
+    if is_youtube:
+        metadata["is_youtube"] = True
+        metadata["media_type"] = "youtube"
+        if youtube_id:
+            metadata["youtube_id"] = youtube_id
+        if source_url:
+            metadata["source_url"] = source_url
     if excluded_words:
         metadata["excluded_names_fantasy_count"] = len(excluded_words)
     if excluded_words is not None or c1_assessment or gpt_coarse_cefr:
@@ -618,7 +649,7 @@ def save_tierlist_results_to_dir(
     (output_episode_dir / "episode_info.json").write_text(
         json.dumps(metadata, indent=2, ensure_ascii=False), encoding="utf-8"
     )
-    ep_label = "" if is_movie else f", Episode {episode_number}"
+    ep_label = "" if (is_movie or is_youtube) else f", Episode {episode_number}"
     readme = (
         f"# {series_name} - Word Tier List\n\n"
         f"**{season_label}{ep_label}**\n\n"
@@ -763,15 +794,32 @@ def _try_skip_fresh_pipeline(
     season_number: Optional[int],
     episode_number: Optional[int],
     year: Optional[int],
+    is_youtube: bool = False,
+    youtube_id: Optional[str] = None,
 ) -> Optional[Path]:
     """If tier outputs exist and fingerprint matches subtitle file stat, return episode dir."""
-    from download_subtitles import get_tierlist_episode_dir, get_tierlist_movie_dir
+    from download_subtitles import (
+        get_tierlist_episode_dir,
+        get_tierlist_movie_dir,
+        get_tierlist_youtube_dir,
+    )
 
     sn = series_name
     sea_n = season_number
     ep_n = episode_number
     yr = year
-    if is_movie:
+    yt_id = youtube_id
+    if is_youtube:
+        if sn is None or yt_id is None:
+            info = extract_youtube_info(subtitle_path)
+            if sn is None:
+                sn = info["series"]
+            if yt_id is None:
+                yt_id = info.get("youtube_id")
+        if not sn:
+            return None
+        output_episode_dir = get_tierlist_youtube_dir(tierlist_base_dir, sn, yt_id or "")
+    elif is_movie:
         if sn is None or yr is None:
             info = extract_movie_info(subtitle_path)
             if sn is None:
@@ -828,6 +876,9 @@ def run_pipeline(
     episode_number: Optional[int] = None,
     is_movie: bool = False,
     year: Optional[int] = None,
+    is_youtube: bool = False,
+    youtube_id: Optional[str] = None,
+    source_url: Optional[str] = None,
     freq_path: Optional[Path] = None,
     filters_dir: Optional[Path] = None,
     max_english_freq: int = 20_000_000,
@@ -896,6 +947,8 @@ def run_pipeline(
             season_number,
             episode_number,
             year,
+            is_youtube=is_youtube,
+            youtube_id=youtube_id,
         )
         if skipped_dir is not None:
             timings_ms["pipeline_skipped"] = 1
@@ -928,7 +981,16 @@ def run_pipeline(
     timings_ms["parse_subtitle_ms"] = int((time.perf_counter() - phase_started) * 1000)
 
     # Resolve series/episode for GPT prompts (same logic as output paths)
-    if is_movie:
+    if is_youtube:
+        if series_name is None or youtube_id is None:
+            info = extract_youtube_info(subtitle_path)
+            if series_name is None:
+                series_name = info["series"]
+            if youtube_id is None:
+                youtube_id = info.get("youtube_id")
+        season_number = 0
+        episode_number = 0
+    elif is_movie:
         if series_name is None or year is None:
             info = extract_movie_info(subtitle_path)
             if series_name is None:
@@ -1070,8 +1132,16 @@ def run_pipeline(
             print(f"Warning: Name/fantasy filter failed ({e}), saving tier lists without filtering")
     timings_ms["gpt_filter_ms"] = int((time.perf_counter() - phase_started) * 1000)
 
-    from download_subtitles import get_tierlist_episode_dir, get_tierlist_movie_dir
-    if is_movie:
+    from download_subtitles import (
+        get_tierlist_episode_dir,
+        get_tierlist_movie_dir,
+        get_tierlist_youtube_dir,
+    )
+    if is_youtube:
+        output_episode_dir = get_tierlist_youtube_dir(
+            tierlist_base_dir, series_name, youtube_id or ""
+        )
+    elif is_movie:
         output_episode_dir = get_tierlist_movie_dir(
             tierlist_base_dir, series_name, year or 0
         )
@@ -1094,6 +1164,9 @@ def run_pipeline(
         c1_assessment=c1_assessment,
         is_movie=is_movie,
         movie_year=year if is_movie else None,
+        is_youtube=is_youtube,
+        youtube_id=youtube_id,
+        source_url=source_url,
         min_episode_count=min_episode_count if min_episode_count > 0 else None,
         gpt_coarse_cefr=gpt_coarse_cefr if gpt_coarse_cefr else None,
     )
@@ -1120,6 +1193,9 @@ def main() -> None:
     parser.add_argument("--episode", type=int, help="Episode number (default: from filename)")
     parser.add_argument("--movie", action="store_true", help="Treat as movie (use Tier_lists/Movies/... path)")
     parser.add_argument("--year", type=int, default=None, help="Movie release year (for movies)")
+    parser.add_argument("--youtube", action="store_true", help="Treat as YouTube video (use Tier_lists/YouTube/... path)")
+    parser.add_argument("--youtube-id", type=str, default=None, help="YouTube video id")
+    parser.add_argument("--source-url", type=str, default=None, help="Original source URL")
     parser.add_argument("--freq-list", type=Path, help="English frequency CSV")
     parser.add_argument("--max-english-freq", type=int, default=20_000_000, help="Max English freq for Tier 1")
     parser.add_argument(
@@ -1147,6 +1223,9 @@ def main() -> None:
         episode_number=args.episode,
         is_movie=args.movie,
         year=args.year,
+        is_youtube=args.youtube,
+        youtube_id=args.youtube_id,
+        source_url=args.source_url,
         freq_path=args.freq_list or base_dir / "Frequency list" / "English" / "unigram_freq.csv",
         max_english_freq=args.max_english_freq,
         min_episode_count=args.min_episode_count,
