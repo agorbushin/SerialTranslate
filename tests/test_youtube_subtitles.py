@@ -6,7 +6,14 @@ from download_subtitles import (
     get_youtube_subtitle_path,
 )
 from translate_tier_translations import resolve_subtitle_path
-from youtube_subtitles import extract_youtube_video_id, is_youtube_url, vtt_to_srt
+from youtube_subtitles import (
+    BOT_CHECK_HINT,
+    _cli_cookie_args,
+    _friendly_youtube_error,
+    extract_youtube_video_id,
+    is_youtube_url,
+    vtt_to_srt,
+)
 
 
 def test_youtube_url_detection_and_id_extraction():
@@ -63,3 +70,27 @@ def test_resolve_subtitle_path_supports_youtube_metadata(tmp_path):
     (episode_dir / "episode_info.json").write_text(json.dumps(info), encoding="utf-8")
 
     assert resolve_subtitle_path(episode_dir, info, subtitle_base, None) == subtitle_path
+
+
+def test_cookie_env_builds_yt_dlp_cli_args(monkeypatch):
+    monkeypatch.setenv("YTDLP_COOKIES", "/tmp/cookies.txt")
+    monkeypatch.setenv("YTDLP_COOKIES_FROM_BROWSER", "chrome")
+
+    assert _cli_cookie_args() == [
+        "--cookies",
+        "/tmp/cookies.txt",
+        "--cookies-from-browser",
+        "chrome",
+    ]
+
+
+def test_bot_check_error_is_actionable_without_cookie_config(monkeypatch):
+    monkeypatch.delenv("YTDLP_COOKIES", raising=False)
+    monkeypatch.delenv("YTDLP_COOKIES_FROM_BROWSER", raising=False)
+
+    msg = _friendly_youtube_error(
+        "ERROR: [youtube] abc: Sign in to confirm you’re not a bot. "
+        "Use --cookies-from-browser or --cookies for the authentication."
+    )
+
+    assert msg == BOT_CHECK_HINT

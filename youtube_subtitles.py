@@ -11,6 +11,7 @@ from __future__ import annotations
 import html
 import importlib.util
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -26,6 +27,11 @@ YOUTUBE_URL_RE = re.compile(
     r"(?:https?://)?(?:www\.|m\.)?"
     r"(?:youtube\.com/(?:watch\?v=|shorts/|embed/)|youtu\.be/)"
     r"(?P<id>[A-Za-z0-9_-]{6,})"
+)
+BOT_CHECK_HINT = (
+    "YouTube is asking for a signed-in browser session. Set "
+    "YTDLP_COOKIES_FROM_BROWSER=chrome (or safari/firefox) on the bot machine, "
+    "or set YTDLP_COOKIES=/path/to/cookies.txt."
 )
 
 
@@ -80,6 +86,54 @@ def _require_yt_dlp() -> None:
         )
 
 
+def _cookies_file_from_env() -> str:
+    return (os.environ.get("YTDLP_COOKIES") or "").strip()
+
+
+def _cookies_from_browser_from_env() -> str:
+    return (os.environ.get("YTDLP_COOKIES_FROM_BROWSER") or "").strip()
+
+
+def _has_cookie_config() -> bool:
+    return bool(_cookies_file_from_env() or _cookies_from_browser_from_env())
+
+
+def _cli_cookie_args() -> List[str]:
+    args: List[str] = []
+    cookies = _cookies_file_from_env()
+    if cookies:
+        args.extend(["--cookies", cookies])
+    browser = _cookies_from_browser_from_env()
+    if browser:
+        args.extend(["--cookies-from-browser", browser])
+    return args
+
+
+def _python_cookie_opts() -> Dict[str, Any]:
+    opts: Dict[str, Any] = {}
+    cookies = _cookies_file_from_env()
+    if cookies:
+        opts["cookiefile"] = cookies
+    return opts
+
+
+def _needs_cookie_auth(message: str) -> bool:
+    msg = (message or "").lower()
+    return (
+        "sign in to confirm" in msg
+        or "not a bot" in msg
+        or "use --cookies-from-browser" in msg
+        or "use --cookies" in msg
+    )
+
+
+def _friendly_youtube_error(message: str) -> str:
+    clean = (message or "").strip()
+    if _needs_cookie_auth(clean) and not _has_cookie_config():
+        return BOT_CHECK_HINT
+    return clean
+
+
 def _select_caption(
     info: Dict[str, Any],
     preferred_languages: Iterable[str],
@@ -107,6 +161,7 @@ def _extract_info_with_python_api(url: str) -> Dict[str, Any]:
         "quiet": True,
         "skip_download": True,
         "no_warnings": True,
+        **_python_cookie_opts(),
     }
     with YoutubeDL(opts) as ydl:
         return ydl.extract_info(url, download=False)
@@ -129,6 +184,7 @@ def _download_caption_with_python_api(
         "subtitlesformat": "vtt/srt/best",
         "writesubtitles": not auto_subs,
         "writeautomaticsub": auto_subs,
+        **_python_cookie_opts(),
     }
     with YoutubeDL(opts) as ydl:
         return ydl.extract_info(url, download=True)
@@ -139,13 +195,21 @@ def _extract_info_with_cli(url: str) -> Dict[str, Any]:
     if not cmd:
         raise RuntimeError("yt-dlp executable not found.")
     proc = subprocess.run(
-        [*cmd, "--dump-single-json", "--skip-download", "--no-warnings", url],
+        [
+            *cmd,
+            "--dump-single-json",
+            "--skip-download",
+            "--no-warnings",
+            *_cli_cookie_args(),
+            url,
+        ],
         text=True,
         capture_output=True,
         check=False,
     )
     if proc.returncode != 0:
-        raise RuntimeError((proc.stderr or proc.stdout or "yt-dlp metadata failed").strip())
+        msg = (proc.stderr or proc.stdout or "yt-dlp metadata failed").strip()
+        raise RuntimeError(_friendly_youtube_error(msg))
     return json.loads(proc.stdout)
 
 
@@ -168,12 +232,14 @@ def _download_caption_with_cli(
         "vtt/srt/best",
         "-o",
         str(temp_dir / "%(id)s.%(ext)s"),
+        *_cli_cookie_args(),
     ]
     args.append("--write-auto-subs" if auto_subs else "--write-subs")
     args.append(url)
     proc = subprocess.run(args, text=True, capture_output=True, check=False)
     if proc.returncode != 0:
-        raise RuntimeError((proc.stderr or proc.stdout or "yt-dlp subtitle download failed").strip())
+        msg = (proc.stderr or proc.stdout or "yt-dlp subtitle download failed").strip()
+        raise RuntimeError(_friendly_youtube_error(msg))
     return _extract_info_with_cli(url)
 
 
@@ -265,10 +331,15 @@ def download_youtube_subtitle(
     """
     _require_yt_dlp()
     preferred = list(preferred_languages or ("en", "en-US", "en-GB"))
+    use_cli_for_browser_cookies = bool(_cookies_from_browser_from_env())
     try:
+        if use_cli_for_browser_cookies:
+            raise RuntimeError("Using yt-dlp CLI for browser cookies")
         info = _extract_info_with_python_api(url)
         use_python_api = True
-    except Exception:
+    except Exception as e:
+        if _needs_cookie_auth(str(e)) and not _has_cookie_config():
+            raise RuntimeError(BOT_CHECK_HINT) from e
         info = _extract_info_with_cli(url)
         use_python_api = False
 
