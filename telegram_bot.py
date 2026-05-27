@@ -36,7 +36,7 @@ from title_resolution import (
     pending_to_dict,
     resolve_input_async,
 )
-from translation_modes import DEFAULT_TRANSLATION_MODE
+from translation_modes import DEFAULT_TRANSLATION_MODE, TranslationMode, normalize_translation_mode
 
 TELEGRAM_BOT_TOKEN = (os.environ.get("TELEGRAM_BOT_TOKEN") or "").strip()
 OPENAI_API_KEY = get_openai_api_key()
@@ -73,6 +73,8 @@ _IDIOMS_WIP_MESSAGE = (
 )
 LATENCY_METRICS_BASE = BASE_DIR / "latency_metrics"
 OPENAI_HTTP_TIMEOUT_SEC = 45.0
+USER_TRANSLATION_MODE_KEY = "translation_mode"
+CALLBACK_SET_TRANSLATION_MODE_PREFIX = "set_translation_mode:"
 
 
 def _md1(text: str) -> str:
@@ -735,7 +737,8 @@ def keyboard_discovery(context: ContextTypes.DEFAULT_TYPE) -> InlineKeyboardMark
             [
                 InlineKeyboardButton("📺 Next series", callback_data="next_series"),
                 InlineKeyboardButton("▶️ YouTube", callback_data="next_youtube"),
-            ]
+            ],
+            [InlineKeyboardButton("⚙️ Translation setting", callback_data="open_translation_settings")],
         ]
     )
 
@@ -784,8 +787,72 @@ def keyboard_loaded(
             ]
         )
     rows.append([InlineKeyboardButton("📺 Next series", callback_data="next_series")])
+    rows.append([InlineKeyboardButton("⚙️ Translation setting", callback_data="open_translation_settings")])
     rows.append([InlineKeyboardButton("📚 My dictionary", callback_data="show_my_words")])
     return InlineKeyboardMarkup(rows)
+
+
+def _get_user_translation_mode(context: ContextTypes.DEFAULT_TYPE) -> TranslationMode:
+    raw = context.user_data.get(USER_TRANSLATION_MODE_KEY)
+    if raw is None:
+        return DEFAULT_TRANSLATION_MODE
+    return normalize_translation_mode(str(raw))
+
+
+def _set_user_translation_mode(context: ContextTypes.DEFAULT_TYPE, mode: str) -> TranslationMode:
+    normalized = normalize_translation_mode(mode)
+    context.user_data[USER_TRANSLATION_MODE_KEY] = normalized
+    return normalized
+
+
+def _translation_mode_label(mode: TranslationMode) -> str:
+    if mode == "russian":
+        return "Russian translation"
+    return "Dictionary translation (English)"
+
+
+def _settings_keyboard(mode: TranslationMode) -> InlineKeyboardMarkup:
+    en_prefix = "✅ " if mode == "english_dictionary" else ""
+    ru_prefix = "✅ " if mode == "russian" else ""
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    f"{en_prefix}📘 Dictionary (EN)",
+                    callback_data=f"{CALLBACK_SET_TRANSLATION_MODE_PREFIX}english_dictionary",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    f"{ru_prefix}🇷🇺 Russian",
+                    callback_data=f"{CALLBACK_SET_TRANSLATION_MODE_PREFIX}russian",
+                )
+            ],
+        ]
+    )
+
+
+def _settings_text(mode: TranslationMode) -> str:
+    return (
+        "⚙️ *Translation setting*\n\n"
+        f"Current: *{_md1(_translation_mode_label(mode))}*\n\n"
+        "Choose translation output style:\n"
+        "- *Dictionary (EN)* — English dictionary-style glosses\n"
+        "- *Russian* — Russian translation\n\n"
+        "_Applies to newly generated word lists and phrasal verbs._"
+    )
+
+
+async def settings(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, *, query=None
+) -> None:
+    mode = _get_user_translation_mode(context)
+    await _reply_bot_message(
+        update,
+        query=query,
+        text=_settings_text(mode),
+        reply_markup=_settings_keyboard(mode),
+    )
 
 
 def _csv_data_row_count(csv_path: Path) -> int:
@@ -1028,6 +1095,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "👋 **Welcome to SerialTranslate**\n\n"
         "Gives a list of hard words with short English meanings from a specific episode of a TV series, a movie, or a YouTube video.\n\n"
         "Keeps track of the words you want to learn\n\n"
+        "Use /settings to switch translation mode: Dictionary (EN) or Russian.\n\n"
         "To start enter the name of a TV series with season and episode, a movie with a year, or a YouTube link \n(e.g. Fallout S2E2, _The Matrix 1999_).\n\n"
         f"_v{BOT_VERSION} · {build}_",
         parse_mode="Markdown",
@@ -1493,7 +1561,11 @@ async def _run_movie_pipeline(
             ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
-                    lambda: _do_translate(episode_dir, subtitle_path),
+                    lambda: _do_translate(
+                        episode_dir,
+                        subtitle_path,
+                        translation_mode=_get_user_translation_mode(context),
+                    ),
                 ),
                 timeout=timeout,
             )
@@ -1603,7 +1675,10 @@ async def _run_movie_pipeline(
             loop.run_in_executor(
                 None,
                 lambda ed=episode_dir, sp=subtitle_path, raw=subtitle_raw_handoff: _do_translate(
-                    ed, sp, subtitle_raw=raw
+                    ed,
+                    sp,
+                    subtitle_raw=raw,
+                    translation_mode=_get_user_translation_mode(context),
                 ),
             ),
             timeout=timeout,
@@ -1765,7 +1840,11 @@ async def _run_series_pipeline(
             ok, out_dir, trans_err, translator_metrics = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
-                    lambda ed=episode_dir, sp=subtitle_path: _do_translate(ed, sp),
+                    lambda ed=episode_dir, sp=subtitle_path: _do_translate(
+                        ed,
+                        sp,
+                        translation_mode=_get_user_translation_mode(context),
+                    ),
                 ),
                 timeout=timeout,
             )
@@ -1871,7 +1950,10 @@ async def _run_series_pipeline(
             loop.run_in_executor(
                 None,
                 lambda ed=episode_dir, sp=subtitle_path, raw=subtitle_raw_handoff: _do_translate(
-                    ed, sp, subtitle_raw=raw
+                    ed,
+                    sp,
+                    subtitle_raw=raw,
+                    translation_mode=_get_user_translation_mode(context),
                 ),
             ),
             timeout=timeout,
@@ -2063,6 +2145,7 @@ async def _run_youtube_pipeline(
                     episode_dir,
                     subtitle_path,
                     subtitle_raw=subtitle_raw_handoff,
+                    translation_mode=_get_user_translation_mode(context),
                 ),
             ),
             timeout=timeout,
@@ -2200,6 +2283,7 @@ def _do_translate(
     translation_overwrite: bool = False,
     *,
     tier_ids: Optional[Collection[str]] = None,
+    translation_mode: TranslationMode = DEFAULT_TRANSLATION_MODE,
 ) -> Tuple[bool, Optional[Path], Optional[str], Optional[Dict[str, Any]]]:
     """Translate selected tiers and save to translations/. Returns (success, out_dir, error_reason, metrics).
 
@@ -2225,7 +2309,7 @@ def _do_translate(
         subtitle_raw=subtitle_raw,
         translation_overwrite=translation_overwrite,
         tier_ids=tiers,
-        translation_mode=DEFAULT_TRANSLATION_MODE,
+        translation_mode=translation_mode,
     )
     if not ok:
         return False, None, err or "Translation failed.", metrics
@@ -3245,7 +3329,12 @@ async def _send_rare_series_full_list(
             ok, _out_dir, trans_err, _metrics = await asyncio.wait_for(
                 loop.run_in_executor(
                     None,
-                    lambda ed=ed, p=sp, t=tid: _do_translate(ed, p, tier_ids=frozenset({t})),
+                    lambda ed=ed, p=sp, t=tid: _do_translate(
+                        ed,
+                        p,
+                        tier_ids=frozenset({t}),
+                        translation_mode=_get_user_translation_mode(context),
+                    ),
                 ),
                 timeout=timeout,
             )
@@ -3432,6 +3521,7 @@ async def send_b_level_words(
                             ed,
                             sp,
                             tier_ids=frozenset({TIER_ID_B1, TIER_ID_B2}),
+                            translation_mode=_get_user_translation_mode(context),
                         ),
                     ),
                     timeout=600.0,
@@ -3636,6 +3726,21 @@ def _load_phrasal_rows(translations_dir: Path) -> List[Tuple[str, str, str, str,
     return rows
 
 
+_CYRILLIC_RE = re.compile(r"[\u0400-\u04FF]")
+
+
+def _phrasal_rows_need_english_refresh(rows: List[Tuple[str, str, str, str, str]]) -> bool:
+    """Detect legacy non-English phrasal glosses (Russian/Cyrillic)."""
+    if not rows:
+        return False
+    sample = rows[: min(12, len(rows))]
+    cyr = 0
+    for _pv, _freq, tr, _ex, _note in sample:
+        if tr and _CYRILLIC_RE.search(tr):
+            cyr += 1
+    return cyr >= max(1, len(sample) // 3)
+
+
 def _load_idiom_rows(translations_dir: Path) -> List[Tuple[str, str, str, str, str]]:
     """Rows: expression, freq, translation, example, idiomacy_rating (or legacy idiomaticity_score)."""
     path = translations_dir / IDIOMATIC_EXPRESSIONS_CSV
@@ -3822,7 +3927,15 @@ async def send_phrasal_verbs(
     csv_path = translations_dir / PHRASAL_VERBS_CSV
     loop = asyncio.get_running_loop()
 
-    if not csv_path.exists():
+    need_rebuild = not csv_path.exists()
+    if csv_path.exists():
+        try:
+            existing_rows = _load_phrasal_rows(translations_dir)
+            need_rebuild = _phrasal_rows_need_english_refresh(existing_rows)
+        except Exception:
+            need_rebuild = True
+
+    if need_rebuild:
         if not OPENAI_API_KEY.strip():
             msg = (
                 "❌ *OPENAI_API_KEY* is not set.\n\n"
@@ -3845,7 +3958,7 @@ async def send_phrasal_verbs(
             return
 
         sn = _series_name_for_phrasal(translations_dir, context)
-        loading = "🔤 *Phrasal verbs*\n\n⏳ Extracting and translating…"
+        loading = "🔤 *Phrasal verbs*\n\n⏳ Extracting and translating (English dictionary glosses)…"
         await _reply_bot_message(
             update, query=query, text=loading, reply_markup=kb_after
         )
@@ -4378,6 +4491,18 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             await next_movie(wrapped, context)
         elif data == "next_youtube":
             await next_youtube(wrapped, context)
+        elif data == "open_translation_settings":
+            await settings(wrapped, context, query=query)
+        elif data.startswith(CALLBACK_SET_TRANSLATION_MODE_PREFIX):
+            selected = data.split(":", 1)[1] if ":" in data else ""
+            mode = _set_user_translation_mode(context, selected)
+            await _reply_bot_message(
+                wrapped,
+                query=query,
+                text=f"✅ Mode set: *{_md1(_translation_mode_label(mode))}*",
+                reply_markup=keyboard_discovery(context),
+            )
+            await settings(wrapped, context, query=query)
         else:
             await _reply_bot_message(
                 wrapped,
@@ -4429,6 +4554,7 @@ def main() -> None:
     app.add_handler(CommandHandler("mywords", show_my_words))
     app.add_handler(CommandHandler("phrasal", send_phrasal_placeholder))
     app.add_handler(CommandHandler("idioms", send_idioms_placeholder))
+    app.add_handler(CommandHandler("settings", settings))
     app.add_handler(CallbackQueryHandler(button_callback))
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document_placeholder))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

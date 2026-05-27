@@ -16,6 +16,57 @@ A separate module for downloading subtitles from the OpenSubtitles API.
 
 ## Usage
 
+### Daily Top Movies + Series Routine
+
+This routine uses an editable local list of popular movies and series, then
+downloads up to 80 new English subtitles per local calendar day from
+OpenSubtitles. Existing files are skipped, so it is safe to run more than once.
+
+Required `.env` values:
+
+```bash
+OPENSUBTITLES_API_KEY=...
+```
+
+Edit the local title list here:
+
+```bash
+config/top_subtitle_titles.json
+```
+
+Run once:
+
+```bash
+scripts/run_daily_top_subtitles.sh
+```
+
+Dry-run the plan without downloading:
+
+```bash
+scripts/run_daily_top_subtitles.sh --dry-run
+```
+
+Outputs:
+
+- Subtitles: `Subtitle/Movies/{movie}/...` and `Subtitle/{series}/Season N/...`
+- Top-title/queue list: `daily_top_subtitle_plan.json`
+- Daily count state: `daily_subtitle_state.json`
+
+Cron example for one daily run at 03:15:
+
+```cron
+15 3 * * * cd /Users/arseniygorbushin/Documents/SerialTranslate && mkdir -p logs && scripts/run_daily_top_subtitles.sh >> logs/daily_top_subtitles.log 2>&1
+```
+
+If you literally want the machine to wake the routine 80 times per day, schedule
+it every 1,080 seconds with launchd/systemd. Plain cron cannot express an exact
+18-minute interval across day boundaries; this cron example runs every 20 minutes
+instead. The script still keeps the daily cap at 80 new files:
+
+```cron
+*/20 * * * * cd /Users/arseniygorbushin/Documents/SerialTranslate && mkdir -p logs && scripts/run_daily_top_subtitles.sh >> logs/daily_top_subtitles.log 2>&1
+```
+
 ### Basic Usage
 
 ```bash

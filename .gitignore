@@ -16,6 +16,7 @@ env/
 *.tmp
 test_results/
 daily_subtitle_state.json
+daily_top_subtitle_plan.json
 monitoring_activity.json
 
 # JavaScript / mobile

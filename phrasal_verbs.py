@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Extract and translate phrasal verbs from subtitles.
+Extract and gloss phrasal verbs from subtitles.
 Phrasal verbs are verb + particle combinations (e.g., "give up", "look for").
+Default gloss style is learner-friendly English dictionary definitions.
 """
 
 import re
@@ -352,7 +353,7 @@ def _translate_phrasal_batch(
     """Returns translations, idiomaticity_scores, literality_scores, score_rationale."""
     context = subtitle_text[:3000] if len(subtitle_text) > 3000 else subtitle_text
     per_phrase = _format_phrasal_lines_for_prompt(pv_list, examples)
-    prompt = f"""You are translating multiword verb units from the TV series "{series_name}" for a **learner list of opaque phrasal / idiomatic verbs only**.
+    prompt = f"""You are glossing multiword verb units from the TV series "{series_name}" for a **learner list of opaque phrasal / idiomatic verbs only**.
 
 PHRASES (with episode lines where each appears — use these to choose the correct sense):
 {per_phrase}
@@ -362,7 +363,10 @@ GENERAL SUBTITLE CONTEXT (same episode):
 
 For EACH phrase listed above you must output:
 
-1. **translation** in {target_language}: accurate, natural, matches EXAMPLE line(s) when present; 1-3 words when possible.
+1. **translation** in {target_language}: dictionary-style learner gloss for the sense used here.
+   - Keep it concise: usually 3-10 words.
+   - Prefer infinitive/base-definition style when natural (e.g., "to stop trying", "to discover").
+   - Do NOT output Russian or any other language.
 
 2. **idiomaticity_score** (integer 1-10): How **fixed / non-literal / idiomatic** the English unit is **in this context** as a verb construction worth memorizing as a chunk.
    - **1-3:** Transparent grammar + preposition/particle (e.g. "believe in", "look at", "think about", "wait for", "depend on", "listen to") — the meaning follows from verb + preposition even if colloquial.
@@ -373,15 +377,15 @@ For EACH phrase listed above you must output:
 3. **literality_score** (integer 1-10): How **directly** the {target_language} gloss maps **word-for-word** to the English pieces (verb + particle/preposition).
    - **1-3:** Clearly **not** word-for-word; translation is idiomatic or rephrased (good for this list).
    - **4-6:** Partially compositional.
-   - **7-10:** Near **direct calque**: you could get the Russian by translating the verb and the preposition/particle separately (e.g. "believe" + "in" → "верить" + "в"). **These must get high literality** even if the English is a common "phrasal" textbook entry.
+   - **7-10:** Near transparent composition: you can derive the meaning directly from verb + particle/preposition (e.g. "believe in" ≈ "to have faith in"). **These must get high literality** even if the phrase appears in textbooks.
 
-**HARD RULE:** If the pair is essentially **verb + common preposition** and the translation is a **literal match** of those parts (like "believe in" → "верить в"), set **idiomaticity_score 1-3** and **literality_score 8-10**. Such items must NOT be recommended for an opaque-phrasal learner list.
+**HARD RULE:** If the pair is essentially **verb + common preposition** and the gloss is a transparent compositional reading (like "believe in" → "to have faith in"), set **idiomaticity_score 1-3** and **literality_score 8-10**. Such items must NOT be recommended for an opaque-phrasal learner list.
 
 4. **score_rationale** (one short English phrase per key, max ~15 words): why you chose those two scores.
 
 Return ONLY JSON with this shape (exact keys for every phrase in the list, exact English spelling):
 {{
-    "translations": {{ "give up": "сдаваться", "believe in": "верить в" }},
+    "translations": {{ "give up": "to stop trying", "believe in": "to have faith in" }},
     "idiomaticity_scores": {{ "give up": 9, "believe in": 2 }},
     "literality_scores": {{ "give up": 2, "believe in": 9 }},
     "score_rationale": {{ "give up": "opaque particle sense", "believe in": "verb+prep calque" }}
@@ -393,7 +397,7 @@ Return ONLY JSON with this shape (exact keys for every phrase in the list, exact
             {
                 "role": "system",
                 "content": (
-                    "You translate verb phrases and output strict JSON with keys: "
+                    "You write concise English dictionary-style glosses for verb phrases and output strict JSON with keys: "
                     "translations, idiomaticity_scores, literality_scores, score_rationale. "
                     "All score values are integers 1-10. Rationale values are short English strings."
                 ),
@@ -435,7 +439,7 @@ def translate_phrasal_verbs(
     subtitle_text: str,
     series_name: str,
     api_key: str,
-    target_language: str = "Russian",
+    target_language: str = "English",
     examples: Optional[Dict[str, List[str]]] = None,
 ) -> Tuple[Dict[str, str], Dict[str, int], Dict[str, int], Dict[str, str]]:
     """Translate and score each phrase (idiomaticity + literality + short rationale).
