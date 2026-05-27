@@ -71,6 +71,23 @@ class TestCommandHandlers:
         assert "series" in message.lower()
         assert "Fallout" in message or "Game of Thrones" in message
         assert parse_mode == 'Markdown'
+
+    @pytest.mark.asyncio
+    async def test_server_api_test_command(self, mock_update, mock_context, monkeypatch):
+        """Test /test command replies with API health report."""
+        import telegram_bot as tb
+
+        async def fake_run_server_api_tests():
+            return "Server API test\n[OK] OpenAI\n[OK] OpenSubtitles key #1"
+
+        monkeypatch.setattr(tb, "_run_server_api_tests", fake_run_server_api_tests)
+
+        await tb.server_api_test(mock_update, mock_context)
+
+        assert mock_update.message.reply_text.call_count == 2
+        assert mock_update.message.reply_text.call_args_list[0][0][0] == "Testing server APIs..."
+        assert "Server API test" in mock_update.message.reply_text.call_args_list[1][0][0]
+        assert mock_update.message.reply_text.call_args_list[1][1]["parse_mode"] is None
     
     @pytest.mark.asyncio
     async def test_full_command_with_context(self, mock_update, mock_context, temp_dir):

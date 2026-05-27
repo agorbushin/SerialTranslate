@@ -10,7 +10,7 @@ git pull origin main
 if [[ -d .venv ]]; then
   echo "==> pip install"
   .venv/bin/python -m pip install -U pip
-  .venv/bin/pip install -U python-telegram-bot openai requests
+  .venv/bin/pip install -U python-telegram-bot openai requests yt-dlp
 fi
 
 if systemctl list-unit-files serialtranslate-bot.service &>/dev/null; then

@@ -28,7 +28,12 @@ from telegram.ext import (
     ContextTypes,
 )
 
-from env_config import get_openai_api_key, get_opensubtitles_api_key, resolve_openai_api_key
+from env_config import (
+    get_openai_api_key,
+    get_opensubtitles_api_key,
+    get_opensubtitles_api_keys,
+    resolve_openai_api_key,
+)
 from title_resolution import (
     ResolvedTitle,
     detect_media_intent,
@@ -727,6 +732,80 @@ async def monitoring(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         return
     _monitoring_record_event(update, "command", "monitoring")
     await update.message.reply_text(_monitoring_render_report())
+
+
+def _short_api_error(error: Optional[str], limit: int = 220) -> str:
+    text = " ".join(str(error or "").split())
+    if len(text) <= limit:
+        return text
+    return text[: limit - 3] + "..."
+
+
+def _format_api_status(name: str, ok: bool, error: Optional[str] = None) -> str:
+    if ok:
+        return f"[OK] {name}"
+    suffix = f": {_short_api_error(error)}" if error else ""
+    return f"[FAIL] {name}{suffix}"
+
+
+def _test_single_opensubtitles_key(api_key: str) -> Tuple[bool, Optional[str]]:
+    from download_subtitles import OpenSubtitlesDownloader
+
+    downloader = OpenSubtitlesDownloader(api_key=api_key)
+    downloader.api_keys = [api_key]
+    downloader._set_active_key(0)
+    try:
+        results = downloader.search_subtitles(
+            query="Friends",
+            languages=["en"],
+            season_number=1,
+            episode_number=1,
+        )
+    except Exception as exc:
+        return False, str(exc)
+    if results:
+        return True, None
+    return False, "OpenSubtitles returned no results for the test query"
+
+
+async def _run_server_api_tests() -> str:
+    from api_health_check import APIHealthChecker
+
+    lines = ["Server API test"]
+    checker = APIHealthChecker()
+
+    openai_ok, openai_error, _ = await checker.test_openai_api()
+    lines.append(_format_api_status("OpenAI", openai_ok, openai_error))
+
+    opensubs_keys = get_opensubtitles_api_keys()
+    if not opensubs_keys:
+        lines.append("[FAIL] OpenSubtitles: no API keys configured")
+    else:
+        lines.append(f"OpenSubtitles keys configured: {len(opensubs_keys)}")
+        tasks = [
+            asyncio.to_thread(_test_single_opensubtitles_key, key)
+            for key in opensubs_keys
+        ]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for index, result in enumerate(results, start=1):
+            if isinstance(result, Exception):
+                lines.append(
+                    _format_api_status(
+                        f"OpenSubtitles key #{index}", False, str(result)
+                    )
+                )
+                continue
+            ok, error = result
+            lines.append(_format_api_status(f"OpenSubtitles key #{index}", ok, error))
+
+    return "\n".join(lines)
+
+
+async def server_api_test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    _monitoring_record_event(update, "command", "test")
+    await update.message.reply_text("Testing server APIs...")
+    report = await _run_server_api_tests()
+    await update.message.reply_text(report, parse_mode=None)
 
 
 def keyboard_discovery(context: ContextTypes.DEFAULT_TYPE) -> InlineKeyboardMarkup:
@@ -4546,6 +4625,7 @@ def main() -> None:
     print("Bot running. Real output: hard-word translations saved under translations/", flush=True)
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(CommandHandler("monitoring", monitoring))
+    app.add_handler(CommandHandler("test", server_api_test))
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("next", next_series))
     app.add_handler(CommandHandler("movie", next_movie))

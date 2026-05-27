@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 _REPO_ROOT = Path(__file__).resolve().parent
 _DOTENV_PATH = _REPO_ROOT / ".env"
@@ -50,7 +50,56 @@ def resolve_openai_api_key(explicit: Optional[str] = None) -> str:
 
 
 def get_opensubtitles_api_key() -> str:
-    return (os.environ.get("OPENSUBTITLES_API_KEY") or "").strip()
+    primary = (os.environ.get("OPENSUBTITLES_API_KEY") or "").strip()
+    if primary:
+        return primary
+    for env_name in (
+        "OPENSUBTITLES_API_KEY_2",
+        "OPENSUBTITLES_API_KEY_ALT",
+        "OPENSUBTITLES_API_ALTERNATIVE_KEY",
+        "OPENSUBTITLES_API_KEY_FALLBACK",
+        "opensubtitles_api_alternative_key",
+    ):
+        key = (os.environ.get(env_name) or "").strip()
+        if key:
+            return key
+    values = _split_env_values(os.environ.get("OPENSUBTITLES_API_KEYS") or "")
+    return values[0] if values else ""
+
+
+def _split_env_values(value: str) -> List[str]:
+    values: List[str] = []
+    for part in value.replace("\n", ",").replace(";", ",").split(","):
+        part = part.strip()
+        if part:
+            values.append(part)
+    return values
+
+
+def get_opensubtitles_api_keys(explicit: Optional[str] = None) -> List[str]:
+    """Return OpenSubtitles API keys in fallback order, de-duplicated."""
+    raw_keys: List[str] = []
+    if explicit and str(explicit).strip():
+        raw_keys.append(str(explicit).strip())
+
+    raw_keys.append(get_opensubtitles_api_key())
+    for env_name in (
+        "OPENSUBTITLES_API_KEY_2",
+        "OPENSUBTITLES_API_KEY_ALT",
+        "OPENSUBTITLES_API_ALTERNATIVE_KEY",
+        "OPENSUBTITLES_API_KEY_FALLBACK",
+        "opensubtitles_api_alternative_key",
+    ):
+        raw_keys.append((os.environ.get(env_name) or "").strip())
+    raw_keys.extend(_split_env_values(os.environ.get("OPENSUBTITLES_API_KEYS") or ""))
+
+    keys: List[str] = []
+    seen = set()
+    for key in raw_keys:
+        if key and key not in seen:
+            seen.add(key)
+            keys.append(key)
+    return keys
 
 
 def get_tmdb_api_key() -> str:

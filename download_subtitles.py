@@ -184,18 +184,87 @@ class OpenSubtitlesDownloader:
     """Download subtitles from OpenSubtitles API and save under Subtitle/{series}/{season}/."""
 
     BASE_URL = "https://api.opensubtitles.com/api/v1"
+    FALLBACK_STATUS_CODES = {401, 403, 406, 429}
 
     def __init__(
         self,
         api_key: Optional[str] = None,
         user_agent: str = "SerialTranslate SubtitleDownloader 1.0",
     ):
-        self.api_key = api_key or _default_api_key()
+        from env_config import get_opensubtitles_api_keys
+
+        self.api_keys = get_opensubtitles_api_keys(api_key)
+        self.api_key = self.api_keys[0] if self.api_keys else ""
+        self.user_agent = user_agent
         self.headers = {
             "User-Agent": user_agent,
             "Accept": "application/json",
             "Api-Key": self.api_key,
         }
+
+    def _set_active_key(self, index: int) -> None:
+        self.api_key = self.api_keys[index]
+        self.headers["Api-Key"] = self.api_key
+
+    def _request_with_key_fallback(
+        self, method: str, url: str, **kwargs
+    ) -> requests.Response:
+        """Send an OpenSubtitles API request, retrying fallback keys on auth/quota failures."""
+        if not self.api_keys:
+            response = requests.request(method, url, headers=self.headers, **kwargs)
+            response.raise_for_status()
+            return response
+
+        last_error: Optional[Exception] = None
+        try:
+            start_index = self.api_keys.index(self.api_key)
+        except ValueError:
+            start_index = 0
+        key_indices = list(range(start_index, len(self.api_keys))) + list(
+            range(0, start_index)
+        )
+        for attempt_index, index in enumerate(key_indices):
+            key = self.api_keys[index]
+            self._set_active_key(index)
+            headers = dict(self.headers)
+            headers["Api-Key"] = key
+            try:
+                if method.lower() == "get":
+                    response = requests.get(url, headers=headers, **kwargs)
+                elif method.lower() == "post":
+                    response = requests.post(url, headers=headers, **kwargs)
+                else:
+                    response = requests.request(method, url, headers=headers, **kwargs)
+                response.raise_for_status()
+                return response
+            except requests.HTTPError as e:
+                last_error = e
+                status_code = e.response.status_code if e.response is not None else None
+                if (
+                    status_code in self.FALLBACK_STATUS_CODES
+                    and attempt_index < len(key_indices) - 1
+                ):
+                    print(
+                        f"OpenSubtitles API key failed with HTTP {status_code}; "
+                        f"retrying with fallback key {attempt_index + 2}/{len(key_indices)}."
+                    )
+                    continue
+                raise
+        if last_error:
+            raise last_error
+        raise RuntimeError("OpenSubtitles request failed before sending")
+
+    def search_subtitles_with_params(self, params: Dict[str, str]) -> List[Dict]:
+        """Search for subtitles using already-built OpenSubtitles API params."""
+        url = f"{self.BASE_URL}/subtitles"
+        try:
+            response = self._request_with_key_fallback(
+                "get", url, params=params, timeout=15
+            )
+            data = response.json()
+            return data.get("data") or []
+        except Exception as e:
+            raise RuntimeError(f"OpenSubtitles search failed: {e}") from e
 
     def search_subtitles(
         self,
@@ -205,7 +274,6 @@ class OpenSubtitlesDownloader:
         episode_number: Optional[int] = None,
     ) -> List[Dict]:
         """Search for subtitles. Returns list of result items from API."""
-        url = f"{self.BASE_URL}/subtitles"
         params: Dict[str, str] = {
             "languages": ",".join(languages),
             "query": query,
@@ -215,20 +283,15 @@ class OpenSubtitlesDownloader:
         if episode_number is not None:
             params["episode_number"] = str(episode_number)
 
-        try:
-            response = requests.get(url, params=params, headers=self.headers, timeout=15)
-            response.raise_for_status()
-            data = response.json()
-            return data.get("data") or []
-        except Exception as e:
-            raise RuntimeError(f"OpenSubtitles search failed: {e}") from e
+        return self.search_subtitles_with_params(params)
 
     def _download_file(self, file_id: str) -> bytes:
         """Get download link and return file bytes."""
         url = f"{self.BASE_URL}/download"
         payload = {"file_id": file_id}
-        response = requests.post(url, json=payload, headers=self.headers, timeout=30)
-        response.raise_for_status()
+        response = self._request_with_key_fallback(
+            "post", url, json=payload, timeout=30
+        )
         result = response.json()
         link = result.get("link")
         if not link:

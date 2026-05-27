@@ -10,8 +10,6 @@ import re
 from pathlib import Path
 from typing import Optional, List, Dict
 
-import requests
-
 from download_subtitles import (
     OpenSubtitlesDownloader,
     get_movie_subtitle_path,
@@ -75,12 +73,8 @@ def download_movie_subtitle(
         if year and year > 0:
             params["year"] = str(year)
 
-    url = f"{downloader.BASE_URL}/subtitles"
     try:
-        resp = requests.get(url, params=params, headers=downloader.headers, timeout=15)
-        resp.raise_for_status()
-        data = resp.json()
-        results = data.get("data") or []
+        results = downloader.search_subtitles_with_params(params)
     except Exception as e:
         raise RuntimeError(f"OpenSubtitles search failed: {e}") from e
 
